@@ -4,5 +4,6 @@ WORKDIR /app
 
 ENV NODE_ENV=development
 
-CMD ["npm", "i"]
+CMD ["rm", "rf", "node_modules", "package-lock.json"]
+CMD ["npm", "install"]
 CMD ["npm", "run", "dev"]
