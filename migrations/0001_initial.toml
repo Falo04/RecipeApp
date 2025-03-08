@@ -1,0 +1,55 @@
+[Migration]
+Hash = "1057218339240581843"
+Initial = true
+Replaces = []
+
+[[Migration.Operations]]
+Type = "CreateModel"
+Name = "recipe"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/recipes.rs"
+Line = 8
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "name"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "unique"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/recipes.rs"
+Line = 11
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "description"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 1024
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/recipes.rs"
+Line = 12
+Column = 9

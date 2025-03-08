@@ -11,6 +11,39 @@ services:
     build:
       dockerfile: ./build/dockerfiles/nginx-dev.Dockerfile
 
+  webserver-dev:
+    build:
+      dockerfile: ./build/dockerfiles/webserver-dev.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres-vol
+    networks:
+      - net-food
+    volumes:
+      - ./webserver/migrations:/migrations
+    env_file: [.env]
+
+  postgres-vol:
+    shm_size: 128mb
+    restart: unless-stopped
+    networks:
+      - net-food
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres-vol:/var/lib/postgresql/data
+    build:
+      dockerfile: ./build/dockerfiles/postgres.Dockerfile
+
+  jaeger-dev:
+    networks: [net-food]
+    env_file: [.env]
+    build:
+      dockerfile: ./build/dockerfiles/jaeger.Dockerfile
+
   # frontend-dev:
   #   restart: unless-stopped
   #   volumes:
@@ -25,3 +58,7 @@ services:
 networks:
   net-food:
     driver: bridge
+
+volumes:
+  postgres-vol:
+    name: food-postgres-vol
