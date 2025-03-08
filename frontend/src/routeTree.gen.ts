@@ -8,17 +8,42 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as FoodFoodOverviewIndexImport } from './routes/_food/food/overview/index'
+import { Route as FoodFoodDashboardIndexImport } from './routes/_food/food/dashboard/index'
+
+// Create Virtual Routes
+
+const FoodLazyImport = createFileRoute('/_food')()
 
 // Create/Update Routes
+
+const FoodLazyRoute = FoodLazyImport.update({
+  id: '/_food',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/_food.lazy').then((d) => d.Route))
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const FoodFoodOverviewIndexRoute = FoodFoodOverviewIndexImport.update({
+  id: '/food/overview/',
+  path: '/food/overview/',
+  getParentRoute: () => FoodLazyRoute,
+} as any)
+
+const FoodFoodDashboardIndexRoute = FoodFoodDashboardIndexImport.update({
+  id: '/food/dashboard/',
+  path: '/food/dashboard/',
+  getParentRoute: () => FoodLazyRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +57,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_food': {
+      id: '/_food'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof FoodLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/_food/food/dashboard/': {
+      id: '/_food/food/dashboard/'
+      path: '/food/dashboard'
+      fullPath: '/food/dashboard'
+      preLoaderRoute: typeof FoodFoodDashboardIndexImport
+      parentRoute: typeof FoodLazyImport
+    }
+    '/_food/food/overview/': {
+      id: '/_food/food/overview/'
+      path: '/food/overview'
+      fullPath: '/food/overview'
+      preLoaderRoute: typeof FoodFoodOverviewIndexImport
+      parentRoute: typeof FoodLazyImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface FoodLazyRouteChildren {
+  FoodFoodDashboardIndexRoute: typeof FoodFoodDashboardIndexRoute
+  FoodFoodOverviewIndexRoute: typeof FoodFoodOverviewIndexRoute
+}
+
+const FoodLazyRouteChildren: FoodLazyRouteChildren = {
+  FoodFoodDashboardIndexRoute: FoodFoodDashboardIndexRoute,
+  FoodFoodOverviewIndexRoute: FoodFoodOverviewIndexRoute,
+}
+
+const FoodLazyRouteWithChildren = FoodLazyRoute._addFileChildren(
+  FoodLazyRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof FoodLazyRouteWithChildren
+  '/food/dashboard': typeof FoodFoodDashboardIndexRoute
+  '/food/overview': typeof FoodFoodOverviewIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof FoodLazyRouteWithChildren
+  '/food/dashboard': typeof FoodFoodDashboardIndexRoute
+  '/food/overview': typeof FoodFoodOverviewIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_food': typeof FoodLazyRouteWithChildren
+  '/_food/food/dashboard/': typeof FoodFoodDashboardIndexRoute
+  '/_food/food/overview/': typeof FoodFoodOverviewIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '' | '/food/dashboard' | '/food/overview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '' | '/food/dashboard' | '/food/overview'
+  id:
+    | '__root__'
+    | '/'
+    | '/_food'
+    | '/_food/food/dashboard/'
+    | '/_food/food/overview/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FoodLazyRoute: typeof FoodLazyRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FoodLazyRoute: FoodLazyRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +153,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/_food"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_food": {
+      "filePath": "_food.lazy.tsx",
+      "children": [
+        "/_food/food/dashboard/",
+        "/_food/food/overview/"
+      ]
+    },
+    "/_food/food/dashboard/": {
+      "filePath": "_food/food/dashboard/index.tsx",
+      "parent": "/_food"
+    },
+    "/_food/food/overview/": {
+      "filePath": "_food/food/overview/index.tsx",
+      "parent": "/_food"
     }
   }
 }
