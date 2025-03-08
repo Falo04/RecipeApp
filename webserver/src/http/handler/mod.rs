@@ -11,7 +11,11 @@ pub fn initialize() -> ApiContext<Router> {
         "/recipes",
         ApiContext::new()
             .tag("Recipes")
-            .handler(recipes::handler::get_all_recipes),
+            .handler(recipes::handler::get_all_recipes)
+            .handler(recipes::handler::get_recipe)
+            .handler(recipes::handler::create_recipe)
+            .handler(recipes::handler::update_recipe)
+            .handler(recipes::handler::delete_recipe),
     );
 
     ApiContext::new()

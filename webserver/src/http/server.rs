@@ -22,7 +22,7 @@ use crate::http::handler::FRONTEND_V1;
 #[instrument(skip_all, ret)]
 pub async fn run(config: &Config) -> std::io::Result<()> {
     let router = Router::new()
-        .merge(ApiContext::new().nest("api/frontend", handler::initialize()))
+        .merge(ApiContext::new().nest("/api", handler::initialize()))
         .nest("/docs", {
             Router::new().route(
                 "/frontend_v1.json",
@@ -33,6 +33,7 @@ pub async fn run(config: &Config) -> std::io::Result<()> {
     let socket_addr = SocketAddr::new(config.server.address, config.server.port);
 
     info!("Start to listen on http://{socket_addr}");
+    println!("Start to listen on http://{socket_addr}");
     let listener = TcpListener::bind(socket_addr).await?;
     axum::serve(listener, router)
         .with_graceful_shutdown(handle_signals().instrument(info_span!("signals")))

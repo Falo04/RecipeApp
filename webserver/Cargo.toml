@@ -10,7 +10,6 @@ dotenv = "0.15.0"
 
 # Webframework
 axum = { version = "~0.8", features = ["ws"] } # Main web library
-galvyn-core = { version = "0.1.0", git = "https://github.com/myOmikron/galvyn.git", rev = "63929f864f6513066d21f47a602e8879670c97c7", default-features = false }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
 tower-sessions = { version = "~0.14" } # Cookie based sessions

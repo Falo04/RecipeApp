@@ -2,7 +2,11 @@ use std::fs;
 
 use clap::Parser;
 use dotenv::dotenv;
+use global::GlobalChan;
+use global::GLOBAL;
+use http::server;
 use rorm::Database;
+use rorm::DatabaseConfiguration;
 use rorm::DatabaseDriver;
 use tracing::init_tracing_panic_hook;
 use tracing_subscriber::layer::SubscriberExt;
@@ -16,20 +20,10 @@ use crate::tracing::opentelemetry_layer;
 
 mod cli;
 mod config;
+mod global;
 mod http;
 mod models;
 mod tracing;
-
-async fn start(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
-    galvyn_core::module::registry::Registry::builder()
-        .register_module::<Database>()
-        .init()
-        .await?;
-
-    http::server::run(config).await?;
-
-    Ok(())
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -48,7 +42,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::Start => start(&config).await?,
+        Command::Start => {
+            let db = Database::connect(DatabaseConfiguration {
+                driver: get_db_driver(&config),
+                min_connections: 2,
+                max_connections: 2,
+            })
+            .await?;
+
+            GLOBAL.init(GlobalChan { db });
+
+            server::run(&config).await?;
+
+            GLOBAL.db.clone().close().await;
+        }
         Command::Migrate { migrations_dir } => {
             rorm::cli::migrate::run_migrate_custom(
                 rorm::cli::config::DatabaseConfig {
