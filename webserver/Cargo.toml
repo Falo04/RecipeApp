@@ -1,0 +1,66 @@
+[package]
+name = "webserver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = "~2"
+regex = "~1"
+
+# Webframework
+actix-web = "~4"
+swaggapi = { version = "*", default-features = false, features = [
+  "axum",
+  "tracing-instrument",
+], git = "https://github.com/gammelalf/swaggapi" } # Auto-generate OpenAPI
+schemars = { version = "~0.8", features = [
+  "uuid1",
+  "raw_value",
+] } # Derive json schema description
+
+# Cli
+clap = { version = "~4", features = ["derive"] }
+
+# Logging
+tracing = { version = "~0.1" } # Base API
+tracing-subscriber = { version = "~0.3", features = [
+  "tracing-log",
+  "env-filter",
+] }
+tracing-opentelemetry = { version = "0.25" }
+opentelemetry = { version = "0.24" }
+opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.17" }
+
+# Datatypes
+uuid = { version = "~1", features = ["serde", "v4"] }
+time = { version = "~0.3" }
+bytes = { version = "~1" }
+
+# Database
+rorm = { version = "~0.6", git = "https://github.com/rorm-orm/rorm.git", tag = "v0.7.0-pre-2", default-features = false, features = [
+  "postgres-only",
+  "cli",
+  "time",
+  "uuid",
+  "schemars",
+] }
+
+# Async
+tokio = { version = "~1", features = ["full"] }
+signal-hook = { version = "~0.3" }
+signal-hook-tokio = { version = "~0.3", features = ["futures-v0_3"] }
+futures-lite = { version = "~2" }
+futures-sink = { version = "~0.3" }
+async-trait = "~0.1"
+
+# Json
+serde = { version = "~1", features = ["derive"] }
+serde_repr = { version = "~0.1" }
+serde_json = { version = "~1" }
+
+[build-dependencies]
+tonic-build = "~0.12"
+
+[features]
+non_docker_build = []
