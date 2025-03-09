@@ -9,12 +9,18 @@ use signal_hook_tokio::Signals;
 use swaggapi::ApiContext;
 use swaggapi::SwaggapiPage;
 use tokio::net::TcpListener;
+use tower::ServiceBuilder;
+use tower_http::trace::DefaultMakeSpan;
+use tower_http::trace::DefaultOnResponse;
+use tower_http::trace::TraceLayer;
 use tracing::error;
 use tracing::info;
 use tracing::info_span;
 use tracing::instrument;
 use tracing::Instrument;
+use tracing::Level;
 
+use super::middleware::catch_unwind::CatchUnwindLayer;
 use crate::config::Config;
 use crate::http::handler;
 use crate::http::handler::FRONTEND_V1;
@@ -28,12 +34,21 @@ pub async fn run(config: &Config) -> std::io::Result<()> {
                 "/frontend_v1.json",
                 get(|| async { Json((&FRONTEND_V1).openapi()) }),
             )
-        });
+        })
+        .layer(
+            ServiceBuilder::new()
+                .layer(
+                    TraceLayer::new_for_http()
+                        .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
+                        .on_response(DefaultOnResponse::new().level(Level::INFO))
+                        .on_failure(()),
+                )
+                .layer(CatchUnwindLayer),
+        );
 
     let socket_addr = SocketAddr::new(config.server.address, config.server.port);
 
     info!("Start to listen on http://{socket_addr}");
-    println!("Start to listen on http://{socket_addr}");
     let listener = TcpListener::bind(socket_addr).await?;
     axum::serve(listener, router)
         .with_graceful_shutdown(handle_signals().instrument(info_span!("signals")))

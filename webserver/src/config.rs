@@ -37,6 +37,7 @@ pub struct Config {
     pub server: ServerConfig,
     pub database: DBConfig,
     pub otel_exporter_otlp_endpoint: String,
+    pub jwt: String,
 }
 
 impl Config {
@@ -50,6 +51,8 @@ impl Config {
         let db_user = env::var("DB_USERNAME").expect("DB_USERNAME must be set");
         let db_password = env::var("DB_PASSWORD").expect("DB_PASSWORD must be set");
         let db_schema = env::var("DB_SCHEMA").expect("DB_SCHEMA must be set");
+
+        let jwt = env::var("JWT_TOKEN").expect("JWT_TOKEN must be set");
 
         Config {
             server: ServerConfig {
@@ -66,6 +69,7 @@ impl Config {
                 schema: db_schema,
             },
             otel_exporter_otlp_endpoint: "http://jaeger-dev:4317".to_string(),
+            jwt,
         }
     }
 }

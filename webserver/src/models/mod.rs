@@ -1,1 +1,2 @@
-pub mod recipes;
+pub mod recipe;
+pub mod user;

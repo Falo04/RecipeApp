@@ -1,11 +1,12 @@
 [Migration]
-Hash = "1057218339240581843"
-Initial = true
+Hash = "14983590713072700319"
+Initial = false
+Dependency = 1
 Replaces = []
 
 [[Migration.Operations]]
 Type = "CreateModel"
-Name = "recipe"
+Name = "user"
 
 [[Migration.Operations.Fields]]
 Name = "uuid"
@@ -15,12 +16,12 @@ Type = "uuid"
 Type = "primary_key"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/recipes.rs"
-Line = 8
+File = "webserver/src/models/users.rs"
+Line = 7
 Column = 9
 
 [[Migration.Operations.Fields]]
-Name = "name"
+Name = "mail"
 Type = "varchar"
 
 [[Migration.Operations.Fields.Annotations]]
@@ -34,12 +35,28 @@ Type = "unique"
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/recipes.rs"
-Line = 11
+File = "webserver/src/models/users.rs"
+Line = 10
 Column = 9
 
 [[Migration.Operations.Fields]]
-Name = "description"
+Name = "display_name"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/users.rs"
+Line = 13
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "password"
 Type = "varchar"
 
 [[Migration.Operations.Fields.Annotations]]
@@ -50,6 +67,10 @@ Value = 1024
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/recipes.rs"
-Line = 12
+File = "webserver/src/models/users.rs"
+Line = 16
 Column = 9
+
+[[Migration.Operations]]
+Type = "DeleteModel"
+Name = "galvynsession"

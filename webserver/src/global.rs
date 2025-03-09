@@ -8,6 +8,7 @@ pub type DB = Database;
 
 pub struct GlobalChan {
     pub db: DB,
+    pub jwt: String,
 }
 
 pub struct GlobalOnceCell<T>(OnceLock<T>);

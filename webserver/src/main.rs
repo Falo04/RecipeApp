@@ -1,10 +1,16 @@
 use std::fs;
 
+use ::tracing::info;
+use bcrypt::hash;
+use bcrypt::DEFAULT_COST;
 use clap::Parser;
 use dotenv::dotenv;
 use global::GlobalChan;
 use global::GLOBAL;
 use http::server;
+use models::user::User;
+use rorm::fields::proxy::new;
+use rorm::fields::types::MaxStr;
 use rorm::Database;
 use rorm::DatabaseConfiguration;
 use rorm::DatabaseDriver;
@@ -12,6 +18,7 @@ use tracing::init_tracing_panic_hook;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
+use uuid::Uuid;
 
 use crate::cli::Cli;
 use crate::cli::Command;
@@ -46,11 +53,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let db = Database::connect(DatabaseConfiguration {
                 driver: get_db_driver(&config),
                 min_connections: 2,
-                max_connections: 2,
+                max_connections: 8,
             })
             .await?;
 
-            GLOBAL.init(GlobalChan { db });
+            GLOBAL.init(GlobalChan {
+                db,
+                jwt: config.jwt.clone(),
+            });
 
             server::run(&config).await?;
 
@@ -89,6 +99,40 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             )?;
 
             fs::remove_file(MODELS)?;
+        }
+        Command::CreateUser {
+            email,
+            display_name,
+        } => {
+            let db = Database::connect(DatabaseConfiguration {
+                driver: get_db_driver(&config),
+                min_connections: 2,
+                max_connections: 2,
+            })
+            .await?;
+            let mut tx = db.start_transaction().await?;
+            let mut password = String::new();
+            loop {
+                password = rpassword::prompt_password("Password: ").unwrap();
+                if password == rpassword::prompt_password("Confirm Password: ").unwrap() {
+                    break;
+                }
+                println!("Password is incorrect, try again");
+            }
+            let hash = hash(password, DEFAULT_COST)?;
+            info!("user with {email}, {display_name}, {hash} will be inserted");
+            let uuid = rorm::insert(&mut tx, User)
+                .return_primary_key()
+                .single(&User {
+                    uuid: Uuid::new_v4(),
+                    display_name,
+                    mail: email,
+                    password: hash,
+                })
+                .await?;
+            info!("created user with uuid: {uuid}");
+            tx.commit().await?;
+            db.close().await;
         }
     }
 

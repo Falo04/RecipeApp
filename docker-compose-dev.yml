@@ -61,4 +61,4 @@ networks:
 
 volumes:
   postgres-vol:
-    name: food-postgres-vol
+    name: food-postgres-dev-vol

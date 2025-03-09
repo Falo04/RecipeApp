@@ -1,5 +1,5 @@
 use super::schema::SimpleRecipe;
-use crate::models::recipes::Recipe;
+use crate::models::recipe::Recipe;
 
 impl From<Recipe> for SimpleRecipe {
     fn from(value: Recipe) -> Self {

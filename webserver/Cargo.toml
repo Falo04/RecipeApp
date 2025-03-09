@@ -63,6 +63,24 @@ serde = { version = "~1", features = ["derive"] }
 serde_repr = { version = "~0.1" }
 serde_json = { version = "~1" }
 
+
+# GRPC
+tonic = { version = "~0.12", default-features = false, features = [
+  "channel",
+  "codegen",
+  "prost",
+  "tls",
+  "tls-native-roots",
+] }
+prost = { version = "~0.13" }
+prost-types = { version = "~0.13" }
+jsonwebtoken = "9.3.1"
+warp = "0.3.7"
+bcrypt = "0.17.0"
+rpassword = "7.3.1"
+
+# Authentication
+
 [build-dependencies]
 tonic-build = "~0.12"
 

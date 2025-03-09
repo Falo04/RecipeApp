@@ -21,7 +21,7 @@ use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::recipes::schema::SimpleRecipe;
 use crate::http::handler::recipes::schema::UpdateRecipeRequest;
-use crate::models::recipes::Recipe;
+use crate::models::recipe::Recipe;
 
 #[get("/")]
 pub async fn get_all_recipes() -> ApiResult<ApiJson<List<SimpleRecipe>>> {
@@ -57,7 +57,6 @@ pub async fn get_recipe(
 pub async fn create_recipe(
     ApiJson(request): ApiJson<CreateRecipeRequest>,
 ) -> ApiResult<ApiJson<FormResult<SingleUuid, CreateRecipeErrors>>> {
-    println!("Debug: beginning");
     static REGEX: LazyLock<Regex> =
         LazyLock::new(|| Regex::new("^[a-z0-9]+(?:\\s+[a-z0-9]+)*$").unwrap());
     if !REGEX.is_match(&request.name) {
@@ -66,7 +65,6 @@ pub async fn create_recipe(
         ));
     }
 
-    println!("Debug: before query");
     let mut tx = GLOBAL.db.start_transaction().await?;
 
     let existing = rorm::query(&mut tx, Recipe)
@@ -79,7 +77,6 @@ pub async fn create_recipe(
             name_not_unique: true,
         })));
     }
-    println!("Debug: insert");
 
     let uuid = rorm::insert(&mut tx, Recipe)
         .return_primary_key()
@@ -90,7 +87,6 @@ pub async fn create_recipe(
         })
         .await?;
 
-    println!("Debug: before returning");
     tx.commit().await?;
     Ok(ApiJson(FormResult::ok(SingleUuid { uuid })))
 }
