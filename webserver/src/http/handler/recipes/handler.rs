@@ -15,6 +15,7 @@ use super::schema::CreateRecipeRequest;
 use crate::global::GLOBAL;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
+use crate::http::common::lazy_query::LazyQueryContext;
 use crate::http::common::schemas::FormResult;
 use crate::http::common::schemas::List;
 use crate::http::common::schemas::SingleUuid;
@@ -22,6 +23,9 @@ use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::recipes::schema::SimpleRecipe;
 use crate::http::handler::recipes::schema::UpdateRecipeRequest;
 use crate::models::recipe::Recipe;
+use crate::models::recipe::RecipeIngredients;
+use crate::models::recipe::RecipeTag;
+use crate::models::tags::Tag;
 
 #[get("/")]
 pub async fn get_all_recipes() -> ApiResult<ApiJson<List<SimpleRecipe>>> {
@@ -45,7 +49,18 @@ pub async fn get_recipe(
         .await?
         .ok_or(ApiError::bad_request("Invalid recipe id"))?;
 
-    tx.commit().await?;
+    let tags = rorm::query(&mut tx, RecipeTag.tag.query_as((Tag.uuid, Tag)))
+        .condition(RecipeTag.recipe.equals(recipe_uuid))
+        .stream()
+        .try_collect()
+        .await?;
+
+    let ingredients = rorm::query(&mut tx, RecipeIngredients.ingredient)
+        .condition(RecipeIngredients.recipe.equals(recipe_uuid))
+        .stream()
+        .try_collect()
+        .await?;
+
     Ok(ApiJson(SimpleRecipe {
         uuid: recipe.uuid,
         name: recipe.name,
