@@ -17,9 +17,9 @@ impl<T> GlobalOnceCell<T> {
         Self(OnceLock::new())
     }
 
-    pub fn is_initalized(&self) -> bool {
-        self.0.get().is_some()
-    }
+    // pub fn is_initalized(&self) -> bool {
+    //     self.0.get().is_some()
+    // }
 
     pub fn init(&self, value: T) {
         self.0

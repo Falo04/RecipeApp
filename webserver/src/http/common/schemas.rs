@@ -22,24 +22,24 @@ pub struct SingleUuid {
 ///
 /// It simply wraps the option into a struct with a single field
 /// to ensure the json returned from a handler is always an object.
-#[derive(Debug, Clone, Copy, Deserialize, Serialize, JsonSchema)]
-pub struct Optional<T> {
-    #[allow(missing_docs)]
-    pub optional: Option<T>,
-}
-impl<T> Optional<T> {
-    /// Shorthand for `Optional { optional: Some(value) }`
-    pub fn some(value: T) -> Self {
-        Self {
-            optional: Some(value),
-        }
-    }
-
-    /// Shorthand for `Optional { optional: None }`
-    pub fn none() -> Self {
-        Self { optional: None }
-    }
-}
+// #[derive(Debug, Clone, Copy, Deserialize, Serialize, JsonSchema)]
+// pub struct Optional<T> {
+//     #[allow(missing_docs)]
+//     pub optional: Option<T>,
+// }
+// impl<T> Optional<T> {
+//     /// Shorthand for `Optional { optional: Some(value) }`
+//     pub fn some(value: T) -> Self {
+//         Self {
+//             optional: Some(value),
+//         }
+//     }
+//
+//     /// Shorthand for `Optional { optional: None }`
+//     pub fn none() -> Self {
+//         Self { optional: None }
+//     }
+// }
 /// # List
 /// A single field which is an array.
 ///
@@ -109,7 +109,6 @@ pub enum ApiStatusCode {
     Unauthenticated = 1000,
     BadRequest = 1001,
     InvalidJson = 1002,
-    MissingPrivileges = 1003,
 
     InternalServerError = 2000,
 }

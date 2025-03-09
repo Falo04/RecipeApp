@@ -46,8 +46,7 @@ impl fmt::Display for ApiError {
         match self.code {
             ApiStatusCode::Unauthenticated
             | ApiStatusCode::BadRequest
-            | ApiStatusCode::InvalidJson
-            | ApiStatusCode::MissingPrivileges => write!(f, "Bad Request")?,
+            | ApiStatusCode::InvalidJson => write!(f, "Bad Request")?,
             ApiStatusCode::InternalServerError => write!(f, "Server Error")?,
         }
         if let Some(context) = self.context {
@@ -117,8 +116,7 @@ impl ApiError {
         match code {
             ApiStatusCode::Unauthenticated
             | ApiStatusCode::BadRequest
-            | ApiStatusCode::InvalidJson
-            | ApiStatusCode::MissingPrivileges => {
+            | ApiStatusCode::InvalidJson => {
                 debug!(
                     error.code = ?code,
                     error.context = context,
@@ -162,7 +160,6 @@ impl IntoResponse for ApiError {
                     ApiStatusCode::Unauthenticated => "Unauthenticated",
                     ApiStatusCode::BadRequest => "Bad request",
                     ApiStatusCode::InvalidJson => "Invalid json",
-                    ApiStatusCode::MissingPrivileges => "Missing privileges",
                     ApiStatusCode::InternalServerError => "Internal server error",
                 }
                 .to_string(),

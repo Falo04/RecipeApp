@@ -1,6 +1,5 @@
 use clap::Parser;
 use clap::Subcommand;
-use rorm::fields::types::MaxStr;
 
 #[derive(Parser)]
 pub struct Cli {

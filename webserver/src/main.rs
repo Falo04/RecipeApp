@@ -9,8 +9,6 @@ use global::GlobalChan;
 use global::GLOBAL;
 use http::server;
 use models::user::User;
-use rorm::fields::proxy::new;
-use rorm::fields::types::MaxStr;
 use rorm::Database;
 use rorm::DatabaseConfiguration;
 use rorm::DatabaseDriver;
@@ -111,7 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
             .await?;
             let mut tx = db.start_transaction().await?;
-            let mut password = String::new();
+            let mut password;
             loop {
                 password = rpassword::prompt_password("Password: ").unwrap();
                 if password == rpassword::prompt_password("Confirm Password: ").unwrap() {
