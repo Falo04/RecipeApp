@@ -1,4 +1,5 @@
 use axum::extract::Path;
+use axum::extract::Query;
 use futures_lite::StreamExt;
 use swaggapi::delete;
 use swaggapi::get;
@@ -8,7 +9,8 @@ use uuid::Uuid;
 use crate::global::GLOBAL;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::List;
+use crate::http::common::schemas::GetPageRequest;
+use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
@@ -16,14 +18,26 @@ use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::tags::Tag;
 
 #[get("/")]
-pub async fn get_all_tags() -> ApiResult<ApiJson<List<SimpleTag>>> {
-    let list: Vec<_> = rorm::query(&GLOBAL.db, Tag)
+pub async fn get_all_tags(
+    pagination: Query<GetPageRequest>,
+) -> ApiResult<ApiJson<Page<SimpleTag>>> {
+    let items: Vec<_> = rorm::query(&GLOBAL.db, Tag)
+        .order_asc(Tag.name)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .stream()
         .map(|result| result.map(SimpleTag::from))
         .try_collect()
         .await?;
 
-    Ok(ApiJson(List { list }))
+    let total = rorm::query(&GLOBAL.db, Tag.uuid.count()).one().await?;
+
+    Ok(ApiJson(Page {
+        items,
+        limit: pagination.limit,
+        offset: pagination.offset,
+        total,
+    }))
 }
 
 #[post("/")]

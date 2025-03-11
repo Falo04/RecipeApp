@@ -7,6 +7,7 @@ use futures_lite::StreamExt;
 use signal_hook::consts::TERM_SIGNALS;
 use signal_hook_tokio::Signals;
 use swaggapi::ApiContext;
+use swaggapi::PageOfEverything;
 use swaggapi::SwaggapiPage;
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
@@ -24,16 +25,23 @@ use super::middleware::catch_unwind::CatchUnwindLayer;
 use crate::config::Config;
 use crate::http::handler;
 use crate::http::handler::FRONTEND_V1;
+use crate::http::middleware::auth_required::AuthRequiredLayer;
 
 #[instrument(skip_all, ret)]
 pub async fn run(config: &Config) -> std::io::Result<()> {
     let router = Router::new()
         .merge(ApiContext::new().nest("/api", handler::initialize()))
         .nest("/docs", {
-            Router::new().route(
-                "/frontend_v1.json",
-                get(|| async { Json((&FRONTEND_V1).openapi()) }),
-            )
+            let router = Router::new()
+                .route(
+                    "/openapi.json",
+                    get(|| async { Json(PageOfEverything.openapi()) }),
+                )
+                .route(
+                    "/frontend_v1.json",
+                    get(|| async { Json((&FRONTEND_V1).openapi()) }),
+                );
+            router.layer(AuthRequiredLayer)
         })
         .layer(
             ServiceBuilder::new()

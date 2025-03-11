@@ -59,10 +59,19 @@ pub struct List<T> {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetPageRequest {
     /// The limit this page was requested with
+    #[serde(default = "default_limit")]
     pub limit: u64,
 
     /// The offset this page was requested with
+    #[serde(default = "default_offset")]
     pub offset: u64,
+}
+
+fn default_limit() -> u64 {
+    50
+}
+fn default_offset() -> u64 {
+    0
 }
 
 /// A page of items

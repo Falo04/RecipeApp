@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::sync::LazyLock;
 
 use axum::extract::Path;
+use axum::extract::Query;
 use futures_lite::StreamExt;
 use regex::Regex;
 use rorm::model::Identifiable;
@@ -16,7 +18,8 @@ use super::schema::CreateRecipeRequest;
 use crate::global::GLOBAL;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::List;
+use crate::http::common::schemas::GetPageRequest;
+use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::recipes::schema::FullRecipe;
@@ -35,13 +38,56 @@ use crate::models::tags::Tag;
 use crate::models::user::User;
 
 #[get("/")]
-pub async fn get_all_recipes() -> ApiResult<ApiJson<List<SimpleRecipe>>> {
-    let list = rorm::query(&GLOBAL.db, Recipe)
+pub async fn get_all_recipes(
+    pagination: Query<GetPageRequest>,
+) -> ApiResult<ApiJson<Page<SimpleRecipe>>> {
+    let items: Vec<_> = rorm::query(&GLOBAL.db, Recipe)
+        .order_asc(Recipe.name)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .stream()
         .map(|result| result.map(SimpleRecipe::from))
         .try_collect()
         .await?;
-    Ok(ApiJson(List { list }))
+
+    let total = rorm::query(&GLOBAL.db, Recipe.uuid.count()).one().await?;
+
+    // let mut map: HashMap<Uuid, Vec<SimpleTag>> =
+    //     HashMap::from_iter(list.iter().map(|rec| (rec.uuid, Vec::new())));
+    //
+    // rorm::query(&mut tx, (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)))
+    //     .condition(DynamicCollection::or(
+    //         list.iter()
+    //             .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
+    //             .collect(),
+    //     ))
+    //     .order_asc(RecipeTag.tag.name)
+    //     .stream()
+    //     .try_for_each(|result| {
+    //         let (ForeignModelByField(recipe_uuid), tag) = result?;
+    //         map.entry(recipe_uuid)
+    //             .or_default()
+    //             .push(SimpleTag::from(tag));
+    //         Ok::<_, rorm::Error>(())
+    //     })
+    //     .await?;
+    //
+    // let list = list
+    //     .into_iter()
+    //     .map(|recipe| SimpleRecipe {
+    //         uuid: recipe.uuid,
+    //         name: recipe.name,
+    //         description: recipe.description,
+    //         tags: map.get(&recipe.uuid).cloned().unwrap_or_default(),
+    //     })
+    //     .collect();
+    //
+    Ok(ApiJson(Page {
+        items,
+        limit: pagination.limit,
+        offset: pagination.offset,
+        total,
+    }))
 }
 
 #[get("/{uuid}")]
