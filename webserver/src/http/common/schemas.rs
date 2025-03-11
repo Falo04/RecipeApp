@@ -81,26 +81,6 @@ pub struct Page<T> {
     pub total: i64,
 }
 
-/// A `Result` with a custom serialization
-#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
-#[serde(tag = "result")]
-#[allow(missing_docs)]
-pub enum FormResult<T, E> {
-    Ok { value: T },
-    Err { error: E },
-}
-impl<T, E> FormResult<T, E> {
-    /// Convenience function to construct a `FormResult::Ok`
-    pub fn ok(value: T) -> Self {
-        Self::Ok { value }
-    }
-
-    /// Convenience function to construct a `FormResult::Err`
-    pub fn err(error: E) -> Self {
-        Self::Err { error }
-    }
-}
-
 /// The Status code that are returned throughout the API
 #[derive(Debug, Clone, Copy, Deserialize_repr, Serialize_repr, JsonSchema_repr)]
 #[repr(u16)]

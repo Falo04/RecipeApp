@@ -33,13 +33,13 @@ where
         let auth_header = parts
             .headers
             .get(header::AUTHORIZATION)
-            .ok_or_else(|| ApiError::server_error("AUTHORIZATION header was not given"))?
+            .ok_or_else(|| ApiError::server_error("AUTHORIZATION header was not given", None))?
             .to_str()
-            .map_err(|_| ApiError::server_error("Invalid AUTHORIZATION header format"))?;
+            .map_err(|_| ApiError::server_error("Invalid AUTHORIZATION header format", None))?;
 
         if !auth_header.starts_with("Bearer ") {
             info!("auth_header: {auth_header}");
-            return Err(ApiError::server_error("Invalid token format"));
+            return Err(ApiError::server_error("Invalid token format", None));
         }
 
         let token = auth_header[BEARER.len()..].trim();
@@ -55,6 +55,7 @@ where
             return Err(ApiError::new(
                 ApiStatusCode::Unauthenticated,
                 "Unknown user UUID in session",
+                None,
             ));
         };
 
@@ -75,6 +76,7 @@ fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, ApiError> {
         ApiError::new(
             ApiStatusCode::Unauthenticated,
             "You are not an authorized user",
+            None,
         )
     })
 }

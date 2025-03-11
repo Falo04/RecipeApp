@@ -41,13 +41,13 @@ pub async fn sign_in_me(
         .await?
     {
         Some(user) => user,
-        None => return Err(ApiError::server_error("user not found")),
+        None => return Err(ApiError::server_error("NOT FOUND: user", None)),
     };
 
     if !verify(&request.password, &user.password)
-        .map_err(|_| ApiError::server_error("bycrpt error"))?
+        .map_err(|_| ApiError::server_error("bycrpt error", None))?
     {
-        return Err(ApiError::bad_request("Wrong password"));
+        return Err(ApiError::bad_request("Wrong password", None));
     }
 
     let exp = OffsetDateTime::now_utc()
@@ -62,7 +62,7 @@ pub async fn sign_in_me(
     let key = EncodingKey::from_secret(GLOBAL.jwt.as_bytes());
 
     let token = encode(&Header::default(), &claims, &key)
-        .map_err(|_| ApiError::server_error("jwt encode error"))?;
+        .map_err(|_| ApiError::server_error("jwt encode error", None))?;
 
     Ok(ApiJson(TokenDataReponse { token }))
 }

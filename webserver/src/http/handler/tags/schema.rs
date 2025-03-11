@@ -9,3 +9,8 @@ pub struct SimpleTag {
     pub uuid: Uuid,
     pub name: MaxStr<255>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct CreateOrUpdateTag {
+    pub name: MaxStr<255>,
+}

@@ -4,18 +4,17 @@ use swaggapi::SwaggapiPageBuilder;
 
 use super::middleware::auth_required::AuthRequiredLayer;
 
-mod ingredients;
-mod recipes;
-mod tags;
-mod users;
+pub mod recipes;
+pub mod tags;
+pub mod users;
 
 pub static FRONTEND_V1: SwaggapiPageBuilder = SwaggapiPageBuilder::new().title("Frontend");
 
 pub fn initialize() -> ApiContext<Router> {
     let auth_not_required = ApiContext::new().nest(
-        "/users",
+        "/jwt",
         ApiContext::new()
-            .tag("/jwt")
+            .tag("Jwt")
             .handler(users::handler::sign_in_me),
     );
 
@@ -35,6 +34,14 @@ pub fn initialize() -> ApiContext<Router> {
             ApiContext::new()
                 .tag("User")
                 .handler(users::handler::get_all_users),
+        )
+        .nest(
+            "/tags",
+            ApiContext::new()
+                .tag("Tags")
+                .handler(tags::handler::get_all_tags)
+                .handler(tags::handler::create_tag)
+                .handler(tags::handler::delete_tag),
         );
 
     ApiContext::new().page(&FRONTEND_V1).nest(

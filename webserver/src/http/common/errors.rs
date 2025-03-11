@@ -35,6 +35,8 @@ pub struct ApiError {
     pub code: ApiStatusCode,
     /// An arbitrary string literal describing the error
     pub context: Option<&'static str>,
+    /// An message for the api enduser
+    pub user_message: Option<&'static str>,
     /// Location where the error originated from
     pub location: &'static Location<'static>,
     /// The error's underlying source
@@ -62,25 +64,30 @@ impl fmt::Display for ApiError {
 impl ApiError {
     /// Constructs a new `ApiError`
     #[track_caller]
-    pub fn new(code: ApiStatusCode, context: &'static str) -> Self {
+    pub fn new(
+        code: ApiStatusCode,
+        context: &'static str,
+        user_message: Option<&'static str>,
+    ) -> Self {
         Self {
             code,
             context: Some(context),
             location: Location::caller(),
             source: None,
+            user_message,
         }
     }
 
     /// Constructs a new `ApiError` with [`ApiStatusCode::BadRequest`]
     #[track_caller]
-    pub fn bad_request(context: &'static str) -> Self {
-        Self::new(ApiStatusCode::BadRequest, context)
+    pub fn bad_request(context: &'static str, user_message: Option<&'static str>) -> Self {
+        Self::new(ApiStatusCode::BadRequest, context, user_message)
     }
 
     /// Constructs a new `ApiError` with [`ApiStatusCode::InternalServerError`]
     #[track_caller]
-    pub fn server_error(context: &'static str) -> Self {
-        Self::new(ApiStatusCode::InternalServerError, context)
+    pub fn server_error(context: &'static str, user_message: Option<&'static str>) -> Self {
+        Self::new(ApiStatusCode::InternalServerError, context, user_message)
     }
 
     /// Adds a source to the `ApiError`
@@ -101,7 +108,7 @@ impl ApiError {
     pub fn map_server_error<E: Error + Send + Sync + 'static>(
         context: &'static str,
     ) -> impl Fn(E) -> Self {
-        move |error| Self::server_error(context).with_source(error)
+        move |error| Self::server_error(context, None).with_source(error)
     }
 
     /// Emit a tracing event `error!` or `debug!` describing the `ApiError`
@@ -111,6 +118,7 @@ impl ApiError {
             context,
             location,
             source,
+            user_message,
         } = &self;
 
         match code {
@@ -125,6 +133,7 @@ impl ApiError {
                     error.column = location.column(),
                     error.display = source.as_ref().map(tracing::field::display),
                     error.debug = source.as_ref().map(tracing::field::debug),
+                    error.user_message = user_message,
                     "Client error"
                 );
             }
@@ -137,6 +146,7 @@ impl ApiError {
                     error.column = location.column(),
                     error.display = source.as_ref().map(tracing::field::display),
                     error.debug = source.as_ref().map(tracing::field::debug),
+                    error.user_message = user_message,
                     "Server error"
                 );
             }
@@ -156,11 +166,14 @@ impl IntoResponse for ApiError {
             },
             ApiJson(ApiErrorResponse {
                 status_code: self.code,
-                message: match self.code {
-                    ApiStatusCode::Unauthenticated => "Unauthenticated",
-                    ApiStatusCode::BadRequest => "Bad request",
-                    ApiStatusCode::InvalidJson => "Invalid json",
-                    ApiStatusCode::InternalServerError => "Internal server error",
+                message: match self.user_message {
+                    Some(user_message) => user_message,
+                    None => match self.code {
+                        ApiStatusCode::Unauthenticated => "Unauthenticated",
+                        ApiStatusCode::BadRequest => "Bad request",
+                        ApiStatusCode::InvalidJson => "Invalid json",
+                        ApiStatusCode::InternalServerError => "Internal server error",
+                    },
                 }
                 .to_string(),
             }),
@@ -197,7 +210,7 @@ impl AsResponses for ApiError {
 impl<'rf, E, M> From<UpdateBuilder<'rf, E, M, rorm::crud::update::columns::Empty>> for ApiError {
     #[track_caller]
     fn from(_value: UpdateBuilder<'rf, E, M, rorm::crud::update::columns::Empty>) -> Self {
-        Self::bad_request("Nothing to update")
+        Self::bad_request("Nothing to update", None)
     }
 }
 
@@ -215,6 +228,7 @@ macro_rules! impl_into_internal_server_error {
                     context: None,
                     location: Location::caller(),
                     source: Some(value.into()),
+                    user_message: None
                 }
             }
         }
