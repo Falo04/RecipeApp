@@ -13,6 +13,7 @@ pub struct SimpleRecipe {
     pub uuid: Uuid,
     pub name: MaxStr<255>,
     pub description: MaxStr<1024>,
+    pub tags: Vec<SimpleTag>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

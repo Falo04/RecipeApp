@@ -3,8 +3,10 @@ use std::sync::LazyLock;
 
 use axum::extract::Path;
 use axum::extract::Query;
+use axum::Json;
 use futures_lite::StreamExt;
 use regex::Regex;
+use rorm::conditions::DynamicCollection;
 use rorm::model::Identifiable;
 use rorm::prelude::ForeignModelByField;
 use swaggapi::delete;
@@ -12,6 +14,7 @@ use swaggapi::get;
 use swaggapi::post;
 use swaggapi::put;
 use time::OffsetDateTime;
+use tracing::debug;
 use uuid::Uuid;
 
 use super::schema::CreateRecipeRequest;
@@ -46,42 +49,42 @@ pub async fn get_all_recipes(
         .limit(pagination.limit)
         .offset(pagination.offset)
         .stream()
-        .map(|result| result.map(SimpleRecipe::from))
         .try_collect()
         .await?;
 
     let total = rorm::query(&GLOBAL.db, Recipe.uuid.count()).one().await?;
 
-    // let mut map: HashMap<Uuid, Vec<SimpleTag>> =
-    //     HashMap::from_iter(list.iter().map(|rec| (rec.uuid, Vec::new())));
-    //
-    // rorm::query(&mut tx, (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)))
-    //     .condition(DynamicCollection::or(
-    //         list.iter()
-    //             .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
-    //             .collect(),
-    //     ))
-    //     .order_asc(RecipeTag.tag.name)
-    //     .stream()
-    //     .try_for_each(|result| {
-    //         let (ForeignModelByField(recipe_uuid), tag) = result?;
-    //         map.entry(recipe_uuid)
-    //             .or_default()
-    //             .push(SimpleTag::from(tag));
-    //         Ok::<_, rorm::Error>(())
-    //     })
-    //     .await?;
-    //
-    // let list = list
-    //     .into_iter()
-    //     .map(|recipe| SimpleRecipe {
-    //         uuid: recipe.uuid,
-    //         name: recipe.name,
-    //         description: recipe.description,
-    //         tags: map.get(&recipe.uuid).cloned().unwrap_or_default(),
-    //     })
-    //     .collect();
-    //
+    let mut map: HashMap<Uuid, Vec<SimpleTag>> =
+        HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
+
+    rorm::query(&GLOBAL.db, (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)))
+        .condition(DynamicCollection::or(
+            items
+                .iter()
+                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
+                .collect(),
+        ))
+        .order_asc(RecipeTag.tag.name)
+        .stream()
+        .try_for_each(|result| {
+            let (ForeignModelByField(recipe_uuid), tag) = result?;
+            map.entry(recipe_uuid)
+                .or_default()
+                .push(SimpleTag::from(tag));
+            Ok::<_, rorm::Error>(())
+        })
+        .await?;
+
+    let items = items
+        .into_iter()
+        .map(|recipe| SimpleRecipe {
+            uuid: recipe.uuid,
+            name: recipe.name,
+            description: recipe.description,
+            tags: map.remove(&recipe.uuid).unwrap_or_default(),
+        })
+        .collect();
+
     Ok(ApiJson(Page {
         items,
         limit: pagination.limit,
