@@ -7,5 +7,6 @@ pub struct Tag {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
+    #[rorm(unique)]
     pub name: MaxStr<255>,
 }
