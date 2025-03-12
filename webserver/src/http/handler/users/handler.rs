@@ -1,3 +1,4 @@
+use axum::extract::Query;
 use bcrypt::verify;
 use futures_lite::StreamExt;
 use jsonwebtoken::encode;
@@ -14,19 +15,35 @@ use super::schema::UserSignInRequest;
 use crate::global::GLOBAL;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::List;
+use crate::http::common::schemas::GetPageRequest;
+use crate::http::common::schemas::Page;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::extractors::authentication::Claims;
 use crate::models::user::User;
 
 #[get("/")]
-pub async fn get_all_users() -> ApiResult<ApiJson<List<SimpleUser>>> {
-    let list = rorm::query(&GLOBAL.db, User)
+pub async fn get_all_users(
+    pagination: Query<GetPageRequest>,
+) -> ApiResult<ApiJson<Page<SimpleUser>>> {
+    let items = rorm::query(&GLOBAL.db, User)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .stream()
         .map(|result| result.map(SimpleUser::from))
         .try_collect()
         .await?;
-    Ok(ApiJson(List { list }))
+    let total = rorm::query(&GLOBAL.db, User.uuid.count()).one().await?;
+    Ok(ApiJson(Page {
+        items,
+        limit: pagination.limit,
+        offset: pagination.offset,
+        total,
+    }))
+}
+
+#[get("/me")]
+pub async fn get_me(user: User) -> ApiResult<ApiJson<SimpleUser>> {
+    Ok(ApiJson(SimpleUser::from(user)))
 }
 
 #[post("/login")]

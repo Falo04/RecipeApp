@@ -46,9 +46,8 @@ pub struct ApiError {
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.code {
-            ApiStatusCode::Unauthenticated
-            | ApiStatusCode::BadRequest
-            | ApiStatusCode::InvalidJson => write!(f, "Bad Request")?,
+            ApiStatusCode::Unauthenticated => write!(f, "Unauthenticated")?,
+            ApiStatusCode::BadRequest | ApiStatusCode::InvalidJson => write!(f, "Bad Request")?,
             ApiStatusCode::InternalServerError => write!(f, "Server Error")?,
         }
         if let Some(context) = self.context {
@@ -159,7 +158,9 @@ impl IntoResponse for ApiError {
         self.emit_tracing_event();
 
         let res = (
-            if (self.code as u16) < 2000 {
+            if (self.code as u16) == 1000 {
+                StatusCode::UNAUTHORIZED
+            } else if (self.code as u16) < 2000 {
                 StatusCode::BAD_REQUEST
             } else {
                 StatusCode::INTERNAL_SERVER_ERROR

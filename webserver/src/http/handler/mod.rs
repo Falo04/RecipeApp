@@ -33,7 +33,8 @@ pub fn initialize() -> ApiContext<Router> {
             "/users",
             ApiContext::new()
                 .tag("User")
-                .handler(users::handler::get_all_users),
+                .handler(users::handler::get_all_users)
+                .handler(users::handler::get_me),
         )
         .nest(
             "/tags",

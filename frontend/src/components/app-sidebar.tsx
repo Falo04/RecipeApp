@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { SidebarContent, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, Sidebar } from './ui/sidebar';
 import { Home, ReceiptText, Soup } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 /**
   * The properties for {@link AppSidebar}
@@ -34,7 +35,7 @@ export function AppSidebar(props: AppSidebarProps) {
   const [t] = useTranslation();
 
   return (
-    <Sidebar collapsible='icon'>
+    <Sidebar collapsible='icon' className='pt-3 ps-1'>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className='flex'>
@@ -55,10 +56,10 @@ export function AppSidebar(props: AppSidebarProps) {
             {data.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
-                  <a href={item.url}>
+                  <Link to={item.url}>
                     <item.icon />
                     <span>{t(item.title)}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

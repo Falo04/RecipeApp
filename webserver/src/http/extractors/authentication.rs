@@ -7,6 +7,7 @@ use jsonwebtoken::TokenData;
 use jsonwebtoken::Validation;
 use serde::Deserialize;
 use serde::Serialize;
+use swaggapi::re_exports::openapiv3::StatusCode;
 use tracing::info;
 use uuid::Uuid;
 
@@ -33,9 +34,23 @@ where
         let auth_header = parts
             .headers
             .get(header::AUTHORIZATION)
-            .ok_or_else(|| ApiError::server_error("AUTHORIZATION header was not given", None))?
+            .ok_or_else(|| {
+                ApiError::new(
+                    ApiStatusCode::Unauthenticated,
+                    "Authorization header was not given",
+                    Some("Authorization header was not given"),
+                )
+            })?
             .to_str()
             .map_err(|_| ApiError::server_error("Invalid AUTHORIZATION header format", None))?;
+
+        if auth_header.is_empty() {
+            return Err(ApiError::new(
+                ApiStatusCode::Unauthenticated,
+                "No valid token format, empty string",
+                Some("No valid token format"),
+            ));
+        }
 
         if !auth_header.starts_with("Bearer ") {
             info!("auth_header: {auth_header}");

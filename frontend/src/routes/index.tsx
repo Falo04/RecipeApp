@@ -1,8 +1,17 @@
+import { Login } from '@/components/login'
+import { UserProvider } from '@/context/user'
 import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
 
 export const Route = createFileRoute('/')({
   component: () => (
-    <Navigate to={"/food/dashboard"} />
+    <>
+      <Toaster richColors />
+      {/* <Navigate to={"/food/dashboard"} /> */}
+      <UserProvider>
+        <Navigate to={"/food/dashboard"} />
+      </UserProvider>
+    </>
   ),
 })
 
