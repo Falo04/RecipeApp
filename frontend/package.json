@@ -6,7 +6,8 @@
     "dev": "vite --host",
     "build": "tsc && vite build --sourcemap true",
     "preview": "vite preview",
-    "format": "prettier --config .prettierrc.json --write src/"
+    "format": "prettier --config .prettierrc.json --write src/",
+    "gen-api": "bash scripts/gen-api.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

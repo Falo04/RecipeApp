@@ -32,7 +32,7 @@ pub async fn run(config: &Config) -> std::io::Result<()> {
     let router = Router::new()
         .merge(ApiContext::new().nest("/api", handler::initialize()))
         .nest("/docs", {
-            let router = Router::new()
+            Router::new()
                 .route(
                     "/openapi.json",
                     get(|| async { Json(PageOfEverything.openapi()) }),
@@ -40,8 +40,7 @@ pub async fn run(config: &Config) -> std::io::Result<()> {
                 .route(
                     "/frontend_v1.json",
                     get(|| async { Json((&FRONTEND_V1).openapi()) }),
-                );
-            router.layer(AuthRequiredLayer)
+                )
         })
         .layer(
             ServiceBuilder::new()
