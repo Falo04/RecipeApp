@@ -10,10 +10,6 @@ export interface SimpleRecipe {
   tags: SimpleTag[];
 }
 
-export interface RecipePageResponse {
-  page: Page<SimpleRecipe>;
-}
-
 export interface FullRecipe {
   uuid: string;
   name: string;

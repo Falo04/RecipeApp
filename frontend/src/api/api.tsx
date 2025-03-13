@@ -1,9 +1,9 @@
 import type { TokenDataReponse, UserSignInRequest } from "./model/jwt.interface";
 import type { SimpleUser } from "./model/user.interface";
-import type { CreateRecipeRequest, FullRecipe, RecipePageResponse, UpdateRecipeRequest } from "./model/recipe.interface";
+import type { CreateRecipeRequest, FullRecipe, SimpleRecipe, UpdateRecipeRequest } from "./model/recipe.interface";
 import type { TagPageRequest } from "./model/tag.interface";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
-import type { ApiError, ApiResponse, SingleUuid } from "./model/global.interface";
+import type { ApiError, ApiResponse, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
 
 export const Api = {
@@ -14,7 +14,7 @@ export const Api = {
     getMe: async (): Promise<ApiResponse<SimpleUser>> => await callApi<SimpleUser>({ method: "GET", url: "/users/me" }),
   },
   recipe: {
-    getAll: async (limit: number, offset: number): Promise<ApiResponse<RecipePageResponse>> => await callApi<RecipePageResponse>({ method: "GET", url: "/recipes", params: { limit, offset } }),
+    getAll: async (limit: number, offset: number): Promise<ApiResponse<Page<SimpleRecipe>>> => await callApi<Page<SimpleRecipe>>({ method: "GET", url: "/recipes", params: { limit, offset } }),
     getById: async (uuid: string): Promise<ApiResponse<FullRecipe>> => await callApi<FullRecipe>({ method: "GET", url: `/recipes/${uuid}` }),
     create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/recipes", data: payload }),
     update: async (uuid: string, payload: UpdateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi({ method: "PUT", url: `/recipes/${uuid}`, data: payload }),

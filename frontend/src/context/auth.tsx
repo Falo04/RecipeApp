@@ -14,6 +14,7 @@ let USER_PROVIDER: UserProvider | null = null;
 export type UserContext = {
   /** The currently logged-in user */
   user: SimpleUser;
+  isAuthenticated: boolean;
 
   /** Reload the user's information */
   reset: () => void;
@@ -26,6 +27,7 @@ const USER_CONTEXT = React.createContext<UserContext>({
     uuid: "",
     email: "",
   },
+  isAuthenticated: false,
 
   /**
    * Reset the user's information
@@ -49,6 +51,7 @@ type UserProviderProps = {
 type UserProviderState = {
   /** The user */
   user: SimpleUser | "unauthenticated";
+  isAuthenticaed: boolean;
 };
 
 /**
@@ -59,6 +62,7 @@ type UserProviderState = {
 export class UserProvider extends React.Component<UserProviderProps, UserProviderState> {
   state: UserProviderState = {
     user: "unauthenticated",
+    isAuthenticaed: false,
   };
 
   fetching: boolean = false;
@@ -75,7 +79,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
       if (result.error) {
         switch (result.error.status_code) {
           case StatusCode.Unauthenticated:
-            this.setState({ user: "unauthenticated" });
+            this.setState({ user: "unauthenticated", isAuthenticaed: false });
             break;
           default:
             toast.error(result.error.message);
@@ -84,7 +88,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
       }
 
       if (result.data) {
-        this.setState({ user: result.data })
+        this.setState({ user: result.data, isAuthenticaed: true })
       }
     });    // Clear guard against a lot of calls
     this.fetching = false;
@@ -139,6 +143,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
           <USER_CONTEXT.Provider
             value={{
               user: this.state.user,
+              isAuthenticated: this.state.isAuthenticaed,
               reset: this.fetchUser,
             }}
           >

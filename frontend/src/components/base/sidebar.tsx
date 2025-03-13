@@ -1,37 +1,26 @@
 import { useTranslation } from 'react-i18next';
-import { SidebarContent, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, Sidebar } from './ui/sidebar';
-import { Home, ReceiptText, Soup } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { Sidebar, SidebarContent, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar';
+
+export interface NavItem {
+  title: string;
+  url: string;
+  icon: any,
+}
 
 /**
   * The properties for {@link AppSidebar}
   */
-export type AppSidebarProps = {};
-
-
-const data = {
-  title: {
-    name: "Food App",
-    icon: Soup
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/food/dashboard",
-      icon: Home,
-    },
-    {
-      title: "Food",
-      url: "/food/overview",
-      icon: ReceiptText,
-    }
-  ]
-}
+export type BaseSidebarProps = {
+  title: string;
+  mainIcon: any;
+  navLinks: NavItem[];
+};
 
 /**
   * The AppSidebar
   */
-export function AppSidebar(props: AppSidebarProps) {
+export function BaseSidebar(props: BaseSidebarProps) {
   const [t] = useTranslation();
 
   return (
@@ -40,11 +29,11 @@ export function AppSidebar(props: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem className='flex'>
             <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-              <data.title.icon className='size-4' />
+              <props.mainIcon className='size-4' />
             </div>
             <div className="ps-2 grid flex-1 text-left text-sm leading-tight justify-start items-center">
               <span className="truncate font-semibold">
-                {data.title.name}
+                {props.title}
               </span>
             </div>
           </SidebarMenuItem>
@@ -53,7 +42,7 @@ export function AppSidebar(props: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroupContent>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {props.navLinks.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
                   <Link to={item.url}>
