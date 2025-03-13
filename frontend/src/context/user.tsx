@@ -1,13 +1,11 @@
-import { ApiClient } from "@/api/api-client";
-import { StatusCode, type ApiError } from "@/api/models/global.interface";
-import type { SimpleUser } from "@/api/models/user.interface";
+import { Api } from "@/api/api";
+import { StatusCode, type ApiError } from "@/api/error";
+import type { SimpleUser } from "@/api/model/user.interface";
 import { Login } from "@/components/login";
 import { Spinner } from "@/components/ui/spinner";
 import { Navigate } from "@tanstack/react-router";
-import axios from "axios";
 import React from "react";
 import { toast } from "sonner";
-import { boolean } from "zod";
 
 /** The global {@link UserProvider} instance */
 let USER_PROVIDER: UserProvider | null = null;
@@ -51,7 +49,6 @@ type UserProviderProps = {
 type UserProviderState = {
   /** The user */
   user: SimpleUser | "unauthenticated";
-  isLoading: boolean;
 };
 
 /**
@@ -61,43 +58,36 @@ type UserProviderState = {
  */
 export class UserProvider extends React.Component<UserProviderProps, UserProviderState> {
   state: UserProviderState = {
-    user: {
-      display_name: "",
-      email: "",
-      uuid: "",
-    },
-    isLoading: false,
+    user: "unauthenticated",
   };
+
+  fetching: boolean = false;
 
   /**
    * Fetch the user
    */
   fetchUser = () => {
     // Guard against a lot of calls
-    if (this.state.isLoading) return;
+    if (this.fetching) return;
+    this.fetching = true;
 
-    this.setState({ isLoading: true });
-
-    ApiClient.get("/users/me").then((data) => {
-      const user: SimpleUser = data.data;
-      this.setState({ user });
-    }).catch((error: any) => {
-      if (axios.isAxiosError(error) && error.response) {
-        const apiError: ApiError = error.response.data;
-        switch (apiError.status_code) {
+    Api.user.getMe().then((result) => {
+      if (result.error) {
+        switch (result.error.status_code) {
           case StatusCode.Unauthenticated:
             this.setState({ user: "unauthenticated" });
             break;
           default:
-            toast.error(`Error ${error.message}`);
+            toast.error(result.error.message);
             break;
         }
-      } else {
-        console.error(error);
       }
-    });
-    // Clear guard against a lot of calls
-    this.setState({ isLoading: false });
+
+      if (result.data) {
+        this.setState({ user: result.data })
+      }
+    });    // Clear guard against a lot of calls
+    this.fetching = false;
   };
 
   /**
@@ -129,7 +119,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
    * @returns The JSX component
    */
   render() {
-    if (this.state.isLoading) {
+    if (this.fetching) {
       return (<Spinner />);
     }
     switch (this.state.user) {

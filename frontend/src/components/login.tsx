@@ -6,11 +6,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import axios from 'axios';
-import type { TokenDataReponse, UserSignInRequest } from '@/api/models/jwt.interface';
-import type { ApiError } from '@/api/models/global.interface'; // Assuming you have this type defined
 import { toast } from 'sonner';
-import { ApiClient } from '@/api/api-client';
+import { Api } from '@/api/api';
+import type { UserSignInRequest } from '@/api/model/jwt.interface';
 
 /**
   * The properties for {@link Login}
@@ -45,33 +43,28 @@ export function Login(props: LoginProps) {
     };
 
     // Show loading toast while request is being processed
-    const toastId = toast.promise(
+    toast.promise(
       // The API request
-      ApiClient.post("/jwt/login", payload),
+      Api.jwt.login(payload),
       {
         loading: 'Logging in...', // The message shown while loading
-        success: (data) => {
+        success: (result) => {
           // Assuming response.data matches TokenDataReponse structure
-          const tokenData: TokenDataReponse = data.data;
 
-          // Store token in localStorage if it's received
-          if (tokenData?.token) {
-            localStorage.setItem("access_token", tokenData.token);
+          if (result.error) {
+            toast.error(result.error.message);
+            return;
+          }
+
+          if (result.data) {
+            localStorage.setItem("access_token", result.data.token);
             props.onLogin();
-            return 'Logged in successfully!'; // Success message
-          } else {
-            return 'Token not found in response.'; // Success message when token is missing
+            return "Logged in successfully!";
           }
         },
-        error: (error: any) => {
-          if (axios.isAxiosError(error) && error.response) {
-            // Handle API error response
-            const apiError: ApiError = error.response.data; // Assuming response data follows ApiError shape
-            return `Error: ${apiError.message}`; // Displaying message from ApiError
-          } else {
-            return 'Login failed. Please try again.';
-          }
-        },
+        error: () => {
+          return "Logging failed";
+        }
       }
     );
   }
@@ -122,4 +115,3 @@ export function Login(props: LoginProps) {
     </div >
   );
 }
-
