@@ -1,30 +1,77 @@
-import { Err, Ok, type Result } from "@/utils/result";
-import { parseError, StatusCode, type ApiError } from "./error";
-import { RequiredError, ResponseError } from "./generated";
-import CONSOLE from "@/utils/console";
+import type { TokenDataReponse, UserSignInRequest } from "./model/jwt.interface";
+import type { SimpleUser } from "./model/user.interface";
+import type { CreateRecipeRequest, FullRecipe, RecipePageResponse, UpdateRecipeRequest } from "./model/recipe.interface";
+import type { TagPageRequest } from "./model/tag.interface";
+import axios, { AxiosError, type AxiosRequestConfig } from "axios";
+import type { ApiError, ApiResponse, SingleUuid } from "./model/global.interface";
+import { ApiClient } from "./api-client";
 
 export const Api = {
+  jwt: {
+    login: async (payload: UserSignInRequest): Promise<ApiResponse<TokenDataReponse>> => await callApi<TokenDataReponse>({ method: "POST", url: "/jwt/login", data: payload }),
+  },
+  user: {
+    getMe: async (): Promise<ApiResponse<SimpleUser>> => await callApi<SimpleUser>({ method: "GET", url: "/users/me" }),
+  },
+  recipe: {
+    getAll: async (limit: number, offset: number): Promise<ApiResponse<RecipePageResponse>> => await callApi<RecipePageResponse>({ method: "GET", url: "/recipes", params: { limit, offset } }),
+    getById: async (uuid: string): Promise<ApiResponse<FullRecipe>> => await callApi<FullRecipe>({ method: "GET", url: `/recipes/${uuid}` }),
+    create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/recipes", data: payload }),
+    update: async (uuid: string, payload: UpdateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi({ method: "PUT", url: `/recipes/${uuid}`, data: payload }),
+    delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipe/${uuid}` }),
+  },
+  tags: {
+    getAll: async (): Promise<ApiResponse<TagPageRequest>> => await callApi<TagPageRequest>({ method: "GET", url: "/tags" }),
+    create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
+    delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/tags/${uuid}` })
+  }
 
 }
 
-export async function handleError<T>(promise: Promise<T>): Promise<Result<T, ApiError>> {
+export async function callApi<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
   try {
-    return new Ok(await promise);
-  } catch (e) {
-    if (e instanceof ResponseError) {
-      return new Err(await parseError(e.response));
-    } else if (e instanceof RequiredError) {
-      CONSOLE.error(e);
-      return new Err({
-        status_code: StatusCode.JsonDecodeError,
-        message: "The server's response didn't match the spec",
-      });
-    } else {
-      CONSOLE.error("Unknown error occurred:", e);
-      return new Err({
-        status_code: StatusCode.ArbitraryJSError,
-        message: "Unknown error occurred",
-      });
+    const { data } = await ApiClient.request<T>(config);
+
+    return {
+      data,
+      error: null,
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const { response } = axiosError;
+
+      let apiError: ApiError = {
+        status_code: 0,
+        message: "http request failed"
+      };
+
+      if (response && response.statusText) {
+        apiError.message = response.statusText;
+        apiError.status_code = response.status;
+      }
+
+      if (axiosError.message) {
+        apiError.message = axiosError.message;
+        apiError.status_code = axiosError.status ?? 0;
+      }
+
+      if (response && response.data && (response.data as ApiError).message) {
+        apiError = response.data as ApiError;
+      }
+
+      return {
+        data: null,
+        error: apiError
+      }
+    }
+
+    return {
+      data: null,
+      error: {
+        status_code: 0,
+        message: (error as Error).message,
+      }
     }
   }
 }
