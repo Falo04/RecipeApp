@@ -3,7 +3,6 @@ use std::sync::LazyLock;
 
 use axum::extract::Path;
 use axum::extract::Query;
-use axum::Json;
 use futures_lite::StreamExt;
 use regex::Regex;
 use rorm::conditions::DynamicCollection;
@@ -14,7 +13,7 @@ use swaggapi::get;
 use swaggapi::post;
 use swaggapi::put;
 use time::OffsetDateTime;
-use tracing::debug;
+use tracing::info;
 use uuid::Uuid;
 
 use super::schema::CreateRecipeRequest;
@@ -57,23 +56,25 @@ pub async fn get_all_recipes(
     let mut map: HashMap<Uuid, Vec<SimpleTag>> =
         HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
 
-    rorm::query(&GLOBAL.db, (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)))
-        .condition(DynamicCollection::or(
-            items
-                .iter()
-                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
-                .collect(),
-        ))
-        .order_asc(RecipeTag.tag.name)
-        .stream()
-        .try_for_each(|result| {
-            let (ForeignModelByField(recipe_uuid), tag) = result?;
-            map.entry(recipe_uuid)
-                .or_default()
-                .push(SimpleTag::from(tag));
-            Ok::<_, rorm::Error>(())
-        })
-        .await?;
+    if total != 0 {
+        rorm::query(&GLOBAL.db, (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)))
+            .condition(DynamicCollection::or(
+                items
+                    .iter()
+                    .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
+                    .collect(),
+            ))
+            .order_asc(RecipeTag.tag.name)
+            .stream()
+            .try_for_each(|result| {
+                let (ForeignModelByField(recipe_uuid), tag) = result?;
+                map.entry(recipe_uuid)
+                    .or_default()
+                    .push(SimpleTag::from(tag));
+                Ok::<_, rorm::Error>(())
+            })
+            .await?;
+    }
 
     let items = items
         .into_iter()
