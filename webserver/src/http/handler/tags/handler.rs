@@ -63,6 +63,7 @@ pub async fn create_tag(
         .single(&Tag {
             uuid: Uuid::new_v4(),
             name: request.name,
+            color: request.color,
         })
         .await?;
 

@@ -6,6 +6,7 @@ impl From<Tag> for SimpleTag {
         Self {
             uuid: value.uuid,
             name: value.name,
+            color: value.color,
         }
     }
 }
