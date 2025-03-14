@@ -14,7 +14,6 @@ let USER_PROVIDER: UserProvider | null = null;
 export type UserContext = {
   /** The currently logged-in user */
   user: SimpleUser;
-  isAuthenticated: boolean;
 
   /** Reload the user's information */
   reset: () => void;
@@ -27,7 +26,6 @@ const USER_CONTEXT = React.createContext<UserContext>({
     uuid: "",
     email: "",
   },
-  isAuthenticated: false,
 
   /**
    * Reset the user's information
@@ -50,8 +48,7 @@ type UserProviderProps = {
  */
 type UserProviderState = {
   /** The user */
-  user: SimpleUser | "unauthenticated";
-  isAuthenticaed: boolean;
+  user: SimpleUser | "unauthenticated" | "loading";
 };
 
 /**
@@ -61,8 +58,7 @@ type UserProviderState = {
  */
 export class UserProvider extends React.Component<UserProviderProps, UserProviderState> {
   state: UserProviderState = {
-    user: "unauthenticated",
-    isAuthenticaed: false,
+    user: "loading",
   };
 
   fetching: boolean = false;
@@ -75,11 +71,13 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
     if (this.fetching) return;
     this.fetching = true;
 
+    this.setState({ user: "loading" });
+
     Api.user.getMe().then((result) => {
       if (result.error) {
         switch (result.error.status_code) {
           case StatusCode.Unauthenticated:
-            this.setState({ user: "unauthenticated", isAuthenticaed: false });
+            this.setState({ user: "unauthenticated" });
             break;
           default:
             toast.error(result.error.message);
@@ -88,7 +86,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
       }
 
       if (result.data) {
-        this.setState({ user: result.data, isAuthenticaed: true })
+        this.setState({ user: result.data })
       }
     });    // Clear guard against a lot of calls
     this.fetching = false;
@@ -123,10 +121,9 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
    * @returns The JSX component
    */
   render() {
-    if (this.fetching) {
-      return (<Spinner />);
-    }
     switch (this.state.user) {
+      case "loading":
+        return <div>"Loading"</div>;
       case "unauthenticated":
         return (
           <>
@@ -143,7 +140,6 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
           <USER_CONTEXT.Provider
             value={{
               user: this.state.user,
-              isAuthenticated: this.state.isAuthenticaed,
               reset: this.fetchUser,
             }}
           >
@@ -154,22 +150,18 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
   }
 };
 
-
-function componentDidMount() {
-  throw new Error("Function not implemented.");
-}
 /**
  * Inspect an error and handle the {@link StatusCode.Unauthenticated} status code by requiring the user to log in again.
  *
  * @param error {@link ApiError} to inspect for {@link StatusCode.Unauthenticated}
  */
-// export function inspectError(error: ApiError) {
-//   switch (error.status_code) {
-//     case StatusCode.Unauthenticated:
-//       if (USER_PROVIDER !== null) USER_PROVIDER.setState({ user: "unauthenticated" });
-//       else CONSOLE.warn("inspectError has been called without a UserProvider");
-//       break;
-//     default:
-//       break;
-//   }
-// }
+export function inspectError(error: ApiError) {
+  switch (error.status_code) {
+    case StatusCode.Unauthenticated:
+      if (USER_PROVIDER !== null) USER_PROVIDER.setState({ user: "unauthenticated" });
+      else console.warn("inspectError has been called without a UserProvider");
+      break;
+    default:
+      break;
+  }
+}

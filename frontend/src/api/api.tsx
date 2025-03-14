@@ -1,7 +1,7 @@
 import type { TokenDataReponse, UserSignInRequest } from "./model/jwt.interface";
 import type { SimpleUser } from "./model/user.interface";
 import type { CreateRecipeRequest, FullRecipe, SimpleRecipe, UpdateRecipeRequest } from "./model/recipe.interface";
-import type { TagPageRequest } from "./model/tag.interface";
+import type { CreateTag, SimpleTag, TagPageRequest } from "./model/tag.interface";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
@@ -21,8 +21,8 @@ export const Api = {
     delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipe/${uuid}` }),
   },
   tags: {
-    getAll: async (): Promise<ApiResponse<TagPageRequest>> => await callApi<TagPageRequest>({ method: "GET", url: "/tags" }),
-    create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
+    getAll: async (): Promise<ApiResponse<Page<SimpleTag>>> => await callApi<TagPageRequest>({ method: "GET", url: "/tags" }),
+    create: async (payload: CreateTag): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
     delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/tags/${uuid}` })
   }
 

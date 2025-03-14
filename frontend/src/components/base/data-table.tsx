@@ -1,7 +1,7 @@
 import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { Button } from './ui/button';
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from './ui/table';
+import { Button } from '../ui/button';
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../ui/table';
 import React from 'react';
 
 /**
@@ -35,7 +35,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 
   return (
     <div className='w-full'>
-      <div className='rounded-md border'>
+      <div className='rounded-md border px-4'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

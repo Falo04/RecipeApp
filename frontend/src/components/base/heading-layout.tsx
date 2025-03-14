@@ -28,11 +28,11 @@ export type HeadingLayoutProps = {
  */
 export default function HeadingLayout(props: HeadingLayoutProps) {
   return (
-    <div className={clsx("flex flex-col gap-12", props.className)}>
+    <div className={clsx("flex flex-col gap-6", props.className)}>
       <div
         className={clsx(
           // Base
-          "flex w-full flex-wrap items-end justify-between gap-4 border-b pb-6",
+          "flex w-full flex-wrap items-end justify-between gap-4",
           // Colors
           "border-zinc-950/10 dark:border-white/10",
         )}
