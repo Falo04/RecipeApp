@@ -42,7 +42,7 @@ export default function HeadingLayout(props: HeadingLayoutProps) {
           {props.headingDescription && <Text>{props.headingDescription}</Text>}
         </div>
         {props.headingChildren !== undefined ? (
-          <div className={"flex gap-4"}>{props.headingChildren}</div>
+          <div className={"flex justify-end gap-4"}>{props.headingChildren}</div>
         ) : undefined}
       </div>
       {props.children}
