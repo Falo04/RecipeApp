@@ -1,9 +1,10 @@
-import { BaseSidebar } from '@/components/base/sidebar';
-import { SidebarLayout } from '@/components/base/sidebar-layout';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { BaseLayout } from '@/components/base/base-layout';
+import { Navbar } from '@/components/base/navbar';
+import { TagsProvider } from '@/context/tags';
+import USER_CONTEXT, { UserProvider } from '@/context/user';
 import { createLazyFileRoute, Outlet } from '@tanstack/react-router';
-import { Soup, Home, ReceiptText } from 'lucide-react';
-import { Suspense } from 'react';
+import { Soup, Home, ReceiptText, TagIcon } from 'lucide-react';
+import React, { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -18,12 +19,10 @@ const data = {
     {
       title: "Dashboard",
       url: "/food/dashboard",
-      icon: Home,
     },
     {
       title: "Food",
       url: "/food/overview",
-      icon: ReceiptText,
     }
   ]
 }
@@ -34,25 +33,24 @@ const data = {
 export default function FoodMenu(props: FoodMenuProps) {
   const [t] = useTranslation("food-menu");
 
+  const user = React.useContext(USER_CONTEXT);
 
   return (
-    <SidebarProvider>
-      <SidebarLayout sidebar={
-        <BaseSidebar title={data.title} mainIcon={data.mainIcon} navLinks={data.navMain} />
-      } children={
-        <SidebarInset>
-          <Suspense>
-            <Outlet />
-          </Suspense>
-        </SidebarInset>
-      }>
-      </SidebarLayout>
-    </SidebarProvider>
+    <BaseLayout navbar={<Navbar title={data.title} icon={data.mainIcon} navItems={data.navMain} />} children={
+      <Suspense>
+        <Outlet />
+      </Suspense>
+    }>
+    </BaseLayout>
   );
 }
 
 export const Route = createLazyFileRoute('/_food')({
   component: () => (
-    <FoodMenu />
+    <UserProvider>
+      <TagsProvider>
+        <FoodMenu />
+      </TagsProvider>
+    </UserProvider>
   )
 })
