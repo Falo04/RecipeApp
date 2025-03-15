@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../ui/table';
 import React from 'react';
+import clsx from 'clsx';
 
 /**
   * The properties for {@link DataTable}
@@ -16,10 +17,8 @@ export type DataTableProps<TData, TValue> = {
   * The DataTable
   */
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
-  const [t] = useTranslation();
+  const [tg] = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
-  console.log(props);
 
   const table = useReactTable({
     data: props.data,
@@ -66,17 +65,13 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
             ) : (
               <TableRow>
                 <TableCell colSpan={props.columns.length} className='h-24 text-center'>
-                  No results.
+                  {tg("table.no-result")}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
         <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
           <div className="space-x-2">
             <Button
               variant="outline"

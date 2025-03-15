@@ -1,6 +1,15 @@
 {
-  "breadcrumb": {
-    "dashboard": "Dashboard",
-    "overview": "Recipe Overview",
+  "label": {
+    "name": "Name",
+    "color": "Color"
+  },
+  "button": {
+    "close": "Abbrechen"
+  },
+  "search-recipe": "Search Recipe",
+  "table": {
+    "action": "Action",
+    "name": "Name",
+    "color": "Color"
   }
 }

@@ -1,6 +1,10 @@
 {
-  "breadcrumb": {
-    "dashboard": "Dashboard",
-    "overview": "Recipe Overview",
-  }
+  "label": {
+    "name": "Name",
+    "color": "Color"
+  },
+  "button": {
+    "close": "Abbrechen"
+  },
+  "search-recipe": "Suche Rezept"
 }

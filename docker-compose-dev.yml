@@ -48,6 +48,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     env_file: [.env]
     networks: [net-food]
     user: "${UID}:${GID}"

@@ -1,0 +1,16 @@
+{
+  "heading": {
+    "overview-title": "Tag Overview",
+    "overview-description": "All tags are listed here"
+  },
+  "button": {
+    "create": "Create Tag",
+    "delete": "Delete Tag"
+  },
+  "dialog": {
+    "create-title": "Create a tag",
+    "create-description": "Description for creating a tag",
+    "delete-title": "Delete Tag: ",
+    "delete-description": "Delete tag, cannot be restored"
+  }
+}

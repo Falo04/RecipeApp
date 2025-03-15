@@ -21,8 +21,12 @@ const data = {
       url: "/food/dashboard",
     },
     {
-      title: "Food",
+      title: "Recipes",
       url: "/food/overview",
+    },
+    {
+      title: "Tag",
+      url: "/food/tag",
     }
   ]
 }

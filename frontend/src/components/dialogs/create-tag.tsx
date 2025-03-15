@@ -1,12 +1,12 @@
 import { Api } from '@/api/api';
-import { TagColors, type CreateTag, type SimpleTag } from '@/api/model/tag.interface';
+import { TagColors, type CreateOrUpdateTag } from '@/api/model/tag.interface';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from "zod";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -25,7 +25,8 @@ export type CreateTagDialogProps = {
   * The CreateTagDialog
   */
 export function CreateTagDialog(props: CreateTagDialogProps) {
-  const [t] = useTranslation();
+  const [t] = useTranslation("tag");
+  const [tg] = useTranslation();
   const tagContext = React.useContext(TAGS_CONTEXT);
 
   const zodEnumColors = z.enum(Object.values(TagColors) as [string, ...string[]]);
@@ -44,7 +45,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload: CreateTag = {
+    const payload: CreateOrUpdateTag = {
       name: values.name,
       color: values.color as TagColors,
     }
@@ -77,9 +78,9 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
     <Dialog open={true} onOpenChange={props.onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Tag</DialogTitle>
+          <DialogTitle>{t("dialog.create-title")}</DialogTitle>
           <DialogDescription>
-            Create a tag here.
+            {t("dialog.create-description")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -89,7 +90,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("label.name")}</FormLabel>
+                  <FormLabel>{tg("label.name")}</FormLabel>
                   <FormControl>
                     <Input placeholder="name" {...field} />
                   </FormControl>
@@ -101,7 +102,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("label.color")}</FormLabel>
+                  <FormLabel>{tg("label.color")}</FormLabel>
                   <Select {...field} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger id={"create-tag"} className="w-full">
@@ -119,7 +120,10 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
               )}
             />
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <div className='w-full flex justify-between'>
+                <Button variant="secondary" onClick={() => props.onClose()}> {tg("button.close")} </Button>
+                <Button type="submit">{t("button.create")}</Button>
+              </div>
             </DialogFooter>
           </form>
         </Form>

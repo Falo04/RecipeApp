@@ -1,0 +1,16 @@
+{
+  "heading": {
+    "overview-title": "Tag Übersicht",
+    "overview-description": "Hier werden alle Tags aufgelistet",
+  },
+  "button": {
+    "create": "Erstelle Tag",
+    "delete": "Lösche Tag"
+  },
+  "dialog": {
+  "create-title": "Erstelle einen Tag",
+    "create-description": "Beschreibung für erstellung eines Tags",
+    "delete-title": "Lösche den Tag: ",
+    "delete-description:": "Löscht den Tag und kann danach nicht mehr wiederhergestellt werden"
+  }
+}

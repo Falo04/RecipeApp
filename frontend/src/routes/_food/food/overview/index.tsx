@@ -8,7 +8,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import HeadingLayout from '@/components/base/heading-layout';
 import { useMemo } from 'react';
 import { BadgeButton } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 /**
   * The properties for {@link FoodOverview}
