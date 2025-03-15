@@ -8,11 +8,10 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import React from 'react';
 import TAGS_CONTEXT from '@/context/tags';
-
+import { useForm } from 'react-hook-form';
 
 /**
   * The properties for {@link CreateTagDialog}
@@ -29,32 +28,30 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
   const [tg] = useTranslation();
   const tagContext = React.useContext(TAGS_CONTEXT);
 
-  const zodEnumColors = z.enum(Object.values(TagColors) as [string, ...string[]]);
-
   const formSchema = z.object({
-    name: z.string(),
-    color: zodEnumColors,
+    name: z.string().max(255, "Name cant be longer than 255 character"),
+    color: z.nativeEnum(TagColors, { message: "Invalid Color type" }),
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      color: "blue",
-    }
+      color: TagColors.Blue,
+    },
+    mode: "onChange",
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const payload: CreateOrUpdateTag = {
       name: values.name,
-      color: values.color as TagColors,
+      color: values.color,
     }
-
 
     toast.promise(
       Api.tags.create(payload),
       {
-        loading: 'Creating...',
+        loading: tg("toast.loading"),
         success: (result) => {
           if (result.error) {
             toast.error(result.error.message);
@@ -64,11 +61,11 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
           if (result.data) {
             tagContext.reset();
             props.onClose();
-            return "Created successfully";
+            return tg("toast.created-success");
           }
         },
         error: () => {
-          return "Something failed";
+          return tg("toast.general-error");
         },
       }
     );
@@ -94,6 +91,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                   <FormControl>
                     <Input placeholder="name" {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -110,7 +108,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {zodEnumColors.options.map((color) => (
+                      {(Object.keys(TagColors)).map((color) => (
                         <SelectItem key={`create-tag_${color}`} value={color}>{color}</SelectItem>
                       ))}
                     </SelectContent>

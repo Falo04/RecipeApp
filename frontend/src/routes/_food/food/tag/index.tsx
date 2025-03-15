@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { createFileRoute } from '@tanstack/react-router';
 import { TrashIcon } from 'lucide-react';
 import { DeleteTagDialog } from '@/components/dialogs/delete-tag';
-import { toast } from 'sonner';
 
 /**
   * The properties for {@link TagsOverview}
@@ -37,6 +36,9 @@ function TagsOverview(props: TagsOverviewProps) {
       {
         accessorKey: "name",
         header: () => <span>{tg("table.name")}</span>,
+        cell: ({ row }) => (
+          <div className='max-w-[180px] sm:max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap'> <span>{row.original.name}</span></div>
+        )
       },
       {
         accessorKey: "color",
@@ -50,8 +52,8 @@ function TagsOverview(props: TagsOverviewProps) {
         header: () => <div className='flex justify-end'>{tg("table.action")}</div>,
         cell: ({ row }) => (
           <div className='flex justify-end'>
-            <Button onClick={() => { console.log(row.original); setOpenDeleteTag(row.original) }} variant="ghost"><TrashIcon /></Button>
-          </div>
+            <Button onClick={() => setOpenDeleteTag(row.original)} variant="ghost"><TrashIcon /></Button>
+          </div >
         )
       }
     ], [])
@@ -61,7 +63,7 @@ function TagsOverview(props: TagsOverviewProps) {
       headingChildren={
         <Button variant="primary" onClick={() => setOpenCreateTag(true)}>{t("button.create")}</Button>
       }>
-      <DataTable data={tagContext.tags.items} columns={columns} />
+      <DataTable href="/food/tag" data={tagContext.tags.items} columns={columns} />
 
       {openCreateTag && (
         <Suspense>

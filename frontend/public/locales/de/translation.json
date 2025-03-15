@@ -6,5 +6,11 @@
   "button": {
     "close": "Abbrechen"
   },
+  "toast": {
+    "loading": "Lädt...",
+    "created-success": "Erfolgreich erstellt",
+    "deleted-success": "Erfolgreich gelöscht",
+    "general-error": "Irgendwas ist schief gelaufen"
+  },
   "search-recipe": "Suche Rezept"
 }

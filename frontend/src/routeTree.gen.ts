@@ -17,6 +17,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as FoodFoodTagIndexImport } from './routes/_food/food/tag/index'
 import { Route as FoodFoodOverviewIndexImport } from './routes/_food/food/overview/index'
 import { Route as FoodFoodDashboardIndexImport } from './routes/_food/food/dashboard/index'
+import { Route as FoodFoodTagTagIdIndexImport } from './routes/_food/food/tag/$tagId/index'
 
 // Create Virtual Routes
 
@@ -50,6 +51,12 @@ const FoodFoodOverviewIndexRoute = FoodFoodOverviewIndexImport.update({
 const FoodFoodDashboardIndexRoute = FoodFoodDashboardIndexImport.update({
   id: '/food/dashboard/',
   path: '/food/dashboard/',
+  getParentRoute: () => FoodLazyRoute,
+} as any)
+
+const FoodFoodTagTagIdIndexRoute = FoodFoodTagTagIdIndexImport.update({
+  id: '/food/tag/$tagId/',
+  path: '/food/tag/$tagId/',
   getParentRoute: () => FoodLazyRoute,
 } as any)
 
@@ -92,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FoodFoodTagIndexImport
       parentRoute: typeof FoodLazyImport
     }
+    '/_food/food/tag/$tagId/': {
+      id: '/_food/food/tag/$tagId/'
+      path: '/food/tag/$tagId'
+      fullPath: '/food/tag/$tagId'
+      preLoaderRoute: typeof FoodFoodTagTagIdIndexImport
+      parentRoute: typeof FoodLazyImport
+    }
   }
 }
 
@@ -101,12 +115,14 @@ interface FoodLazyRouteChildren {
   FoodFoodDashboardIndexRoute: typeof FoodFoodDashboardIndexRoute
   FoodFoodOverviewIndexRoute: typeof FoodFoodOverviewIndexRoute
   FoodFoodTagIndexRoute: typeof FoodFoodTagIndexRoute
+  FoodFoodTagTagIdIndexRoute: typeof FoodFoodTagTagIdIndexRoute
 }
 
 const FoodLazyRouteChildren: FoodLazyRouteChildren = {
   FoodFoodDashboardIndexRoute: FoodFoodDashboardIndexRoute,
   FoodFoodOverviewIndexRoute: FoodFoodOverviewIndexRoute,
   FoodFoodTagIndexRoute: FoodFoodTagIndexRoute,
+  FoodFoodTagTagIdIndexRoute: FoodFoodTagTagIdIndexRoute,
 }
 
 const FoodLazyRouteWithChildren = FoodLazyRoute._addFileChildren(
@@ -119,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/food/dashboard': typeof FoodFoodDashboardIndexRoute
   '/food/overview': typeof FoodFoodOverviewIndexRoute
   '/food/tag': typeof FoodFoodTagIndexRoute
+  '/food/tag/$tagId': typeof FoodFoodTagTagIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -127,6 +144,7 @@ export interface FileRoutesByTo {
   '/food/dashboard': typeof FoodFoodDashboardIndexRoute
   '/food/overview': typeof FoodFoodOverviewIndexRoute
   '/food/tag': typeof FoodFoodTagIndexRoute
+  '/food/tag/$tagId': typeof FoodFoodTagTagIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -136,13 +154,26 @@ export interface FileRoutesById {
   '/_food/food/dashboard/': typeof FoodFoodDashboardIndexRoute
   '/_food/food/overview/': typeof FoodFoodOverviewIndexRoute
   '/_food/food/tag/': typeof FoodFoodTagIndexRoute
+  '/_food/food/tag/$tagId/': typeof FoodFoodTagTagIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/food/dashboard' | '/food/overview' | '/food/tag'
+  fullPaths:
+    | '/'
+    | ''
+    | '/food/dashboard'
+    | '/food/overview'
+    | '/food/tag'
+    | '/food/tag/$tagId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/food/dashboard' | '/food/overview' | '/food/tag'
+  to:
+    | '/'
+    | ''
+    | '/food/dashboard'
+    | '/food/overview'
+    | '/food/tag'
+    | '/food/tag/$tagId'
   id:
     | '__root__'
     | '/'
@@ -150,6 +181,7 @@ export interface FileRouteTypes {
     | '/_food/food/dashboard/'
     | '/_food/food/overview/'
     | '/_food/food/tag/'
+    | '/_food/food/tag/$tagId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -185,7 +217,8 @@ export const routeTree = rootRoute
       "children": [
         "/_food/food/dashboard/",
         "/_food/food/overview/",
-        "/_food/food/tag/"
+        "/_food/food/tag/",
+        "/_food/food/tag/$tagId/"
       ]
     },
     "/_food/food/dashboard/": {
@@ -198,6 +231,10 @@ export const routeTree = rootRoute
     },
     "/_food/food/tag/": {
       "filePath": "_food/food/tag/index.tsx",
+      "parent": "/_food"
+    },
+    "/_food/food/tag/$tagId/": {
+      "filePath": "_food/food/tag/$tagId/index.tsx",
       "parent": "/_food"
     }
   }

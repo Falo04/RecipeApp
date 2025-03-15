@@ -1,10 +1,10 @@
 import { BaseLayout } from '@/components/base/base-layout';
 import { Navbar } from '@/components/base/navbar';
 import { TagsProvider } from '@/context/tags';
-import USER_CONTEXT, { UserProvider } from '@/context/user';
+import { UserProvider } from '@/context/user';
 import { createLazyFileRoute, Outlet } from '@tanstack/react-router';
-import { Soup, Home, ReceiptText, TagIcon } from 'lucide-react';
-import React, { Suspense } from 'react';
+import { Soup, } from 'lucide-react';
+import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -36,8 +36,6 @@ const data = {
   */
 export default function FoodMenu(props: FoodMenuProps) {
   const [t] = useTranslation("food-menu");
-
-  const user = React.useContext(USER_CONTEXT);
 
   return (
     <BaseLayout navbar={<Navbar title={data.title} icon={data.mainIcon} navItems={data.navMain} />} children={

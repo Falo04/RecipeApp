@@ -11,5 +11,11 @@
     "action": "Action",
     "name": "Name",
     "color": "Color"
+  },
+  "toast": {
+    "loading": "Loading...",
+    "created-success": "Succesfully created",
+    "deleted-success": "Succesfully deleted",
+    "general-error": "Something failed..."
   }
 }

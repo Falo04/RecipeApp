@@ -22,26 +22,31 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
   const [tg] = useTranslation();
 
   const deleteTag = async () => {
-    Api.tags.delete(props.tag.uuid).then((result) => {
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
+    toast.promise(
+      Api.tags.delete(props.tag.uuid), {
+      loading: t("toast.loading"),
+      success: (result) => {
+        if (result.error) {
+          toast.error(result.error.message);
+          return;
+        }
 
-      toast.success("Deleted successfully");
-      props.onDeletion();
-    }
-    )
+        props.onDeletion();
+        return tg("toast.deleted-success");
+      },
+      error: t("toast.general-error")
+    })
   }
 
 
   return (
     <Dialog open={true} onOpenChange={props.onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{t("dialog.delete-title")} <span className='ml-1 text-2xl'>{props.tag.name}</span></DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-[325px] sm:max-w-[425px]">
+        <DialogHeader className='items-start'>
+          <DialogTitle>{t("dialog.delete-title")} </DialogTitle>
+          <DialogDescription className='w-full flex flex-col items-start gap-2'>
             {t("dialog.delete-description")}
+            <span className='ml-1 text-2xl max-w-[200px] truncate' title={props.tag.name}>{props.tag.name}</span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
