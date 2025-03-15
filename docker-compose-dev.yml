@@ -44,16 +44,15 @@ services:
     build:
       dockerfile: ./build/dockerfiles/jaeger.Dockerfile
 
-  # frontend-dev:
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./frontend:/app
-  #   env_file: [.env]
-  #   networks: [net-food]
-  #   user: "${UID}:${GID}"
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: ../build/dockerfiles/frontend-dev.Dockerfile
+  frontend-dev:
+    restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
+    env_file: [.env]
+    networks: [net-food]
+    user: "${UID}:${GID}"
+    build:
+      dockerfile: ./build/dockerfiles/frontend-dev.Dockerfile
 
 networks:
   net-food:
