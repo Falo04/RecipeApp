@@ -1,7 +1,7 @@
 import type { TokenDataReponse, UserSignInRequest } from "./model/jwt.interface";
 import type { SimpleUser } from "./model/user.interface";
-import type { CreateRecipeRequest, FullRecipe, SimpleRecipe, UpdateRecipeRequest } from "./model/recipe.interface";
-import type { CreateTag, SimpleTag, TagPageRequest } from "./model/tag.interface";
+import type { CreateRecipeRequest, FullRecipe, SimpleRecipe, SimpleRecipeWithTags, UpdateRecipeRequest } from "./model/recipe.interface";
+import type { CreateOrUpdateTag, SimpleTag } from "./model/tag.interface";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
@@ -14,15 +14,16 @@ export const Api = {
     getMe: async (): Promise<ApiResponse<SimpleUser>> => await callApi<SimpleUser>({ method: "GET", url: "/users/me" }),
   },
   recipe: {
-    getAll: async (limit: number, offset: number): Promise<ApiResponse<Page<SimpleRecipe>>> => await callApi<Page<SimpleRecipe>>({ method: "GET", url: "/recipes", params: { limit, offset } }),
+    getAll: async (limit: number, offset: number): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> => await callApi<Page<SimpleRecipeWithTags>>({ method: "GET", url: "/recipes", params: { limit, offset } }),
     getById: async (uuid: string): Promise<ApiResponse<FullRecipe>> => await callApi<FullRecipe>({ method: "GET", url: `/recipes/${uuid}` }),
     create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/recipes", data: payload }),
     update: async (uuid: string, payload: UpdateRecipeRequest): Promise<ApiResponse<SingleUuid>> => await callApi({ method: "PUT", url: `/recipes/${uuid}`, data: payload }),
     delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipe/${uuid}` }),
   },
   tags: {
-    getAll: async (): Promise<ApiResponse<Page<SimpleTag>>> => await callApi<TagPageRequest>({ method: "GET", url: "/tags" }),
-    create: async (payload: CreateTag): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
+    getAll: async (): Promise<ApiResponse<Page<SimpleTag>>> => await callApi<Page<SimpleTag>>({ method: "GET", url: "/tags" }),
+    getRecipesByTag: async (uuid: string): Promise<ApiResponse<Page<SimpleRecipe>>> => await callApi<Page<SimpleRecipe>>({ method: "GET", url: `/tags/${uuid}/recipes` }),
+    create: async (payload: CreateOrUpdateTag): Promise<ApiResponse<SingleUuid>> => await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
     delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/tags/${uuid}` })
   }
 

@@ -13,7 +13,6 @@ use swaggapi::get;
 use swaggapi::post;
 use swaggapi::put;
 use time::OffsetDateTime;
-use tracing::info;
 use uuid::Uuid;
 
 use super::schema::CreateRecipeRequest;
@@ -26,7 +25,7 @@ use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::Ingredients;
-use crate::http::handler::recipes::schema::SimpleRecipe;
+use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Steps;
 use crate::http::handler::recipes::schema::UpdateRecipeRequest;
 use crate::http::handler::tags::schema::SimpleTag;
@@ -42,7 +41,7 @@ use crate::models::user::User;
 #[get("/")]
 pub async fn get_all_recipes(
     pagination: Query<GetPageRequest>,
-) -> ApiResult<ApiJson<Page<SimpleRecipe>>> {
+) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let items: Vec<_> = rorm::query(&GLOBAL.db, Recipe)
         .order_asc(Recipe.name)
         .limit(pagination.limit)
@@ -78,7 +77,7 @@ pub async fn get_all_recipes(
 
     let items = items
         .into_iter()
-        .map(|recipe| SimpleRecipe {
+        .map(|recipe| SimpleRecipeWithTags {
             uuid: recipe.uuid,
             name: recipe.name,
             description: recipe.description,

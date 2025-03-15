@@ -1,9 +1,14 @@
-import type { Page } from "./global.interface";
 import type { Ingredients } from "./ingredients.interface";
 import type { SimpleTag } from "./tag.interface";
 import type { SimpleUser } from "./user.interface";
 
 export interface SimpleRecipe {
+  uuid: string;
+  name: string;
+  description: string;
+}
+
+export interface SimpleRecipeWithTags {
   uuid: string;
   name: string;
   description: string;

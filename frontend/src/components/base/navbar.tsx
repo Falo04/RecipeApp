@@ -45,7 +45,7 @@ export function Navbar(props: NavbarProps) {
           {props.navItems.map((item) => (
             <li key={item.url}>
               <Link to={item.url}>
-                <span className={clsx(pathname === item.url ? "pb-1 border-b-2 border-sidebar-primary text-zinc-900 dark:text-zinc-100" : "text-zinc-500 dark:text-zinc-400", "hover:text-zinc-900 dark:hover:text-zinc-100")}>
+                <span className={clsx(pathname.includes(item.url) ? "pb-1 border-b-2 border-sidebar-primary text-zinc-900 dark:text-zinc-100" : "text-zinc-500 dark:text-zinc-400", "hover:text-zinc-900 dark:hover:text-zinc-100")}>
                   {item.title}
                 </span>
               </Link>

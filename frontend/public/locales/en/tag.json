@@ -1,7 +1,9 @@
 {
   "heading": {
     "overview-title": "Tag Overview",
-    "overview-description": "All tags are listed here"
+    "overview-description": "All tags are listed here",
+    "detail-title": "Tag Details",
+    "detail-description": "Here you see all recipes which are connected to tags"
   },
   "button": {
     "create": "Create Tag",

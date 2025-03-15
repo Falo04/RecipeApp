@@ -13,8 +13,11 @@ use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
+use crate::http::handler::recipes::schema::SimpleRecipe;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
 use crate::http::handler::tags::schema::SimpleTag;
+use crate::models::recipe::Recipe;
+use crate::models::recipe_tag::RecipeTag;
 use crate::models::tags::Tag;
 
 #[get("/")]
@@ -31,6 +34,34 @@ pub async fn get_all_tags(
         .await?;
 
     let total = rorm::query(&GLOBAL.db, Tag.uuid.count()).one().await?;
+
+    Ok(ApiJson(Page {
+        items,
+        limit: pagination.limit,
+        offset: pagination.offset,
+        total,
+    }))
+}
+
+#[get("/{uuid}/recipes")]
+pub async fn get_recipes_by_tag(
+    Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
+    pagination: Query<GetPageRequest>,
+) -> ApiResult<ApiJson<Page<SimpleRecipe>>> {
+    let items: Vec<_> = rorm::query(&GLOBAL.db, RecipeTag.recipe.query_as(Recipe))
+        .condition(RecipeTag.tag.equals(tag_uuid))
+        .order_asc(RecipeTag.recipe.name)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
+        .stream()
+        .map(|result| result.map(SimpleRecipe::from))
+        .try_collect()
+        .await?;
+
+    let total = rorm::query(&GLOBAL.db, RecipeTag.uuid.count())
+        .condition(RecipeTag.tag.equals(tag_uuid))
+        .one()
+        .await?;
 
     Ok(ApiJson(Page {
         items,

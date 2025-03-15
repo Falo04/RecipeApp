@@ -1,5 +1,5 @@
 import { Api } from '@/api/api';
-import type { SimpleRecipe } from '@/api/model/recipe.interface';
+import type { SimpleRecipe, SimpleRecipeWithTags } from '@/api/model/recipe.interface';
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -22,7 +22,7 @@ export type FoodOverviewProps = {};
 function FoodOverview(props: FoodOverviewProps) {
   const [t] = useTranslation();
 
-  const columns: ColumnDef<SimpleRecipe>[] = useMemo(() => [
+  const columns: ColumnDef<SimpleRecipeWithTags>[] = useMemo(() => [
     {
       accessorKey: "name",
       header: "Name",

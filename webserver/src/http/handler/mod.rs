@@ -41,6 +41,7 @@ pub fn initialize() -> ApiContext<Router> {
             ApiContext::new()
                 .tag("Tags")
                 .handler(tags::handler::get_all_tags)
+                .handler(tags::handler::get_recipes_by_tag)
                 .handler(tags::handler::create_tag)
                 .handler(tags::handler::delete_tag),
         );

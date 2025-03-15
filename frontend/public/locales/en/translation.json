@@ -10,7 +10,9 @@
   "table": {
     "action": "Action",
     "name": "Name",
-    "color": "Color"
+    "color": "Color",
+    "description": "Description",
+    "no-result": "Looks empty..."
   },
   "toast": {
     "loading": "Loading...",

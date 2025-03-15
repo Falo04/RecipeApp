@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../ui/table';
 import React from 'react';
 import { useNavigate, type LinkProps } from '@tanstack/react-router';
+import clsx from 'clsx';
 
 /**
   * The properties for {@link DataTable}
@@ -11,7 +12,7 @@ import { useNavigate, type LinkProps } from '@tanstack/react-router';
 export type DataTableProps<TData extends { uuid: string }, TValue> = {
   columns: ColumnDef<TData, TValue>[],
   data: TData[],
-  href: LinkProps["href"];
+  href?: LinkProps["href"];
 };
 
 /**
@@ -57,8 +58,11 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={'hover:cursor-pointer'}
-                  onClick={() => navigate({ to: `${props.href}/${row.original.uuid}` })}
+                  className={clsx(props.href ? 'hover:cursor-pointer' : '')}
+                  onClick={() => {
+                    if (!props.href) return;
+                    navigate({ to: `${props.href}/${row.original.uuid}` });
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
