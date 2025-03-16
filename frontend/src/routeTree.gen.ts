@@ -14,21 +14,23 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as FoodFoodTagIndexImport } from './routes/_food/food/tag/index'
-import { Route as FoodFoodOverviewIndexImport } from './routes/_food/food/overview/index'
-import { Route as FoodFoodDashboardIndexImport } from './routes/_food/food/dashboard/index'
-import { Route as FoodFoodTagTagIdIndexImport } from './routes/_food/food/tag/$tagId/index'
+import { Route as AppAppTagIndexImport } from './routes/_app/app/tag/index'
+import { Route as AppAppRecipesIndexImport } from './routes/_app/app/recipes/index'
+import { Route as AppAppDashboardIndexImport } from './routes/_app/app/dashboard/index'
+import { Route as AppAppRecipesCreateImport } from './routes/_app/app/recipes/create'
+import { Route as AppAppTagTagIdIndexImport } from './routes/_app/app/tag/$tagId/index'
+import { Route as AppAppRecipesRecipeIdIndexImport } from './routes/_app/app/recipes/$recipeId/index'
 
 // Create Virtual Routes
 
-const FoodLazyImport = createFileRoute('/_food')()
+const AppLazyImport = createFileRoute('/_app')()
 
 // Create/Update Routes
 
-const FoodLazyRoute = FoodLazyImport.update({
-  id: '/_food',
+const AppLazyRoute = AppLazyImport.update({
+  id: '/_app',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/_food.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/_app.lazy').then((d) => d.Route))
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -36,29 +38,43 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const FoodFoodTagIndexRoute = FoodFoodTagIndexImport.update({
-  id: '/food/tag/',
-  path: '/food/tag/',
-  getParentRoute: () => FoodLazyRoute,
+const AppAppTagIndexRoute = AppAppTagIndexImport.update({
+  id: '/app/tag/',
+  path: '/app/tag/',
+  getParentRoute: () => AppLazyRoute,
 } as any)
 
-const FoodFoodOverviewIndexRoute = FoodFoodOverviewIndexImport.update({
-  id: '/food/overview/',
-  path: '/food/overview/',
-  getParentRoute: () => FoodLazyRoute,
+const AppAppRecipesIndexRoute = AppAppRecipesIndexImport.update({
+  id: '/app/recipes/',
+  path: '/app/recipes/',
+  getParentRoute: () => AppLazyRoute,
 } as any)
 
-const FoodFoodDashboardIndexRoute = FoodFoodDashboardIndexImport.update({
-  id: '/food/dashboard/',
-  path: '/food/dashboard/',
-  getParentRoute: () => FoodLazyRoute,
+const AppAppDashboardIndexRoute = AppAppDashboardIndexImport.update({
+  id: '/app/dashboard/',
+  path: '/app/dashboard/',
+  getParentRoute: () => AppLazyRoute,
 } as any)
 
-const FoodFoodTagTagIdIndexRoute = FoodFoodTagTagIdIndexImport.update({
-  id: '/food/tag/$tagId/',
-  path: '/food/tag/$tagId/',
-  getParentRoute: () => FoodLazyRoute,
+const AppAppRecipesCreateRoute = AppAppRecipesCreateImport.update({
+  id: '/app/recipes/create',
+  path: '/app/recipes/create',
+  getParentRoute: () => AppLazyRoute,
 } as any)
+
+const AppAppTagTagIdIndexRoute = AppAppTagTagIdIndexImport.update({
+  id: '/app/tag/$tagId/',
+  path: '/app/tag/$tagId/',
+  getParentRoute: () => AppLazyRoute,
+} as any)
+
+const AppAppRecipesRecipeIdIndexRoute = AppAppRecipesRecipeIdIndexImport.update(
+  {
+    id: '/app/recipes/$recipeId/',
+    path: '/app/recipes/$recipeId/',
+    getParentRoute: () => AppLazyRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -71,90 +87,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_food': {
-      id: '/_food'
+    '/_app': {
+      id: '/_app'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof FoodLazyImport
+      preLoaderRoute: typeof AppLazyImport
       parentRoute: typeof rootRoute
     }
-    '/_food/food/dashboard/': {
-      id: '/_food/food/dashboard/'
-      path: '/food/dashboard'
-      fullPath: '/food/dashboard'
-      preLoaderRoute: typeof FoodFoodDashboardIndexImport
-      parentRoute: typeof FoodLazyImport
+    '/_app/app/recipes/create': {
+      id: '/_app/app/recipes/create'
+      path: '/app/recipes/create'
+      fullPath: '/app/recipes/create'
+      preLoaderRoute: typeof AppAppRecipesCreateImport
+      parentRoute: typeof AppLazyImport
     }
-    '/_food/food/overview/': {
-      id: '/_food/food/overview/'
-      path: '/food/overview'
-      fullPath: '/food/overview'
-      preLoaderRoute: typeof FoodFoodOverviewIndexImport
-      parentRoute: typeof FoodLazyImport
+    '/_app/app/dashboard/': {
+      id: '/_app/app/dashboard/'
+      path: '/app/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppAppDashboardIndexImport
+      parentRoute: typeof AppLazyImport
     }
-    '/_food/food/tag/': {
-      id: '/_food/food/tag/'
-      path: '/food/tag'
-      fullPath: '/food/tag'
-      preLoaderRoute: typeof FoodFoodTagIndexImport
-      parentRoute: typeof FoodLazyImport
+    '/_app/app/recipes/': {
+      id: '/_app/app/recipes/'
+      path: '/app/recipes'
+      fullPath: '/app/recipes'
+      preLoaderRoute: typeof AppAppRecipesIndexImport
+      parentRoute: typeof AppLazyImport
     }
-    '/_food/food/tag/$tagId/': {
-      id: '/_food/food/tag/$tagId/'
-      path: '/food/tag/$tagId'
-      fullPath: '/food/tag/$tagId'
-      preLoaderRoute: typeof FoodFoodTagTagIdIndexImport
-      parentRoute: typeof FoodLazyImport
+    '/_app/app/tag/': {
+      id: '/_app/app/tag/'
+      path: '/app/tag'
+      fullPath: '/app/tag'
+      preLoaderRoute: typeof AppAppTagIndexImport
+      parentRoute: typeof AppLazyImport
+    }
+    '/_app/app/recipes/$recipeId/': {
+      id: '/_app/app/recipes/$recipeId/'
+      path: '/app/recipes/$recipeId'
+      fullPath: '/app/recipes/$recipeId'
+      preLoaderRoute: typeof AppAppRecipesRecipeIdIndexImport
+      parentRoute: typeof AppLazyImport
+    }
+    '/_app/app/tag/$tagId/': {
+      id: '/_app/app/tag/$tagId/'
+      path: '/app/tag/$tagId'
+      fullPath: '/app/tag/$tagId'
+      preLoaderRoute: typeof AppAppTagTagIdIndexImport
+      parentRoute: typeof AppLazyImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface FoodLazyRouteChildren {
-  FoodFoodDashboardIndexRoute: typeof FoodFoodDashboardIndexRoute
-  FoodFoodOverviewIndexRoute: typeof FoodFoodOverviewIndexRoute
-  FoodFoodTagIndexRoute: typeof FoodFoodTagIndexRoute
-  FoodFoodTagTagIdIndexRoute: typeof FoodFoodTagTagIdIndexRoute
+interface AppLazyRouteChildren {
+  AppAppRecipesCreateRoute: typeof AppAppRecipesCreateRoute
+  AppAppDashboardIndexRoute: typeof AppAppDashboardIndexRoute
+  AppAppRecipesIndexRoute: typeof AppAppRecipesIndexRoute
+  AppAppTagIndexRoute: typeof AppAppTagIndexRoute
+  AppAppRecipesRecipeIdIndexRoute: typeof AppAppRecipesRecipeIdIndexRoute
+  AppAppTagTagIdIndexRoute: typeof AppAppTagTagIdIndexRoute
 }
 
-const FoodLazyRouteChildren: FoodLazyRouteChildren = {
-  FoodFoodDashboardIndexRoute: FoodFoodDashboardIndexRoute,
-  FoodFoodOverviewIndexRoute: FoodFoodOverviewIndexRoute,
-  FoodFoodTagIndexRoute: FoodFoodTagIndexRoute,
-  FoodFoodTagTagIdIndexRoute: FoodFoodTagTagIdIndexRoute,
+const AppLazyRouteChildren: AppLazyRouteChildren = {
+  AppAppRecipesCreateRoute: AppAppRecipesCreateRoute,
+  AppAppDashboardIndexRoute: AppAppDashboardIndexRoute,
+  AppAppRecipesIndexRoute: AppAppRecipesIndexRoute,
+  AppAppTagIndexRoute: AppAppTagIndexRoute,
+  AppAppRecipesRecipeIdIndexRoute: AppAppRecipesRecipeIdIndexRoute,
+  AppAppTagTagIdIndexRoute: AppAppTagTagIdIndexRoute,
 }
 
-const FoodLazyRouteWithChildren = FoodLazyRoute._addFileChildren(
-  FoodLazyRouteChildren,
-)
+const AppLazyRouteWithChildren =
+  AppLazyRoute._addFileChildren(AppLazyRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof FoodLazyRouteWithChildren
-  '/food/dashboard': typeof FoodFoodDashboardIndexRoute
-  '/food/overview': typeof FoodFoodOverviewIndexRoute
-  '/food/tag': typeof FoodFoodTagIndexRoute
-  '/food/tag/$tagId': typeof FoodFoodTagTagIdIndexRoute
+  '': typeof AppLazyRouteWithChildren
+  '/app/recipes/create': typeof AppAppRecipesCreateRoute
+  '/app/dashboard': typeof AppAppDashboardIndexRoute
+  '/app/recipes': typeof AppAppRecipesIndexRoute
+  '/app/tag': typeof AppAppTagIndexRoute
+  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdIndexRoute
+  '/app/tag/$tagId': typeof AppAppTagTagIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof FoodLazyRouteWithChildren
-  '/food/dashboard': typeof FoodFoodDashboardIndexRoute
-  '/food/overview': typeof FoodFoodOverviewIndexRoute
-  '/food/tag': typeof FoodFoodTagIndexRoute
-  '/food/tag/$tagId': typeof FoodFoodTagTagIdIndexRoute
+  '': typeof AppLazyRouteWithChildren
+  '/app/recipes/create': typeof AppAppRecipesCreateRoute
+  '/app/dashboard': typeof AppAppDashboardIndexRoute
+  '/app/recipes': typeof AppAppRecipesIndexRoute
+  '/app/tag': typeof AppAppTagIndexRoute
+  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdIndexRoute
+  '/app/tag/$tagId': typeof AppAppTagTagIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_food': typeof FoodLazyRouteWithChildren
-  '/_food/food/dashboard/': typeof FoodFoodDashboardIndexRoute
-  '/_food/food/overview/': typeof FoodFoodOverviewIndexRoute
-  '/_food/food/tag/': typeof FoodFoodTagIndexRoute
-  '/_food/food/tag/$tagId/': typeof FoodFoodTagTagIdIndexRoute
+  '/_app': typeof AppLazyRouteWithChildren
+  '/_app/app/recipes/create': typeof AppAppRecipesCreateRoute
+  '/_app/app/dashboard/': typeof AppAppDashboardIndexRoute
+  '/_app/app/recipes/': typeof AppAppRecipesIndexRoute
+  '/_app/app/tag/': typeof AppAppTagIndexRoute
+  '/_app/app/recipes/$recipeId/': typeof AppAppRecipesRecipeIdIndexRoute
+  '/_app/app/tag/$tagId/': typeof AppAppTagTagIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -162,37 +201,43 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | ''
-    | '/food/dashboard'
-    | '/food/overview'
-    | '/food/tag'
-    | '/food/tag/$tagId'
+    | '/app/recipes/create'
+    | '/app/dashboard'
+    | '/app/recipes'
+    | '/app/tag'
+    | '/app/recipes/$recipeId'
+    | '/app/tag/$tagId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | ''
-    | '/food/dashboard'
-    | '/food/overview'
-    | '/food/tag'
-    | '/food/tag/$tagId'
+    | '/app/recipes/create'
+    | '/app/dashboard'
+    | '/app/recipes'
+    | '/app/tag'
+    | '/app/recipes/$recipeId'
+    | '/app/tag/$tagId'
   id:
     | '__root__'
     | '/'
-    | '/_food'
-    | '/_food/food/dashboard/'
-    | '/_food/food/overview/'
-    | '/_food/food/tag/'
-    | '/_food/food/tag/$tagId/'
+    | '/_app'
+    | '/_app/app/recipes/create'
+    | '/_app/app/dashboard/'
+    | '/_app/app/recipes/'
+    | '/_app/app/tag/'
+    | '/_app/app/recipes/$recipeId/'
+    | '/_app/app/tag/$tagId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  FoodLazyRoute: typeof FoodLazyRouteWithChildren
+  AppLazyRoute: typeof AppLazyRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  FoodLazyRoute: FoodLazyRouteWithChildren,
+  AppLazyRoute: AppLazyRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -206,36 +251,46 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_food"
+        "/_app"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/_food": {
-      "filePath": "_food.lazy.tsx",
+    "/_app": {
+      "filePath": "_app.lazy.tsx",
       "children": [
-        "/_food/food/dashboard/",
-        "/_food/food/overview/",
-        "/_food/food/tag/",
-        "/_food/food/tag/$tagId/"
+        "/_app/app/recipes/create",
+        "/_app/app/dashboard/",
+        "/_app/app/recipes/",
+        "/_app/app/tag/",
+        "/_app/app/recipes/$recipeId/",
+        "/_app/app/tag/$tagId/"
       ]
     },
-    "/_food/food/dashboard/": {
-      "filePath": "_food/food/dashboard/index.tsx",
-      "parent": "/_food"
+    "/_app/app/recipes/create": {
+      "filePath": "_app/app/recipes/create.tsx",
+      "parent": "/_app"
     },
-    "/_food/food/overview/": {
-      "filePath": "_food/food/overview/index.tsx",
-      "parent": "/_food"
+    "/_app/app/dashboard/": {
+      "filePath": "_app/app/dashboard/index.tsx",
+      "parent": "/_app"
     },
-    "/_food/food/tag/": {
-      "filePath": "_food/food/tag/index.tsx",
-      "parent": "/_food"
+    "/_app/app/recipes/": {
+      "filePath": "_app/app/recipes/index.tsx",
+      "parent": "/_app"
     },
-    "/_food/food/tag/$tagId/": {
-      "filePath": "_food/food/tag/$tagId/index.tsx",
-      "parent": "/_food"
+    "/_app/app/tag/": {
+      "filePath": "_app/app/tag/index.tsx",
+      "parent": "/_app"
+    },
+    "/_app/app/recipes/$recipeId/": {
+      "filePath": "_app/app/recipes/$recipeId/index.tsx",
+      "parent": "/_app"
+    },
+    "/_app/app/tag/$tagId/": {
+      "filePath": "_app/app/tag/$tagId/index.tsx",
+      "parent": "/_app"
     }
   }
 }

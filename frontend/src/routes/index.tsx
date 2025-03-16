@@ -7,7 +7,7 @@ export const Route = createFileRoute('/')({
     <>
       <Toaster richColors />
       <UserProvider>
-        <Navigate to={"/food/dashboard"} />
+        <Navigate to={"/app/recipes"} />
       </UserProvider>
     </>
   ),

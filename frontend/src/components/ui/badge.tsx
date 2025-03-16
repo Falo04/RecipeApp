@@ -68,16 +68,11 @@ function Badge({
 function BadgeButton({
   className,
   variant,
-  href,
   ...props
 }: React.ComponentProps<"button"> &
-  VariantProps<typeof badgeVariants> & { href?: string }) {
+  VariantProps<typeof badgeVariants>,) {
 
-  return href ? (
-    <Link className={cn(badgeVariants({ variant }), className)} to={href}>
-      <button data-slot="clickable-badge" className="hover:cursor-pointer" {...props} />
-    </Link>
-  ) : (
+  return (
     <button
       data-slot="clickable-badge"
       className={cn(badgeVariants({ variant }), className, "hover:cursor-pointer")}

@@ -10,7 +10,7 @@ import type { VariantProps } from 'class-variance-authority';
 import React, { Suspense } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { TrashIcon } from 'lucide-react';
 import { DeleteTagDialog } from '@/components/dialogs/delete-tag';
 
@@ -37,7 +37,9 @@ function TagsOverview(props: TagsOverviewProps) {
         accessorKey: "name",
         header: () => <span>{tg("table.name")}</span>,
         cell: ({ row }) => (
-          <div className='max-w-[180px] sm:max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap'> <span>{row.original.name}</span></div>
+          <Link to={"/app/tag/$tagId"} params={{ tagId: row.original.uuid }}  >
+            <div className='max-w-[180px] sm:max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap'> <span>{row.original.name}</span></div>
+          </Link >
         )
       },
       {
@@ -52,7 +54,7 @@ function TagsOverview(props: TagsOverviewProps) {
         header: () => <div className='flex justify-end'>{tg("table.action")}</div>,
         cell: ({ row }) => (
           <div className='flex justify-end'>
-            <Button onClick={() => setOpenDeleteTag(row.original)} variant="ghost"><TrashIcon /></Button>
+            <Button onClick={() => setOpenDeleteTag(row.original)} variant="ghost" className='cursor-pointer'><TrashIcon /></Button>
           </div >
         )
       }
@@ -63,7 +65,7 @@ function TagsOverview(props: TagsOverviewProps) {
       headingChildren={
         <Button variant="primary" onClick={() => setOpenCreateTag(true)}>{t("button.create")}</Button>
       }>
-      <DataTable href="/food/tag" data={tagContext.tags.items} columns={columns} />
+      <DataTable data={tagContext.tags.items} columns={columns} />
 
       {openCreateTag && (
         <Suspense>
@@ -84,7 +86,7 @@ function TagsOverview(props: TagsOverviewProps) {
     </HeadingLayout>
   );
 }
-export const Route = createFileRoute('/_food/food/tag/')({
+export const Route = createFileRoute('/_app/app/tag/')({
   component: TagsOverview,
 })
 

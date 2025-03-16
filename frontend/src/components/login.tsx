@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -26,7 +26,7 @@ const formSchema = z.object({
   * The Login
   */
 export function Login(props: LoginProps) {
-  const [t] = useTranslation();
+  const [tg] = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,7 +47,7 @@ export function Login(props: LoginProps) {
       // The API request
       Api.jwt.login(payload),
       {
-        loading: 'Logging in...', // The message shown while loading
+        loading: tg("toast.login-loading"), // The message shown while loading
         success: (result) => {
           // Assuming response.data matches TokenDataReponse structure
 
@@ -59,11 +59,11 @@ export function Login(props: LoginProps) {
           if (result.data) {
             localStorage.setItem("access_token", result.data.token);
             props.onLogin();
-            return "Logged in successfully!";
+            return tg("toast.login-success");
           }
         },
         error: () => {
-          return "Logging failed";
+          return tg("toast.login-failed");
         }
       }
     );
@@ -75,8 +75,8 @@ export function Login(props: LoginProps) {
         <div className='flex flex-col gap-6'>
           <Card>
             <CardHeader>
-              <CardTitle className='test-2xl'>{t("card.title")}</CardTitle>
-              <CardDescription>{t("card.description")}</CardDescription>
+              <CardTitle className='test-2xl'>{tg("login.title")}</CardTitle>
+              <CardDescription>{tg("login.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -86,10 +86,11 @@ export function Login(props: LoginProps) {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("label.email")}</FormLabel>
+                        <FormLabel>{tg("label.email")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Email" {...field} />
+                          <Input placeholder={tg("placeholder.email")} {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -98,14 +99,14 @@ export function Login(props: LoginProps) {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("label.password")}</FormLabel>
+                        <FormLabel>{tg("label.password")}</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Password" {...field} />
+                          <Input type="password" placeholder={tg("placeholder.password")} {...field} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Submit</Button>
+                  <Button type="submit">{tg("button.login")}</Button>
                 </form>
               </Form>
             </CardContent>

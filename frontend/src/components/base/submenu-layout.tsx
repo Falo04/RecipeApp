@@ -4,7 +4,7 @@ import { clsx } from "clsx";
 import { Text } from "./text";
 import { useNavigate, type LinkProps } from "@tanstack/react-router";
 import { Button } from "../ui/button";
-import { ArrowBigLeftIcon, ArrowLeftIcon, ArrowLeftSquareIcon, ArrowLeftToLine, X } from "lucide-react";
+import { X } from "lucide-react";
 
 /**
  * The properties for {@link SubmenuLayout}
@@ -27,6 +27,8 @@ export type SubmenuLayoutProps = {
 
   /** The link back to main menu */
   hrefBack: LinkProps["href"];
+
+  objectName: string;
 };
 
 /**
@@ -47,7 +49,7 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
       >
         <div className={"flex flex-col gap-3 w-full"}>
           <div className={"flex justify-between"}>
-            <Heading>{props.heading}</Heading>
+            <Heading>{props.heading} <span className="underline">{props.objectName}</span></Heading>
             <Button onClick={() => navigate({ to: props.hrefBack })} variant={"ghost"} className={"w-fit"}><X className={"size-6"} /></Button>
           </div>
           {props.headingDescription && <Text>{props.headingDescription}</Text>}

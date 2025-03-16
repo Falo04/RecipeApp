@@ -1,10 +1,18 @@
 {
   "label": {
     "name": "Name",
-    "color": "Color"
+    "color": "Color",
+    "description": "Description",
+    "email": "Email",
+    "password": "Password"
+  },
+  "placeholder": {
+    "email": "test@test.com",
+    "password": "****"
   },
   "button": {
-    "close": "Abbrechen"
+    "close": "Abbrechen",
+    "login": "Log in"
   },
   "search-recipe": "Search Recipe",
   "table": {
@@ -19,5 +27,9 @@
     "created-success": "Succesfully created",
     "deleted-success": "Succesfully deleted",
     "general-error": "Something failed..."
+  },
+  "login": {
+    "title": "Recipe App",
+    "description": "Log in"
   }
 }

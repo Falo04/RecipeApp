@@ -13,20 +13,20 @@ import { useTranslation } from 'react-i18next';
 export type FoodMenuProps = {};
 
 const data = {
-  title: "Food App",
+  title: "Recipe App",
   mainIcon: Soup,
   navMain: [
     {
       title: "Dashboard",
-      url: "/food/dashboard",
+      url: "/app/dashboard",
     },
     {
       title: "Recipes",
-      url: "/food/overview",
+      url: "/app/recipes",
     },
     {
       title: "Tag",
-      url: "/food/tag",
+      url: "/app/tag",
     }
   ]
 }
@@ -47,7 +47,7 @@ export default function FoodMenu(props: FoodMenuProps) {
   );
 }
 
-export const Route = createLazyFileRoute('/_food')({
+export const Route = createLazyFileRoute('/_app')({
   component: () => (
     <UserProvider>
       <TagsProvider>
