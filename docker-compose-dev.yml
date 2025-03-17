@@ -16,14 +16,14 @@ services:
       dockerfile: ./build/dockerfiles/webserver-dev.Dockerfile
     restart: unless-stopped
     depends_on:
-      - postgres-vol
+      - postgres-dev
     networks:
       - net-food
     volumes:
       - ./webserver/migrations:/migrations
     env_file: [.env]
 
-  postgres-vol:
+  postgres-dev:
     shm_size: 128mb
     restart: unless-stopped
     networks:
@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       # POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - postgres-vol:/var/lib/postgresql/data
+      - postgres-dev:/var/lib/postgresql/data
     build:
       dockerfile: ./build/dockerfiles/postgres.Dockerfile
 
@@ -60,5 +60,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres-vol:
+  postgres-dev:
     name: food-postgres-dev-vol
