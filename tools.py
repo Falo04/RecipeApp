@@ -4,7 +4,7 @@ import sys
 import subprocess
 import shlex
 import json
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 DOCKER_COMMANDS = ["up", "down", "pull", "push", "build", "logs", "run", "exec", "ls"]
 
@@ -42,7 +42,6 @@ def docker_compose_dev(command: str, unknown_args):
 
 
 def main():
-    load_dotenv()
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers(dest="command")
     subparser.required = True
@@ -57,6 +56,7 @@ def main():
     args, unknown_args = parser.parse_known_args()
 
     if args.command == "db":
+        load_dotenv()
         db_username = os.getenv("DB_USERNAME")
         db_database = os.getenv("DB_DATABASE")
         docker_compose_dev(

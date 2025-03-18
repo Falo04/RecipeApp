@@ -1,6 +1,11 @@
 {
   "heading": {
     "overview-title": "Recipe Overview",
-    "overview-description": "All recipes are listed here"
+    "overview-description": "All recipes are listed here",
+    "detail-heading": "Recipe Details",
+    "detail-description": "Here is the full recipe:"
+  },
+  "button": {
+    "create": "Create Recipe"
   }
 }

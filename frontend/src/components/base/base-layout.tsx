@@ -14,8 +14,8 @@ export function BaseLayout({
     <div className='relative isolate flex flex-col min-h-svh w-full bg-white max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950'>
       <div className='w-full'>{navbar}</div>
 
-      <div className='grow p-4 lg:rounded-lg lg:bg-white md:p-8 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:rind-white/10'>
-        <div className='mx-auto overflow-hidden'>{children}</div>
+      <div className='flex grow m-2 p-4 lg:rounded-lg lg:bg-white md:p-8 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:rind-white/10'>
+        {children}
       </div>
 
       <div className='absolute'>
