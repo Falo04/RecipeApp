@@ -32,7 +32,6 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      # POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres-dev:/var/lib/postgresql/data
     build:
@@ -61,4 +60,4 @@ networks:
 
 volumes:
   postgres-dev:
-    name: food-postgres-dev-vol
+    name: postgres-dev-vol
