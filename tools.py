@@ -6,7 +6,17 @@ import shlex
 import json
 # from dotenv import load_dotenv
 
-DOCKER_COMMANDS = ["up", "down", "pull", "push", "build", "logs", "run", "exec", "ls"]
+DOCKER_COMMANDS = [
+    "up",
+    "down",
+    "pull",
+    "push",
+    "build",
+    "logs",
+    "run",
+    "exec",
+    "ls",
+]
 
 
 def check_return_code(code):
@@ -30,7 +40,9 @@ def get_webserver_service() -> str | None:
     for line in lines.split("\n"):
         info = json.loads(line)
 
-        if "webserver" in [x.split("=")[0] for x in info["Labels"].split(",")]:
+        print(info["Name"])
+
+        if "webserver" in info["Name"]:
             return info["Service"]
 
 
@@ -52,16 +64,14 @@ def main():
     # special subcommands
     subparser.add_parser("db")
     subparser.add_parser("make-migratios")
+    subparser.add_parser("create-user")
 
     args, unknown_args = parser.parse_known_args()
 
     if args.command == "db":
-        load_dotenv()
-        db_username = os.getenv("DB_USERNAME")
-        db_database = os.getenv("DB_DATABASE")
         docker_compose_dev(
             "exec",
-            ["-it", "postgres-dev", "psql", "-U", {db_username}, "-d", {db_database}],
+            ["-it", "postgres-dev", "psql", "-U", "$DB_USERNAME", "-d", "$DB_DATABASE"],
         )
     elif args.command == "make-migratios":
         webserver_name = get_webserver_service()
@@ -71,6 +81,18 @@ def main():
         docker_compose_dev(
             "exec", ["-it", webserver_name, "server", "make-migrations", *unknown_args]
         )
+    elif args.command == "create-user":
+        webserver_name = get_webserver_service()
+        if webserver_name is None:
+            print("No service is running. Please run `up` first")
+            exit(1)
+        email = input("Email: ")
+        username = input("Username: ")
+        docker_compose_dev(
+            "exec", ["webserver-dev", "server", "create-user", email, username]
+        )
+        docker_compose_dev("down", ["webserver-dev"])
+        docker_compose_dev("up", ["-d", "webserver-dev"])
     else:
         docker_compose_dev(args.command, unknown_args)
 
