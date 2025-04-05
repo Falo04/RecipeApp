@@ -1,35 +1,41 @@
 {
-  "label": {
-    "name": "Name",
-    "color": "Color",
-    "description": "Description",
-    "email": "Email",
-    "password": "Password"
-  },
-  "placeholder": {
-    "email": "test@test.com",
-    "password": "****"
-  },
-  "button": {
-    "close": "Abbrechen",
-    "login": "Log in"
-  },
-  "search-recipe": "Search Recipe",
-  "table": {
-    "action": "Action",
-    "name": "Name",
-    "color": "Color",
-    "description": "Description",
-    "no-result": "Looks empty..."
-  },
-  "toast": {
-    "loading": "Loading...",
-    "created-success": "Succesfully created",
-    "deleted-success": "Succesfully deleted",
-    "general-error": "Something failed..."
-  },
-  "login": {
-    "title": "Recipe App",
-    "description": "Log in"
-  }
+    "label": {
+        "name": "Name",
+        "color": "Color",
+        "description": "Description",
+        "email": "Email",
+        "password": "Password",
+        "ingredients-title": "Ingredients:",
+        "ingredients-name": "Name",
+        "ingredients-description": "Description",
+        "ingredients-unit": "Unit",
+        "step-title": "Steps:",
+        "steps": "Step"
+    },
+    "placeholder": {
+        "email": "test@test.com",
+        "password": "****"
+    },
+    "button": {
+        "close": "Abbrechen",
+        "login": "Log in"
+    },
+    "search-recipe": "Search Recipe",
+    "table": {
+        "action": "Action",
+        "name": "Name",
+        "color": "Color",
+        "description": "Description",
+        "no-result": "Looks empty..."
+    },
+    "toast": {
+        "loading": "Loading...",
+        "created-success": "Succesfully created",
+        "deleted-success": "Succesfully deleted",
+        "general-error": "Something failed..."
+    },
+    "login": {
+        "title": "Recipe App",
+        "description": "Log in"
+    }
 }

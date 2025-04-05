@@ -1,118 +1,124 @@
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { toast } from 'sonner';
-import { Api } from '@/api/api';
-import type { UserSignInRequest } from '@/api/model/jwt.interface';
+import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Api } from "@/api/api";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { FormLabel } from "./ui/form";
+import type { UserSignInRequest } from "@/api/model/jwt.interface";
 
 /**
-  * The properties for {@link Login}
-  */
+ * The properties for {@link Login}
+ */
 export type LoginProps = {
-  onLogin: () => void;
+    onLogin: () => void;
 };
 
-const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string(),
-});
-
 /**
-  * The Login
-  */
+ * The Login
+ */
 export function Login(props: LoginProps) {
-  const [tg] = useTranslation();
+    const [tg] = useTranslation();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    }
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload: UserSignInRequest = {
-      email: values.email,
-      password: values.password,
-    };
-
-    // Show loading toast while request is being processed
-    toast.promise(
-      // The API request
-      Api.jwt.login(payload),
-      {
-        loading: tg("toast.login-loading"), // The message shown while loading
-        success: (result) => {
-          // Assuming response.data matches TokenDataReponse structure
-
-          if (result.error) {
-            toast.error(result.error.message);
-            return;
-          }
-
-          if (result.data) {
-            localStorage.setItem("access_token", result.data.token);
-            props.onLogin();
-            return tg("toast.login-success");
-          }
+    const form = useForm({
+        defaultValues: {
+            email: "",
+            password: "",
         },
-        error: () => {
-          return tg("toast.login-failed");
-        }
-      }
-    );
-  }
+        onSubmit: async (values) => {
+            const payload: UserSignInRequest = {
+                email: values.value.email,
+                password: values.value.password,
+            };
 
-  return (
-    <div className='flex min-h-svh w-full items-center justify-center p-6 md:p-10'>
-      <div className='w-full max-w-sm'>
-        <div className='flex flex-col gap-6'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='test-2xl'>{tg("login.title")}</CardTitle>
-              <CardDescription>{tg("login.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{tg("label.email")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={tg("placeholder.email")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{tg("label.password")}</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder={tg("placeholder.password")} {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit">{tg("button.login")}</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+            // Show loading toast while request is being processed
+            toast.promise(Api.jwt.login(payload), {
+                loading: tg("toast.login-loading"), // The message shown while loading
+                success: (result) => {
+                    if (result.error) {
+                        toast.error(result.error.message);
+                        return;
+                    }
+
+                    if (result.data) {
+                        localStorage.setItem("access_token", result.data.token);
+                        props.onLogin();
+                        return tg("toast.login-success");
+                    }
+                },
+                error: () => {
+                    return tg("toast.login-failed");
+                },
+            });
+        },
+    });
+
+    return (
+        <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+            <div className="w-full max-w-sm">
+                <div className="flex flex-col gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="test-2xl">{tg("login.title")}</CardTitle>
+                            <CardDescription>{tg("login.description")}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form
+                                className="space-y-8"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    form.handleSubmit();
+                                }}
+                            >
+                                <form.Field
+                                    name="email"
+                                    validators={{
+                                        onChange: ({ value }) =>
+                                            value.includes("@") ? undefined : tg("error.invalid-email"),
+                                    }}
+                                    children={(field) => (
+                                        <div>
+                                            <FormLabel htmlFor="email">{tg("label.email")}</FormLabel>
+                                            <Input
+                                                id="email"
+                                                placeholder={tg("placeholder.email")}
+                                                value={field.state.value}
+                                                onChange={(e) => field.handleChange(e.target.value)}
+                                            />
+                                            {field.state.meta.errors?.[0] && (
+                                                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                                            )}
+                                        </div>
+                                    )}
+                                />
+                                <form.Field
+                                    name="password"
+                                    validators={{
+                                        onChange: ({ value }) =>
+                                            value.length >= 3 ? undefined : tg("error.password-too-short"),
+                                    }}
+                                    children={(field) => (
+                                        <div>
+                                            <FormLabel htmlFor="password">{tg("label.password")}</FormLabel>
+                                            <Input
+                                                id="password"
+                                                placeholder={tg("placeholder.password")}
+                                                value={field.state.value}
+                                                onChange={(e) => field.handleChange(e.target.value)}
+                                            />
+                                            {field.state.meta.errors?.[0] && (
+                                                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                                            )}
+                                        </div>
+                                    )}
+                                />
+                                <Button type="submit">{tg("button.login")}</Button>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
-      </div >
-    </div >
-  );
+    );
 }

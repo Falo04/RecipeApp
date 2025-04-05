@@ -10,5 +10,10 @@
     },
     "button": {
         "create": "Create Recipe"
+    },
+    "error": {
+        "amount-not-zero": "Ingredients amount should not be zero",
+        "step-length-zero": "Step cannot be empty",
+        "step-length-1024": "Step cannot be longer than 1024 characters"
     }
 }

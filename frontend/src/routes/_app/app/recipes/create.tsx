@@ -1,223 +1,213 @@
 import { Api } from "@/api/api";
-import { Units, type Ingredients } from "@/api/model/ingredients.interface";
+import { Units } from "@/api/model/ingredients.interface";
 import type { CreateRecipeRequest } from "@/api/model/recipe.interface";
 import SubmenuLayout from "@/components/base/submenu-layout";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
 import USER_CONTEXT from "@/context/user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import React from "react";
-import { useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { z } from "zod";
 
-/**
- * The properties for {@link CreateRecipe}
- */
-export type CreateRecipeProps = {};
-
-/**
- * The CreateRecipe
- */
-function CreateRecipe(props: CreateRecipeProps) {
+export function CreateRecipe() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
+    const navigate = useNavigate();
     const tagContext = React.useContext(TAGS_CONTEXT);
     const userContext = React.useContext(USER_CONTEXT);
 
-    const navigate = useNavigate();
-
-    const formSchema = z.object({
-        name: z.string().max(255, "Name cant be longer than 255 character"),
-        description: z.string().max(255, "cant be longer that 255 character"),
-        ingredients: z.array(
-            z.object({
-                name: z.string(),
-                unit: z.nativeEnum(Units),
-                amount: z.number({ coerce: true }),
-            }),
-        ),
-        steps: z.array(
-            z.object({
-                step: z.string(),
-            }),
-        ),
-    });
-
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm({
         defaultValues: {
             name: "",
             description: "",
-            ingredients: [
-                {
-                    name: "",
-                    unit: Units.Teaspoon,
-                    amount: 0,
-                },
-            ],
+            ingredients: [{ name: "", amount: 0, unit: Units.Teaspoon }],
             steps: [{ step: "" }],
         },
-        mode: "onSubmit",
+        onSubmit: async ({ value }) => {
+            const payload: CreateRecipeRequest = {
+                user: userContext.user.uuid,
+                tags: [],
+                name: value.name,
+                description: value.description,
+                ingredients: value.ingredients,
+                steps: value.steps.map((s, idx) => ({ index: idx, step: s.step })),
+            };
+
+            toast.promise(Api.recipe.create(payload), {
+                loading: tg("toast.loading"),
+                success: (result) => {
+                    if (result.error) {
+                        toast.error(result.error.message);
+                        return;
+                    }
+
+                    if (result.data) {
+                        navigate({ to: "/app/recipes/$recipeId", params: { recipeId: result.data.uuid } });
+                        return tg("toast.created-success");
+                    }
+                },
+                error: () => tg("toast.general-error"),
+            });
+        },
     });
-
-    const ingreFieldArray = useFieldArray({
-        control: form.control,
-        name: "ingredients",
-    });
-
-    const stepFieldArray = useFieldArray({
-        control: form.control,
-        name: "steps",
-    });
-
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        const payload: CreateRecipeRequest = {
-            user: userContext.user.uuid,
-            tags: [],
-            name: values.name,
-            description: values.description,
-            ingredients: values.ingredients.map((ing) => ({
-                name: ing.name,
-                amount: ing.amount,
-                unit: ing.unit,
-            })),
-            steps: values.steps.map((step, index) => ({ index: index, step: step.step })),
-        };
-
-        toast.promise(Api.recipe.create(payload), {
-            loading: tg("toast.loading"),
-            success: (result) => {
-                if (result.error) {
-                    toast.error(result.error.message);
-                    return;
-                }
-
-                if (result.data) {
-                    navigate({ to: "/app/recipes/$recipeId", params: { recipeId: result.data.uuid } });
-                    return tg("toast.created-success");
-                }
-            },
-            error: () => {
-                return tg("toast.general-error");
-            },
-        });
-    }
 
     return (
         <div className="mx-auto w-4xl">
             <SubmenuLayout
                 heading={t("heading.detail-heading")}
                 headingDescription={t("heading.detail-description")}
-                hrefBack={"/app/recipes"}
+                hrefBack="/app/recipes"
             >
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col gap-5 px-4">
-                        <ScrollArea className="h-[70vh] pr-4">
-                            <div className="flex flex-col gap-5 pb-4">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="name" type="text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="description"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>description</FormLabel>
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="description"
-                                                    className="h-[100px] resize-none"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="mt-8 flex justify-between">
-                                <h2>{t("table.ingredients-title")}</h2>
-                                <Button
-                                    className=""
-                                    onClick={() =>
-                                        ingreFieldArray.append({ name: "", amount: 0, unit: Units.Kilogram })
-                                    }
-                                >
-                                    <PlusIcon />
-                                </Button>
-                            </div>
-                            <Table className="relative">
-                                <TableHeader className="sticky top-0">
-                                    <TableRow>
-                                        <TableHead>{t("table.ingredients-name")}</TableHead>
-                                        <TableHead>{t("table.ingredients-description")}</TableHead>
-                                        <TableHead className="min-w-[140px]">{t("table.ingredients-unit")}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {ingreFieldArray.fields.map((item, index) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`ingredients.${index}.name`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Input placeholder="name" type="text" {...field} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`ingredients.${index}.amount`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Input placeholder="amount" type="number" {...field} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell className="min-w-[140px]">
-                                                {" "}
-                                                {/* Ensures unit column stays wide */}
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`ingredients.${index}.unit`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormControl>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        form.handleSubmit();
+                    }}
+                    className="flex h-full flex-col gap-5 px-4"
+                >
+                    <ScrollArea className="h-[70vh] pr-4">
+                        <div className="flex flex-col gap-5 pb-4">
+                            <form.Field
+                                name="name"
+                                validators={{
+                                    onChangeListenTo: ["name"],
+                                    onChange: ({ value }) =>
+                                        !value ? "Name is required" : value.length > 255 ? "Too long" : undefined,
+                                }}
+                            >
+                                {(field) => (
+                                    <div>
+                                        <FormLabel htmlFor="name">{tg("label.name")}</FormLabel>
+                                        <Input
+                                            id="name"
+                                            value={field.state.value}
+                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            placeholder="name"
+                                        />
+                                        {field.state.meta.errors?.[0] && (
+                                            <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+
+                            <form.Field
+                                name="description"
+                                validators={{
+                                    onChangeListenTo: ["description"],
+                                    onChange: ({ value }) =>
+                                        !value
+                                            ? "Description is required"
+                                            : value.length > 255
+                                              ? "Too long"
+                                              : undefined,
+                                }}
+                            >
+                                {(field) => (
+                                    <div>
+                                        <FormLabel htmlFor="description">{tg("label.description")}</FormLabel>
+                                        <Textarea
+                                            id="description"
+                                            value={field.state.value}
+                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            placeholder="description"
+                                            className="h-[100px] resize-none"
+                                        />
+                                        {field.state.meta.errors?.[0] && (
+                                            <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                        </div>
+
+                        <form.Field
+                            name="ingredients"
+                            mode="array"
+                            children={(ingredients) => (
+                                <div>
+                                    <div className="mt-8 flex justify-between">
+                                        <h2>{tg("label.ingredients-title")}</h2>
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                ingredients.pushValue({
+                                                    name: "",
+                                                    amount: 0,
+                                                    unit: Units.Teaspoon,
+                                                })
+                                            }
+                                        >
+                                            <PlusIcon />
+                                        </Button>
+                                    </div>
+
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>{tg("label.ingredients-name")}</TableHead>
+                                                <TableHead>{tg("label.ingredients-description")}</TableHead>
+                                                <TableHead>{tg("label.ingredients-unit")}</TableHead>
+                                                <TableHead />
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {ingredients.state.value.map((_, index) => (
+                                                <TableRow key={index}>
+                                                    <form.Field name={`ingredients[${index}].name`}>
+                                                        {(f) => (
+                                                            <TableCell>
+                                                                <Input
+                                                                    value={f.state.value}
+                                                                    onChange={(e) => f.handleChange(e.target.value)}
+                                                                    placeholder="Name"
+                                                                />
+                                                            </TableCell>
+                                                        )}
+                                                    </form.Field>
+
+                                                    <form.Field
+                                                        name={`ingredients[${index}].amount`}
+                                                        validators={{
+                                                            onSubmit: ({ value }) =>
+                                                                value === 0 ? t("error.amount-not-zero") : undefined,
+                                                        }}
+                                                    >
+                                                        {(f) => (
+                                                            <TableCell>
+                                                                <Input
+                                                                    type="number"
+                                                                    value={f.state.value}
+                                                                    onChange={(e) =>
+                                                                        f.handleChange(Number(e.target.value))
+                                                                    }
+                                                                    placeholder="Amount"
+                                                                />
+                                                                {f.state.meta.errors?.[0] && (
+                                                                    <p className="text-sm text-red-500">
+                                                                        {f.state.meta.errors[0]}
+                                                                    </p>
+                                                                )}
+                                                            </TableCell>
+                                                        )}
+                                                    </form.Field>
+
+                                                    <form.Field name={`ingredients[${index}].unit`}>
+                                                        {(f) => (
+                                                            <TableCell className="min-w-[140px]">
                                                                 <Select
-                                                                    onValueChange={field.onChange}
-                                                                    value={field.value}
+                                                                    value={f.state.value}
+                                                                    onValueChange={(val) => f.setValue(val as Units)}
                                                                 >
                                                                     <SelectTrigger className="w-full">
                                                                         <SelectValue placeholder="Select unit" />
@@ -230,65 +220,87 @@ function CreateRecipe(props: CreateRecipeProps) {
                                                                         ))}
                                                                     </SelectContent>
                                                                 </Select>
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button variant="ghost" onClick={() => ingreFieldArray.remove(index)}>
-                                                    <MinusIcon />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                                            </TableCell>
+                                                        )}
+                                                    </form.Field>
 
-                            <div className="mt-8 flex flex-col">
-                                <div className="flex justify-between">
-                                    <h2>{t("label.step-title")}</h2>
-                                    <Button className="" onClick={() => stepFieldArray.append({ step: "" })}>
-                                        <PlusIcon />
-                                    </Button>
+                                                    <TableCell>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            onClick={() => ingredients.removeValue(index)}
+                                                        >
+                                                            <MinusIcon />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
                                 </div>
+                            )}
+                        />
+                        <div className="mt-8 flex justify-between">
+                            <h2>{tg("label.step-title")}</h2>
+                            <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
+                                <PlusIcon />
+                            </Button>
+                        </div>
 
-                                {stepFieldArray.fields.map((item, index) => (
-                                    <div className="relative my-4" key={item.id}>
-                                        <FormField
-                                            control={form.control}
-                                            name={`steps.${index}.step`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>{tg("label-steps") + index}</FormLabel>
-                                                    <FormControl>
+                        <form.Field name="steps">
+                            {(fieldArray) => (
+                                <div>
+                                    {fieldArray.state.value.map((_, index) => (
+                                        <div className="relative my-4" key={index}>
+                                            <form.Field
+                                                name={`steps[${index}].step`}
+                                                validators={{
+                                                    onSubmit: ({ value }) =>
+                                                        value.length === 0 ? t("error.step-length-zero") : undefined,
+                                                    onChange: ({ value }) =>
+                                                        value.length > 1024 ? t("error.step-length-1024") : undefined,
+                                                }}
+                                            >
+                                                {(f) => (
+                                                    <div>
+                                                        <FormLabel
+                                                            htmlFor={"step" + index}
+                                                        >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
                                                         <Textarea
-                                                            placeholder="step"
+                                                            id={"step" + index}
+                                                            value={f.state.value}
+                                                            onChange={(e) => f.handleChange(e.target.value)}
+                                                            placeholder="Step"
                                                             className="h-[100px] resize-none"
-                                                            {...field}
                                                         />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button
-                                            className="absolute top-6 right-1"
-                                            variant="ghost"
-                                            onClick={() => stepFieldArray.remove(index)}
-                                        >
-                                            <MinusIcon />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                        <Button className="col-start-2 place-self-end" variant="primary" type="submit">
-                            Submit
-                        </Button>
-                    </form>
-                </Form>
+                                                        {f.state.meta.errors?.[0] && (
+                                                            <p className="text-sm text-red-500">
+                                                                {f.state.meta.errors[0]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </form.Field>
+
+                                            <Button
+                                                type="button"
+                                                className="absolute top-6 right-1"
+                                                variant="ghost"
+                                                onClick={() => form.removeFieldValue("steps", index)}
+                                            >
+                                                <MinusIcon />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </form.Field>
+                    </ScrollArea>
+
+                    <Button type="submit" variant="primary" className="self-end">
+                        Submit
+                    </Button>
+                </form>
             </SubmenuLayout>
         </div>
     );
