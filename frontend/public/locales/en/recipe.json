@@ -1,11 +1,14 @@
 {
-  "heading": {
-    "overview-title": "Recipe Overview",
-    "overview-description": "All recipes are listed here",
-    "detail-heading": "Recipe Details",
-    "detail-description": "Here is the full recipe:"
-  },
-  "button": {
-    "create": "Create Recipe"
-  }
+    "heading": {
+        "overview-title": "Recipe Overview",
+        "overview-description": "All recipes are listed here",
+        "detail-heading": "Recipe Details",
+        "detail-description": "Here is the full recipe:",
+        "ingredients": "List of all Ingredients",
+        "steps": "Instruction:",
+        "step": "Step: "
+    },
+    "button": {
+        "create": "Create Recipe"
+    }
 }

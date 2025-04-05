@@ -26,15 +26,15 @@ export interface FullRecipe {
 }
 
 export interface Steps {
-  uuid: string | null;
+  uuid?: string;
   step: string;
-  index: string;
+  index: number;
 }
 
 export interface CreateRecipeRequest {
   name: string;
   description: string;
-  user: SimpleUser;
+  user: string;
   tags: SimpleTag[];
   ingredients: Ingredients[];
   steps: Steps[];

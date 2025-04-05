@@ -11,7 +11,7 @@ export interface Page<T> {
 }
 
 export interface SingleUuid {
-  uuid: String;
+  uuid: string;
 }
 
 export interface ApiError {

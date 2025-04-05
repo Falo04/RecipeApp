@@ -17,10 +17,6 @@ const data = {
   mainIcon: Soup,
   navMain: [
     {
-      title: "Dashboard",
-      url: "/app/dashboard",
-    },
-    {
       title: "Recipes",
       url: "/app/recipes",
     },

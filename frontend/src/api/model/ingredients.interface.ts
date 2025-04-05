@@ -1,8 +1,8 @@
 export interface Ingredients {
-  uuid: string | null;
+  uuid?: string;
   name: string;
   unit: Units;
-  amoutn: number;
+  amount: number;
 }
 
 export enum Units {
