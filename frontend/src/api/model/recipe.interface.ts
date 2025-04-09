@@ -3,48 +3,48 @@ import type { SimpleTag } from "./tag.interface";
 import type { SimpleUser } from "./user.interface";
 
 export interface SimpleRecipe {
-  uuid: string;
-  name: string;
-  description: string;
+    uuid: string;
+    name: string;
+    description: string;
 }
 
 export interface SimpleRecipeWithTags {
-  uuid: string;
-  name: string;
-  description: string;
-  tags: SimpleTag[];
+    uuid: string;
+    name: string;
+    description: string;
+    tags: SimpleTag[];
 }
 
 export interface FullRecipe {
-  uuid: string;
-  name: string;
-  description: string;
-  user: SimpleUser;
-  tags: SimpleTag[];
-  ingredients: Ingredients[];
-  steps: Steps[];
+    uuid: string;
+    name: string;
+    description: string;
+    user: SimpleUser;
+    tags: SimpleTag[];
+    ingredients: Ingredients[];
+    steps: Steps[];
 }
 
 export interface Steps {
-  uuid?: string;
-  step: string;
-  index: number;
+    uuid?: string;
+    step: string;
+    index: number;
 }
 
 export interface CreateRecipeRequest {
-  name: string;
-  description: string;
-  user: string;
-  tags: SimpleTag[];
-  ingredients: Ingredients[];
-  steps: Steps[];
+    name: string;
+    description: string;
+    user: string;
+    tags: SimpleTag[];
+    ingredients: Ingredients[];
+    steps: Steps[];
 }
 
 export interface UpdateRecipeRequest {
-  name: string;
-  description: string;
-  user: SimpleUser;
-  tags: SimpleTag[];
-  ingredients: Ingredients[];
-  steps: Steps[];
+    name: string;
+    description: string;
+    user: string;
+    tags: SimpleTag[];
+    ingredients: Ingredients[];
+    steps: Steps[];
 }

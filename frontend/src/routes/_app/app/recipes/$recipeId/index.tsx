@@ -2,9 +2,11 @@ import { Api } from "@/api/api";
 import { Heading, Subheading } from "@/components/base/heading";
 import SubmenuLayout from "@/components/base/submenu-layout";
 import { Text } from "@/components/base/text";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TableHeader, TableRow, TableHead, TableCell, Table, TableBody } from "@/components/ui/table";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -20,6 +22,10 @@ function RecipeDetail(props: RecipeDetailProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
+    const navigate = useNavigate();
+
+    const { recipeId } = Route.useParams();
+
     const data = Route.useLoaderData();
     if (!data) {
         return;
@@ -30,7 +36,8 @@ function RecipeDetail(props: RecipeDetailProps) {
             <SubmenuLayout
                 heading={t("heading.detail-heading")}
                 headingDescription={t("heading.detail-description")}
-                hrefBack={"/app/recipes"}
+                navigate={() => navigate({ to: "/app/recipes" })}
+                editButton={() => navigate({ to: "/app/recipes/$recipeId/update", params: { recipeId: recipeId } })}
             >
                 <ScrollArea className="h-[75vh]">
                     <div className="flex flex-col gap-4">

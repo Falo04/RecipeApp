@@ -12,7 +12,6 @@ import TAGS_CONTEXT from "@/context/tags";
 import { useForm } from "@tanstack/react-form";
 import { Badge, badgeVariants } from "../ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import { Value } from "@radix-ui/react-select";
 
 export type CreateTagDialogProps = {
     onClose: () => void;

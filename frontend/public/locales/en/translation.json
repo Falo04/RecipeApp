@@ -17,8 +17,10 @@
         "password": "****"
     },
     "button": {
-        "close": "Abbrechen",
-        "login": "Log in"
+        "close": "Cancel",
+        "login": "Log in",
+        "create": "Create",
+        "update": "Update"
     },
     "search-recipe": "Search Recipe",
     "table": {
@@ -31,6 +33,7 @@
     "toast": {
         "loading": "Loading...",
         "created-success": "Succesfully created",
+        "updated-success": "Succesfully updated",
         "deleted-success": "Succesfully deleted",
         "general-error": "Something failed..."
     },

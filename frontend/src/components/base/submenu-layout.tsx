@@ -4,7 +4,7 @@ import { clsx } from "clsx";
 import { Text } from "./text";
 import { useNavigate, type LinkProps } from "@tanstack/react-router";
 import { Button } from "../ui/button";
-import { X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 
 /**
  * The properties for {@link SubmenuLayout}
@@ -26,15 +26,16 @@ export type SubmenuLayoutProps = {
     className?: string;
 
     /** The link back to main menu */
-    hrefBack?: LinkProps["href"];
+    navigate: () => void;
+
+    /** The button to open the edit page */
+    editButton?: () => void;
 };
 
 /**
  * A layout that defines the submenu with a button to get back to the parent menu
  */
 export default function SubmenuLayout(props: SubmenuLayoutProps) {
-    const navigate = useNavigate();
-
     return (
         <div className={clsx("flex w-full flex-col gap-6", props.className)}>
             <div
@@ -48,17 +49,16 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
                 <div className={"flex w-full flex-col gap-3"}>
                     <div className={"flex justify-between"}>
                         <Heading>{props.heading} </Heading>
-                        {props.hrefBack ? (
-                            <Button
-                                onClick={() => navigate({ to: props.hrefBack })}
-                                variant={"ghost"}
-                                className={"w-fit"}
-                            >
+                        <div className="flex">
+                            {props.editButton && (
+                                <Button onClick={() => props.editButton?.()} variant={"ghost"} className={"w-fit"}>
+                                    <Edit className={"size-6"} />
+                                </Button>
+                            )}
+                            <Button onClick={() => props.navigate()} variant={"ghost"} className={"w-fit"}>
                                 <X className={"size-6"} />
                             </Button>
-                        ) : (
-                            <div></div>
-                        )}
+                        </div>
                     </div>
                     {props.headingDescription && <Text>{props.headingDescription}</Text>}
                 </div>

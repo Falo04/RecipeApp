@@ -1,71 +1,83 @@
-import { Api } from '@/api/api';
-import type { SimpleRecipe } from '@/api/model/recipe.interface';
-import { DataTable } from '@/components/base/data-table';
-import SubmenuLayout from '@/components/base/submenu-layout';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
+import { Api } from "@/api/api";
+import type { SimpleRecipe } from "@/api/model/recipe.interface";
+import { DataTable } from "@/components/base/data-table";
+import SubmenuLayout from "@/components/base/submenu-layout";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 /**
-  * The properties for {@link TagDetail}
-  */
+ * The properties for {@link TagDetail}
+ */
 export type TagDetailProps = {
-  tagName: string;
+    tagName: string;
 };
 
 /**
-  * The TagDetail
-  */
+ * The TagDetail
+ */
 function TagDetail(props: TagDetailProps) {
-  const [t] = useTranslation("tag");
-  const [tg] = useTranslation();
+    const [t] = useTranslation("tag");
+    const [tg] = useTranslation();
 
-  const data = Route.useLoaderData();
-  if (!data) {
-    return;
-  }
+    const navigate = useNavigate();
 
-  const columns: ColumnDef<SimpleRecipe>[] = useMemo(() => [
-    {
-      accessorKey: "name",
-      header: () => <span>{tg("table.name")}</span>,
-      cell: ({ row }) => (
-        <Link to={"/app/tag/$tagId"} params={{ tagId: row.original.uuid }}  >
-          <div className='max-w-[180px] sm:max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap'> <span>{row.original.name}</span></div>
-        </Link >
-      )
-    },
-    {
-      accessorKey: "description",
-      header: () => <span>{tg("table.description")}</span>,
-      cell: ({ row }) => (
-        <Link to={"/app/recipes"} params={{ tagId: row.original.uuid }}  >
-          <div className='max-w-[180px] sm:max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap'> <span>{row.original.description}</span></div>
-        </Link >
-      )
+    const data = Route.useLoaderData();
+    if (!data) {
+        return;
     }
-  ], []);
 
-  return (
-    <SubmenuLayout hrefBack='/app/tag' heading={t("heading.detail-title")}
-      headingDescription={t("heading.detail-description")} objectName={props.tagName}>
-      <DataTable data={data.items} columns={columns} />
-    </SubmenuLayout>
-  );
+    const columns: ColumnDef<SimpleRecipe>[] = useMemo(
+        () => [
+            {
+                accessorKey: "name",
+                header: () => <span>{tg("table.name")}</span>,
+                cell: ({ row }) => (
+                    <Link to={"/app/tag/$tagId"} params={{ tagId: row.original.uuid }}>
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
+                            {" "}
+                            <span>{row.original.name}</span>
+                        </div>
+                    </Link>
+                ),
+            },
+            {
+                accessorKey: "description",
+                header: () => <span>{tg("table.description")}</span>,
+                cell: ({ row }) => (
+                    <Link to={"/app/recipes"} params={{ tagId: row.original.uuid }}>
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
+                            {" "}
+                            <span>{row.original.description}</span>
+                        </div>
+                    </Link>
+                ),
+            },
+        ],
+        [],
+    );
+
+    return (
+        <SubmenuLayout
+            heading={t("heading.detail-title")}
+            headingDescription={t("heading.detail-description")}
+            navigate={() => navigate({ to: "/app/tag" })}
+        >
+            <DataTable data={data.items} columns={columns} />
+        </SubmenuLayout>
+    );
 }
 
-export const Route = createFileRoute('/_app/app/tag/$tagId/')({
-  component: TagDetail,
-  loader: async ({ params }) => {
-    const res = await Api.tags.getRecipesByTag(params.tagId);
-    if (res.error) {
-      toast.error(res.error.message);
-      return;
-    }
-    return res.data;
-  }
-
-})
-
+export const Route = createFileRoute("/_app/app/tag/$tagId/")({
+    component: TagDetail,
+    loader: async ({ params }) => {
+        const res = await Api.tags.getRecipesByTag(params.tagId);
+        if (res.error) {
+            toast.error(res.error.message);
+            return;
+        }
+        return res.data;
+    },
+});
