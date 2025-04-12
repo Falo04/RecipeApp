@@ -68,3 +68,14 @@ pub struct Ingredients {
     pub unit: Units,
     pub amount: i32,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct RecipeSearchRequest {
+    pub name: MaxStr<255>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct RecipeSearchResponse {
+    pub name: MaxStr<255>,
+    pub uuid: Uuid,
+}

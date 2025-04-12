@@ -27,7 +27,8 @@ pub fn initialize() -> ApiContext<Router> {
                 .handler(recipes::handler::get_recipe)
                 .handler(recipes::handler::create_recipe)
                 .handler(recipes::handler::update_recipe)
-                .handler(recipes::handler::delete_recipe),
+                .handler(recipes::handler::delete_recipe)
+                .handler(recipes::handler::search_recipes),
         )
         .nest(
             "/users",

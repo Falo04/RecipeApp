@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
@@ -5,6 +6,7 @@ use axum::extract::Path;
 use axum::extract::Query;
 use futures_lite::StreamExt;
 use regex::Regex;
+use rorm::conditions;
 use rorm::conditions::DynamicCollection;
 use rorm::model::Identifiable;
 use rorm::prelude::ForeignModelByField;
@@ -20,11 +22,14 @@ use crate::global::GLOBAL;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
+use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::Ingredients;
+use crate::http::handler::recipes::schema::RecipeSearchRequest;
+use crate::http::handler::recipes::schema::RecipeSearchResponse;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Steps;
 use crate::http::handler::recipes::schema::UpdateRecipeRequest;
@@ -252,4 +257,23 @@ pub async fn delete_recipe(
 
     tx.commit().await?;
     Ok(())
+}
+
+#[get("/search")]
+pub async fn search_recipes(
+    ApiJson(request): ApiJson<RecipeSearchRequest>,
+) -> ApiResult<ApiJson<List<RecipeSearchResponse>>> {
+    let items: Vec<_> = rorm::query(&GLOBAL.db, Recipe)
+        .condition(conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(Recipe.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!("%{}%", request.name))),
+        })
+        .order_asc(Recipe.name)
+        .stream()
+        .map(|result| result.map(RecipeSearchResponse::from))
+        .try_collect()
+        .await?;
+
+    Ok(ApiJson(List { list: items }))
 }
