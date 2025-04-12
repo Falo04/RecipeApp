@@ -261,13 +261,13 @@ pub async fn delete_recipe(
 
 #[get("/search")]
 pub async fn search_recipes(
-    ApiJson(request): ApiJson<RecipeSearchRequest>,
+    search: Query<RecipeSearchRequest>,
 ) -> ApiResult<ApiJson<List<RecipeSearchResponse>>> {
     let items: Vec<_> = rorm::query(&GLOBAL.db, Recipe)
         .condition(conditions::Binary {
             operator: conditions::BinaryOperator::Like,
             fst_arg: conditions::Column(Recipe.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!("%{}%", request.name))),
+            snd_arg: conditions::Value::String(Cow::Owned(format!("%{}%", search.name))),
         })
         .order_asc(Recipe.name)
         .stream()

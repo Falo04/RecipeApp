@@ -48,3 +48,12 @@ export interface UpdateRecipeRequest {
     ingredients: Ingredients[];
     steps: Steps[];
 }
+
+export interface RecipeSearchRequest {
+    name: string;
+}
+
+export interface RecipeSearchResponse {
+    uuid: string;
+    name: string;
+}
