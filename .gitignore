@@ -1,2 +1,5 @@
 .env
 target/
+frontend/.idea
+frontend/.vscode
+webserver/.idea
