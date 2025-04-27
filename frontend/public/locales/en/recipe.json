@@ -6,7 +6,9 @@
         "detail-description": "Here is the full recipe:",
         "ingredients": "List of all Ingredients",
         "steps": "Instruction:",
-        "step": "Step: "
+        "step": "Step: ",
+        "create-heading": "Create Recipe",
+        "create-description": "Create a recipe with the following form"
     },
     "button": {
         "create": "Create Recipe"

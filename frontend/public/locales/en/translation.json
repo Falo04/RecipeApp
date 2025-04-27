@@ -7,10 +7,11 @@
         "password": "Password",
         "ingredients-title": "Ingredients:",
         "ingredients-name": "Name",
-        "ingredients-description": "Description",
+        "ingredients-amount": "Amount",
         "ingredients-unit": "Unit",
         "step-title": "Steps:",
-        "steps": "Step"
+        "steps": "Step",
+        "tags": "Tags"
     },
     "placeholder": {
         "email": "test@test.com",
@@ -40,5 +41,9 @@
     "login": {
         "title": "Recipe App",
         "description": "Log in"
+    },
+    "search": {
+        "recipe": "Search recipe",
+        "recipe-empty": "No recipe found"
     }
 }

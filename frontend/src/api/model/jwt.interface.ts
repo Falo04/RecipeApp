@@ -3,6 +3,6 @@ export interface UserSignInRequest {
   password: string;
 }
 
-export interface TokenDataReponse {
+export interface TokenDataResponse {
   token: string,
 }

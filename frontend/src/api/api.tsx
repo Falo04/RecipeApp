@@ -1,4 +1,4 @@
-import type { TokenDataReponse, UserSignInRequest } from "./model/jwt.interface";
+import type { TokenDataResponse, UserSignInRequest } from "./model/jwt.interface";
 import type { SimpleUser } from "./model/user.interface";
 import type {
     CreateRecipeRequest,
@@ -16,8 +16,8 @@ import { ApiClient } from "./api-client";
 
 export const Api = {
     jwt: {
-        login: async (payload: UserSignInRequest): Promise<ApiResponse<TokenDataReponse>> =>
-            await callApi<TokenDataReponse>({ method: "POST", url: "/jwt/login", data: payload }),
+        login: async (payload: UserSignInRequest): Promise<ApiResponse<TokenDataResponse>> =>
+            await callApi<TokenDataResponse>({ method: "POST", url: "/jwt/login", data: payload }),
     },
     user: {
         getMe: async (): Promise<ApiResponse<SimpleUser>> =>

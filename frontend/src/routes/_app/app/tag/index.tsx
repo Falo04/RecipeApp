@@ -22,7 +22,7 @@ export type TagsOverviewProps = {};
 /**
  * The TagsOverview
  */
-function TagsOverview(props: TagsOverviewProps) {
+function TagsOverview(_props: TagsOverviewProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

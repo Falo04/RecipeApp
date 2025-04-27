@@ -2,23 +2,23 @@ import { Api } from "@/api/api";
 import { Heading, Subheading } from "@/components/base/heading";
 import SubmenuLayout from "@/components/base/submenu-layout";
 import { Text } from "@/components/base/text";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TableHeader, TableRow, TableHead, TableCell, Table, TableBody } from "@/components/ui/table";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Edit } from "lucide-react";
+import {createFileRoute, Link, useNavigate} from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import {Badge, badgeVariants} from "@/components/ui/badge.tsx";
+import type {VariantProps} from "class-variance-authority";
 
 /**
- * The properties for {@link RecipeDetails}
+ * The properties for {@link RecipeDetail}
  */
 export type RecipeDetailProps = {};
 
 /**
  * The RecipeDetails
  */
-function RecipeDetail(props: RecipeDetailProps) {
+function RecipeDetail(_props: RecipeDetailProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
@@ -44,6 +44,19 @@ function RecipeDetail(props: RecipeDetailProps) {
                         <Heading>{data.name}</Heading>
                         <div className="min-h-[100px] rounded-lg border px-2">
                             <Text>{data.description}</Text>
+                        </div>
+                        <Subheading>{t("heading.tags")}</Subheading>
+                        <div className={"flex gap-2"}>
+                            {data.tags.map((tag ) => (
+                                <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                                    <Badge
+                                        variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
+                                        key={tag.uuid}
+                                    >
+                                        {tag.name}
+                                    </Badge>
+                                </Link>
+                            ))}
                         </div>
                         <Subheading>{t("heading.ingredients")}</Subheading>
                         <div className="rounded-lg border px-2">

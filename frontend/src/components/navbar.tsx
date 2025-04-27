@@ -1,13 +1,10 @@
-import { useTranslation } from "react-i18next";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Input } from "./ui/input";
-import { MenuIcon, Search, XIcon, type LucideIcon } from "lucide-react";
+import { MenuIcon, XIcon, type LucideIcon } from "lucide-react";
 import clsx from "clsx";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
-import { RecipeSearch, RecipeSearchMobile } from "./recipe-search";
-import React from "react";
+import { RecipeSearch } from "./recipe-search";
 
 export interface NavItem {
     title: string;
@@ -21,13 +18,10 @@ export type NavbarProps = {
     title: String;
     icon: LucideIcon;
     navItems: NavItem[];
-    openSearchBarMobile: () => void;
 };
 
 export function Navbar(props: NavbarProps) {
-    const [tg] = useTranslation();
     const [mobileNavbar, setMobileNavbar] = useState(false);
-    const [openSearchDialog, setOpenSearchDialog] = React.useState(false);
     const pathname = useRouterState().location.pathname;
     const isMobile = useIsMobile();
 
@@ -69,10 +63,7 @@ export function Navbar(props: NavbarProps) {
                 </div>
                 {isMobile && (
                     <div className="flex">
-                        <Button variant="ghost" onClick={() => setOpenSearchDialog(true)}>
-                            <Search className="size-5" />
-                        </Button>
-
+                        <RecipeSearch />
                         <Button variant="ghost" onClick={() => setMobileNavbar(!mobileNavbar)}>
                             {mobileNavbar ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
                         </Button>
@@ -108,11 +99,6 @@ export function Navbar(props: NavbarProps) {
                         ))}
                     </ul>
                 </div>
-            )}
-            {openSearchDialog && (
-                <Suspense>
-                    <RecipeSearchMobile onClose={() => setOpenSearchDialog(false)} />
-                </Suspense>
             )}
         </nav>
     );

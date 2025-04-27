@@ -1,8 +1,7 @@
 import { Api } from "@/api/api";
-import { StatusCode, type ApiError } from "@/api/error";
+import { StatusCode } from "@/api/error";
 import type { SimpleUser } from "@/api/model/user.interface";
 import { Login } from "@/components/login";
-import { Spinner } from "@/components/ui/spinner";
 import { Navigate } from "@tanstack/react-router";
 import React from "react";
 import { toast } from "sonner";
@@ -147,21 +146,5 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
           </USER_CONTEXT.Provider>
         );
     }
-  }
-};
-
-/**
- * Inspect an error and handle the {@link StatusCode.Unauthenticated} status code by requiring the user to log in again.
- *
- * @param error {@link ApiError} to inspect for {@link StatusCode.Unauthenticated}
- */
-export function inspectError(error: ApiError) {
-  switch (error.status_code) {
-    case StatusCode.Unauthenticated:
-      if (USER_PROVIDER !== null) USER_PROVIDER.setState({ user: "unauthenticated" });
-      else console.warn("inspectError has been called without a UserProvider");
-      break;
-    default:
-      break;
   }
 }

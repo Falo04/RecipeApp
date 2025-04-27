@@ -1,25 +1,32 @@
 import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
 import { Api } from "@/api/api";
 import type { RecipeSearchResponse } from "@/api/model/recipe.interface";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useTranslation } from "react-i18next";
-import { Text } from "./base/text";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {Search} from "lucide-react";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command.tsx";
+import {useIsMobile} from "@/hooks/use-mobile.ts";
+import {clsx} from "clsx";
 
 export function RecipeSearch() {
+    const [tg] = useTranslation();
     const [query, setQuery] = useState("");
+    const [open, setOpen] = useState(false);
     const [suggestions, setSuggestions] = useState<RecipeSearchResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (query.length < 3) {
             setSuggestions([]);
             return;
         }
-
+        if (loading) return;
         setLoading(true);
         Api.recipe.search({ name: query }).then((res) => {
             if (res.error) {
@@ -28,109 +35,42 @@ export function RecipeSearch() {
             }
             if (res.data) {
                 setSuggestions(res.data.list);
+
             }
-
-            setLoading(false);
         });
+        setLoading(false);
     }, [query]);
-
-    const handleSelect = (uuid: string) => {
-        navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } });
-        setQuery("");
-    };
 
     return (
         <div className="group">
-            <Input placeholder="Search recipe" value={query} onChange={(e) => setQuery(e.target.value)} />
-            <div className="relative p-0">
-                {loading ? (
-                    <div className="text-muted-foreground p-2 text-sm">Loading...</div>
-                ) : (
-                    <ul className="bg-background absolute top-0 z-20 hidden w-full divide-y rounded-lg group-hover:block hover:block">
-                        {suggestions.length > 0 &&
-                            suggestions.map((recipe) => (
-                                <li
-                                    key={recipe.uuid}
-                                    onClick={() => handleSelect(recipe.uuid)}
-                                    className="hover:bg-muted cursor-pointer px-3 py-2 text-sm"
-                                >
-                                    {recipe.name}
-                                </li>
-                            ))}
-                    </ul>
-                )}
-            </div>
-        </div>
-    );
-}
-
-export type RecipeSearchMobileProps = {
-    onClose: () => void;
-};
-
-export function RecipeSearchMobile(props: RecipeSearchMobileProps) {
-    const [tg] = useTranslation();
-    const [query, setQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<RecipeSearchResponse[]>([]);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (query.length < 3) {
-            setSuggestions([]);
-            return;
-        }
-
-        setLoading(true);
-        Api.recipe.search({ name: query }).then((res) => {
-            if (res.error) {
-                toast.error(res.error.message);
-                return;
-            }
-            if (res.data) {
-                setSuggestions(res.data.list);
-            }
-
-            setLoading(false);
-        });
-    }, [query]);
-
-    const handleSelect = (uuid: string) => {
-        navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } });
-        setQuery("");
-        props.onClose();
-    };
-
-    return (
-        <div className="absolute inset-0 flex items-center justify-center">
-            <Dialog open={true} onOpenChange={props.onClose}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{tg("dialog.search-recipe")}</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-col justify-start gap-6">
-                        <Input placeholder="Search recipe" value={query} onChange={(e) => setQuery(e.target.value)} />
-                        <div className="relative min-h-40 p-0">
-                            {loading ? (
-                                <div className="text-muted-foreground p-2 text-sm">Loading...</div>
-                            ) : (
-                                <ul className="bg-background w-full divide-y rounded-lg">
-                                    {suggestions.length > 0 &&
-                                        suggestions.map((recipe) => (
-                                            <li
-                                                key={recipe.uuid}
-                                                onClick={() => handleSelect(recipe.uuid)}
-                                                className="hover:bg-muted cursor-pointer px-3 py-2 text-sm"
-                                            >
-                                                {recipe.name}
-                                            </li>
-                                        ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button variant={isMobile ? "ghost" : "outline"} role={"combobox"} aria-expanded={open} className={(clsx( isMobile ? "w-fit" : "w-[200px]"))}>
+                        {isMobile ? "" : tg("search.recipe")}
+                        <Search />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className={"w-[200px] p-0"}>
+                    <Command>
+                        <CommandInput value={query} onValueChange={setQuery} placeholder={tg("search.recipe")} className={"h-9"} />
+                        <CommandList>
+                            <CommandEmpty>{tg("search.recipe-empty")}</CommandEmpty>
+                            <CommandGroup>
+                                {suggestions.map((recipe) => (
+                                    <CommandItem key={recipe.uuid} value={recipe.name} onSelect={() => {
+                                        navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipe.uuid }});
+                                        setOpen(false);
+                                        setQuery("");
+                                        return;
+                                    }}>
+                                        {recipe.name}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
         </div>
     );
 }

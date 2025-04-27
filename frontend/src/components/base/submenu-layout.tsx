@@ -2,7 +2,6 @@ import React from "react";
 import { Heading } from "./heading";
 import { clsx } from "clsx";
 import { Text } from "./text";
-import { useNavigate, type LinkProps } from "@tanstack/react-router";
 import { Button } from "../ui/button";
 import { Edit, X } from "lucide-react";
 

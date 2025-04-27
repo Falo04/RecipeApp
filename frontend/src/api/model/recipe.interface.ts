@@ -35,7 +35,7 @@ export interface CreateRecipeRequest {
     name: string;
     description: string;
     user: string;
-    tags: SimpleTag[];
+    tags: string[];
     ingredients: Ingredients[];
     steps: Steps[];
 }
@@ -44,7 +44,7 @@ export interface UpdateRecipeRequest {
     name: string;
     description: string;
     user: string;
-    tags: SimpleTag[];
+    tags: string[];
     ingredients: Ingredients[];
     steps: Steps[];
 }

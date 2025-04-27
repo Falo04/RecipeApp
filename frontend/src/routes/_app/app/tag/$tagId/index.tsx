@@ -18,7 +18,7 @@ export type TagDetailProps = {
 /**
  * The TagDetail
  */
-function TagDetail(props: TagDetailProps) {
+function TagDetail(_props: TagDetailProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

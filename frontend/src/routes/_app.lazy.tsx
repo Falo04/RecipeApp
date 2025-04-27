@@ -5,7 +5,6 @@ import { UserProvider } from "@/context/user";
 import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
 import { Soup } from "lucide-react";
 import { Suspense } from "react";
-import { useTranslation } from "react-i18next";
 
 /**
  * The properties for {@link FoodMenu}
@@ -30,9 +29,7 @@ const data = {
 /**
  * The FoodMenu
  */
-export default function FoodMenu(props: FoodMenuProps) {
-    const [t] = useTranslation("food-menu");
-
+export default function FoodMenu(_props: FoodMenuProps) {
     return (
         <BaseLayout
             navbar={<Navbar title={data.title} icon={data.mainIcon} navItems={data.navMain} />}

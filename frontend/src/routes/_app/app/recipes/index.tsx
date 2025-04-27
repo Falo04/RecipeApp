@@ -7,8 +7,9 @@ import { DataTable } from "@/components/base/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import HeadingLayout from "@/components/base/heading-layout";
 import { useMemo } from "react";
-import { BadgeButton } from "@/components/ui/badge";
+import {Badge, badgeVariants} from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type {VariantProps} from "class-variance-authority";
 
 /**
  * The properties for {@link FoodOverview}
@@ -18,7 +19,7 @@ export type FoodOverviewProps = {};
 /**
  * The FoodOverview
  */
-function FoodOverview(props: FoodOverviewProps) {
+function FoodOverview(_props: FoodOverviewProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
@@ -55,7 +56,12 @@ function FoodOverview(props: FoodOverviewProps) {
                     <div className="flex flex-wrap gap-1">
                         {row.original.tags.map((tag) => (
                             <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
-                                <BadgeButton variant="blue">{tag.name}</BadgeButton>
+                                <Badge
+                                    variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
+                                    key={tag.uuid}
+                                >
+                                    {tag.name}
+                                </Badge>
                             </Link>
                         ))}
                     </div>
