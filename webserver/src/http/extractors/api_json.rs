@@ -1,15 +1,15 @@
 //! Alternative for [`axum::Json`] which produces our [`ApiError`] in case of failure
 
-use axum::Json;
 use axum::body::Bytes;
 use axum::extract::FromRequest;
 use axum::extract::Request;
-use axum::http::HeaderValue;
 use axum::http::header;
+use axum::http::HeaderValue;
 use axum::response::IntoResponse;
+use axum::Json;
 use schemars::JsonSchema;
-use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use swaggapi::as_responses::AsResponses;
 use swaggapi::handler_argument::HandlerArgument;
 use swaggapi::handler_argument::ShouldBeHandlerArgument;

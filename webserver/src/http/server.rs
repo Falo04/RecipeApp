@@ -1,8 +1,8 @@
 use std::net::SocketAddr;
 
+use axum::routing::get;
 use axum::Json;
 use axum::Router;
-use axum::routing::get;
 use futures_lite::StreamExt;
 use signal_hook::consts::TERM_SIGNALS;
 use signal_hook_tokio::Signals;
@@ -14,12 +14,12 @@ use tower::ServiceBuilder;
 use tower_http::trace::DefaultMakeSpan;
 use tower_http::trace::DefaultOnResponse;
 use tower_http::trace::TraceLayer;
-use tracing::Instrument;
-use tracing::Level;
 use tracing::error;
 use tracing::info;
 use tracing::info_span;
 use tracing::instrument;
+use tracing::Instrument;
+use tracing::Level;
 
 use super::middleware::catch_unwind::CatchUnwindLayer;
 use crate::config::Config;

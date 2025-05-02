@@ -1,11 +1,11 @@
 use std::collections::HashSet;
 
 use futures_lite::StreamExt;
-use rorm::Model;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModel;
 use rorm::prelude::ForeignModelByField;
+use rorm::Model;
 use uuid::Uuid;
 
 use super::recipe::Recipe;

@@ -1,12 +1,12 @@
 use std::collections::HashSet;
 
 use futures_lite::StreamExt;
-use rorm::DbEnum;
-use rorm::Model;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModel;
 use rorm::prelude::ForeignModelByField;
+use rorm::DbEnum;
+use rorm::Model;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;

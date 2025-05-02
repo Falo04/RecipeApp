@@ -1,10 +1,10 @@
 use axum::extract::FromRequestParts;
 use axum::http::header;
 use axum::http::request::Parts;
+use jsonwebtoken::decode;
 use jsonwebtoken::DecodingKey;
 use jsonwebtoken::TokenData;
 use jsonwebtoken::Validation;
-use jsonwebtoken::decode;
 use serde::Deserialize;
 use serde::Serialize;
 use swaggapi::re_exports::openapiv3::StatusCode;
