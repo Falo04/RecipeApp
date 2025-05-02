@@ -1,15 +1,15 @@
 //! Alternative for [`axum::Json`] which produces our [`ApiError`] in case of failure
 
+use axum::Json;
 use axum::body::Bytes;
 use axum::extract::FromRequest;
 use axum::extract::Request;
-use axum::http::header;
 use axum::http::HeaderValue;
+use axum::http::header;
 use axum::response::IntoResponse;
-use axum::Json;
 use schemars::JsonSchema;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use swaggapi::as_responses::AsResponses;
 use swaggapi::handler_argument::HandlerArgument;
 use swaggapi::handler_argument::ShouldBeHandlerArgument;
@@ -67,17 +67,17 @@ impl<T: Serialize> IntoResponse for ApiJson<T> {
 }
 
 impl<T: Serialize + JsonSchema> AsResponses for ApiJson<T> {
-    fn responses(gen: &mut SchemaGenerator) -> Responses {
-        Json::<T>::responses(gen)
+    fn responses(generator: &mut SchemaGenerator) -> Responses {
+        Json::<T>::responses(generator)
     }
 }
 
 impl<T> ShouldBeHandlerArgument for ApiJson<T> {}
 impl<T: DeserializeOwned + JsonSchema> HandlerArgument for ApiJson<T> {
-    fn request_body(gen: &mut SchemaGenerator) -> Option<RequestBody> {
-        Json::<T>::request_body(gen)
+    fn request_body(generator: &mut SchemaGenerator) -> Option<RequestBody> {
+        Json::<T>::request_body(generator)
     }
-    fn parameters(gen: &mut SchemaGenerator, path: &[&str]) -> Vec<Parameter> {
-        Json::<T>::parameters(gen, path)
+    fn parameters(generator: &mut SchemaGenerator, path: &[&str]) -> Vec<Parameter> {
+        Json::<T>::parameters(generator, path)
     }
 }

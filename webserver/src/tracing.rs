@@ -4,19 +4,19 @@ use std::any::Any;
 use std::panic;
 use std::panic::Location;
 
-use opentelemetry::trace::TraceError;
-use opentelemetry::trace::TracerProvider;
 use opentelemetry::Key;
 use opentelemetry::KeyValue;
 use opentelemetry::Value;
+use opentelemetry::trace::TraceError;
+use opentelemetry::trace::TracerProvider;
 use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::Resource;
 use opentelemetry_sdk::runtime;
 use opentelemetry_sdk::trace;
-use opentelemetry_sdk::Resource;
-use tracing::error;
 use tracing::Subscriber;
-use tracing_subscriber::registry::LookupSpan;
+use tracing::error;
 use tracing_subscriber::Layer;
+use tracing_subscriber::registry::LookupSpan;
 
 use crate::config::Config;
 

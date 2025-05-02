@@ -9,9 +9,9 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use rorm::crud::update::UpdateBuilder;
-use swaggapi::as_responses::simple_responses;
 use swaggapi::as_responses::AsResponses;
 use swaggapi::as_responses::SimpleResponse;
+use swaggapi::as_responses::simple_responses;
 use swaggapi::internals::SchemaGenerator;
 use swaggapi::re_exports::mime;
 use swaggapi::re_exports::openapiv3;
@@ -185,9 +185,9 @@ impl IntoResponse for ApiError {
 }
 
 impl AsResponses for ApiError {
-    fn responses(gen: &mut SchemaGenerator) -> Responses {
+    fn responses(generator: &mut SchemaGenerator) -> Responses {
         let media_type = Some(MediaType {
-            schema: Some(gen.generate::<ApiErrorResponse>()),
+            schema: Some(generator.generate::<ApiErrorResponse>()),
             ..Default::default()
         });
 

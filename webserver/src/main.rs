@@ -1,21 +1,21 @@
 use std::fs;
 
 use ::tracing::info;
-use bcrypt::hash;
 use bcrypt::DEFAULT_COST;
+use bcrypt::hash;
 use clap::Parser;
 use dotenv::dotenv;
-use global::GlobalChan;
 use global::GLOBAL;
+use global::GlobalChan;
 use http::server;
 use models::user::User;
 use rorm::Database;
 use rorm::DatabaseConfiguration;
 use rorm::DatabaseDriver;
 use tracing::init_tracing_panic_hook;
+use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
 use crate::cli::Cli;

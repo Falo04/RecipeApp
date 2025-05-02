@@ -1,9 +1,9 @@
 use axum::extract::Query;
 use bcrypt::verify;
 use futures_lite::StreamExt;
-use jsonwebtoken::encode;
 use jsonwebtoken::EncodingKey;
 use jsonwebtoken::Header;
+use jsonwebtoken::encode;
 use swaggapi::get;
 use swaggapi::post;
 use time::Duration;
