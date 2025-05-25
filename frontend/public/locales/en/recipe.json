@@ -1,21 +1,24 @@
 {
-    "heading": {
-        "overview-title": "Recipe Overview",
-        "overview-description": "All recipes are listed here",
-        "detail-heading": "Recipe Details",
-        "detail-description": "Here is the full recipe:",
-        "ingredients": "List of all Ingredients",
-        "steps": "Instruction:",
-        "step": "Step: ",
-        "create-heading": "Create Recipe",
-        "create-description": "Create a recipe with the following form"
-    },
-    "button": {
-        "create": "Create Recipe"
-    },
-    "error": {
-        "amount-not-zero": "Ingredients amount should not be zero",
-        "step-length-zero": "Step cannot be empty",
-        "step-length-1024": "Step cannot be longer than 1024 characters"
-    }
+  "heading": {
+    "overview-title": "Recipe Overview",
+    "overview-description": "All recipes are listed here",
+    "detail-heading": "Recipe Details",
+    "detail-description": "Here is the full recipe:",
+    "ingredients": "List of all Ingredients",
+    "steps": "Instruction:",
+    "step": "Step: ",
+    "create-heading": "Create Recipe",
+    "create-description": "Create a recipe with the following form"
+  },
+  "button": {
+    "create": "Create Recipe"
+  },
+  "error": {
+    "amount-not-zero": "Ingredients amount should not be zero",
+    "step-length-zero": "Step cannot be empty",
+    "step-length-1024": "Step cannot be longer than 1024 characters"
+  },
+  "input": {
+    "filter": "Search Recipe"
+  }
 }

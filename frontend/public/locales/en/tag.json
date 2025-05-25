@@ -14,5 +14,8 @@
     "create-description": "Description for creating a tag",
     "delete-title": "Delete Tag: ",
     "delete-description": "Delete tag, cannot be restored"
+  },
+  "input": {
+    "filter": "Search tag"
   }
 }

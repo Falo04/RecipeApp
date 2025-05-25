@@ -50,7 +50,7 @@ export function RecipeSearch() {
                         <Search />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className={"w-[200px] p-0"}>
+                <PopoverContent className={"w-[200px] p-0"} align={"end"}>
                     <Command>
                         <CommandInput value={query} onValueChange={setQuery} placeholder={tg("search.recipe")} className={"h-9"} />
                         <CommandList>

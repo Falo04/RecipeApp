@@ -83,7 +83,7 @@ function TagsOverview(_props: TagsOverviewProps) {
                 </Button>
             }
         >
-            <DataTable data={tagContext.tags.items} columns={columns} />
+            <DataTable filterTag={t("input.filter")} data={tagContext.tags.items} columns={columns} />
 
             {openCreateTag && (
                 <Suspense>
@@ -109,6 +109,7 @@ function TagsOverview(_props: TagsOverviewProps) {
         </HeadingLayout>
     );
 }
+
 export const Route = createFileRoute("/_app/app/tag/")({
     component: TagsOverview,
 });

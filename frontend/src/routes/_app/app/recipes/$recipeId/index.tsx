@@ -1,14 +1,13 @@
 import { Api } from "@/api/api";
-import { Heading, Subheading } from "@/components/base/heading";
+import { Subheading } from "@/components/base/heading";
 import SubmenuLayout from "@/components/base/submenu-layout";
 import { Text } from "@/components/base/text";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TableHeader, TableRow, TableHead, TableCell, Table, TableBody } from "@/components/ui/table";
-import {createFileRoute, Link, useNavigate} from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import {Badge, badgeVariants} from "@/components/ui/badge.tsx";
-import type {VariantProps} from "class-variance-authority";
+import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
+import type { VariantProps } from "class-variance-authority";
 
 /**
  * The properties for {@link RecipeDetail}
@@ -20,7 +19,6 @@ export type RecipeDetailProps = {};
  */
 function RecipeDetail(_props: RecipeDetailProps) {
     const [t] = useTranslation("recipe");
-    const [tg] = useTranslation();
 
     const navigate = useNavigate();
 
@@ -32,59 +30,54 @@ function RecipeDetail(_props: RecipeDetailProps) {
     }
 
     return (
-        <div className="mx-auto w-4xl">
+        <div className="mx-auto w-4xl px-4">
             <SubmenuLayout
-                heading={t("heading.detail-heading")}
-                headingDescription={t("heading.detail-description")}
+                heading={data.name}
+                headingDescription={data.description}
                 navigate={() => navigate({ to: "/app/recipes" })}
                 editButton={() => navigate({ to: "/app/recipes/$recipeId/update", params: { recipeId: recipeId } })}
             >
                 <ScrollArea className="h-[75vh]">
-                    <div className="flex flex-col gap-4">
-                        <Heading>{data.name}</Heading>
-                        <div className="min-h-[100px] rounded-lg border px-2">
-                            <Text>{data.description}</Text>
+                    <div className="flex flex-col gap-8">
+                        <div className={"flex flex-col gap-2"}>
+                            <Subheading>{t("heading.tags")}</Subheading>
+                            <div className={"flex gap-2"}>
+                                {data.tags.map((tag) => (
+                                    <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                                        <Badge
+                                            variant={
+                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
+                                            }
+                                            key={tag.uuid}
+                                        >
+                                            {tag.name}
+                                        </Badge>
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
-                        <Subheading>{t("heading.tags")}</Subheading>
-                        <div className={"flex gap-2"}>
-                            {data.tags.map((tag ) => (
-                                <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
-                                    <Badge
-                                        variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
-                                        key={tag.uuid}
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                </Link>
-                            ))}
-                        </div>
-                        <Subheading>{t("heading.ingredients")}</Subheading>
-                        <div className="rounded-lg border px-2">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{tg("table.name")}</TableHead>
-                                        <TableHead>{tg("table.amount")}</TableHead>
-                                        <TableHead>{tg("table.unit")}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {data.ingredients.map((ingre) => (
-                                        <TableRow key={ingre.uuid}>
-                                            <TableCell>{ingre.name}</TableCell>
-                                            <TableCell>{ingre.amount}</TableCell>
-                                            <TableCell>{ingre.unit}</TableCell>
-                                        </TableRow>
+                        <div className={"flex flex-col gap-2"}>
+                            <Subheading>{t("heading.ingredients")}</Subheading>
+                            <div className="px-2">
+                                <ul
+                                    className={
+                                        "list-inside list-disc gap-2 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400"
+                                    }
+                                >
+                                    {data.ingredients.map((ingredient) => (
+                                        <li key={ingredient.uuid}>
+                                            {ingredient.amount} {ingredient.unit} {ingredient.name}
+                                        </li>
                                     ))}
-                                </TableBody>
-                            </Table>
+                                </ul>
+                            </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <Subheading>{t("heading.steps")}</Subheading>
                             {data.steps.map((step) => (
-                                <div key={step.uuid}>
-                                    <Text>{t("heading.step") + step.index}</Text>
-                                    <div className="min-h-[100px] rounded-lg border px-2">
+                                <div key={step.uuid} className={"flex items-start gap-2"}>
+                                    <Subheading>{step.index + 1}</Subheading>
+                                    <div className="px-2">
                                         <Text>{step.step}</Text>
                                     </div>
                                 </div>

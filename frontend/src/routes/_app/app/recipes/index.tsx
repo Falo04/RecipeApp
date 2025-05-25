@@ -1,15 +1,15 @@
 import { Api } from "@/api/api";
-import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { DataTable } from "@/components/base/data-table";
-import type { ColumnDef } from "@tanstack/react-table";
 import HeadingLayout from "@/components/base/heading-layout";
-import { useMemo } from "react";
-import {Badge, badgeVariants} from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type {VariantProps} from "class-variance-authority";
+import { DataTable } from "@/components/base/data-table.tsx";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface";
+import { useMemo } from "react";
+import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
+import type { VariantProps } from "class-variance-authority";
 
 /**
  * The properties for {@link FoodOverview}
@@ -23,6 +23,8 @@ function FoodOverview(_props: FoodOverviewProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
+    // const { offset, limit } = Route.useSearch();
+
     const columns: ColumnDef<SimpleRecipeWithTags>[] = useMemo(
         () => [
             {
@@ -31,7 +33,6 @@ function FoodOverview(_props: FoodOverviewProps) {
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
                         <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                            {" "}
                             <span>{row.original.name}</span>
                         </div>
                     </Link>
@@ -43,8 +44,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
                         <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                            {" "}
-                            <span>{row.original.name}</span>
+                            <span className={"text-primary/60 w-[60ch]"}>{row.original.description}</span>
                         </div>
                     </Link>
                 ),
@@ -71,8 +71,6 @@ function FoodOverview(_props: FoodOverviewProps) {
         [],
     );
 
-    // const { offset, limit } = Route.useSearch();
-
     const data = Route.useLoaderData();
     if (!data) {
         return;
@@ -88,7 +86,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 </Link>
             }
         >
-            <DataTable data={data.items} columns={columns} />
+            <DataTable filterTag={t("input.filter")} columns={columns} data={data.items} />
         </HeadingLayout>
     );
 }

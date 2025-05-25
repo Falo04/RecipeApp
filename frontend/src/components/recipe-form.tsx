@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
 import USER_CONTEXT from "@/context/user";
 import { useForm } from "@tanstack/react-form";
-import {MinusIcon, PlusIcon, X} from "lucide-react";
+import { MinusIcon, PlusIcon, X } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -165,63 +165,70 @@ export function RecipeForm(props: RecipeFormProps) {
                     {(field) => (
                         <div className={"flex flex-col"}>
                             <div className={"flex justify-between"}>
-                            <FormLabel htmlFor="description">{tg("label.tags")}</FormLabel>
+                                <FormLabel htmlFor="description">{tg("label.tags")}</FormLabel>
 
-                            <Popover open={open} onOpenChange={setOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"default"}
-                                        role="combobox"
-                                        aria-expanded={open}
-                                        className="w-fit"
-                                    >
-                                       <PlusIcon />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[200px] p-0">
-                                    <Command>
-                                        <CommandInput placeholder="Search Tag..." className="h-9" />
-                                        <CommandList>
-                                            <CommandEmpty>No tag found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {tagContext.tags.items.map((item) => (
-                                                    <CommandItem
-                                                        key={item.uuid}
-                                                        value={item.name}
-                                                        onSelect={() => {
-                                                            field.pushValue(item);
-                                                        }}
-                                                    >
-                                                        <Badge
-                                                            variant={
-                                                                item.color.toLowerCase() as VariantProps<
-                                                                    typeof badgeVariants
-                                                                >["variant"]
-                                                            }
+                                <Popover open={open} onOpenChange={setOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"default"}
+                                            role="combobox"
+                                            aria-expanded={open}
+                                            className="w-fit"
+                                        >
+                                            <PlusIcon />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[200px] p-0" side={"bottom"} align={"end"}>
+                                        <Command>
+                                            <CommandInput placeholder="Search Tag..." className="h-9" />
+                                            <CommandList>
+                                                <CommandEmpty>No tag found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {tagContext.tags.items.map((item) => (
+                                                        <CommandItem
+                                                            key={item.uuid}
+                                                            value={item.name}
+                                                            onSelect={() => {
+                                                                field.pushValue(item);
+                                                            }}
                                                         >
-                                                            {item.name}
-                                                        </Badge>
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
+                                                            <Badge
+                                                                variant={
+                                                                    item.color.toLowerCase() as VariantProps<
+                                                                        typeof badgeVariants
+                                                                    >["variant"]
+                                                                }
+                                                            >
+                                                                {item.name}
+                                                            </Badge>
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                             <div className={"flex gap-4"}>
                                 {field.state.value.map((item, index) => (
                                     <Badge
-                                        variant={item.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
+                                        variant={
+                                            item.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
+                                        }
                                         key={item.uuid}
                                     >
                                         {item.name}
-                                        <button type={"button"} className={"hover:text-blue-200"} onClick={() => field.removeValue(index)}> <X className={"size-4"} /> </button>
+                                        <button
+                                            type={"button"}
+                                            className={"hover:text-blue-200"}
+                                            onClick={() => field.removeValue(index)}
+                                        >
+                                            <X className={"size-4"} />
+                                        </button>
                                     </Badge>
                                 ))}
                             </div>
                         </div>
-
                     )}
                 </form.Field>
 
@@ -350,7 +357,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                             onSubmit: ({ value }) =>
                                                 value.length === 0 ? t("error.step-length-zero") : undefined,
                                             onChange: ({ value }) =>
-                                                value.length > 1024 ? t("error.step-length-1024") : undefined,
+                                                value.length > 255 ? t("error.step-length-1024") : undefined,
                                         }}
                                     >
                                         {(f) => (

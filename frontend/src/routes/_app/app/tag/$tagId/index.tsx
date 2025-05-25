@@ -65,7 +65,7 @@ function TagDetail(_props: TagDetailProps) {
             headingDescription={t("heading.detail-description")}
             navigate={() => navigate({ to: "/app/tag" })}
         >
-            <DataTable data={data.items} columns={columns} />
+            <DataTable filterTag={t("input.filter")} data={data.items} columns={columns} />
         </SubmenuLayout>
     );
 }
