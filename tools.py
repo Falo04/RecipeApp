@@ -47,10 +47,21 @@ def get_webserver_service() -> str | None:
 
 
 def docker_compose_dev(command: str, unknown_args):
-    process = subprocess.run(
-        ["docker", "compose", "-f", "docker-compose-dev.yml", command, *unknown_args]
-    )
-    check_return_code(process.returncode)
+    try:
+        process = subprocess.run(
+            [
+                "docker",
+                "compose",
+                "-f",
+                "docker-compose-dev.yml",
+                command,
+                *unknown_args,
+            ]
+        )
+        check_return_code(process.returncode)
+    except KeyboardInterrupt:
+        print(f"[{sys.argv[0]}]", "Interrupt received. Stopping application!")
+        sys.exit(0)
 
 
 def main():

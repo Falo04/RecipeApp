@@ -160,15 +160,6 @@ pub async fn get_recipe(
 pub async fn create_recipe(
     ApiJson(request): ApiJson<CreateRecipeRequest>,
 ) -> ApiResult<ApiJson<SingleUuid>> {
-    static REGEX: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new("^[a-z0-9]+(?:\\s+[a-z0-9]+)*$").unwrap());
-    if !REGEX.is_match(&request.name) {
-        return Err(ApiError::bad_request(
-            "Recipe name contains invalid characters",
-            Some("Recipe name contains invalid characters"),
-        ));
-    }
-
     let mut tx = GLOBAL.db.start_transaction().await?;
     let recipe_uuid = Uuid::new_v4();
 

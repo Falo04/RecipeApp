@@ -37,7 +37,7 @@ pub struct FullRecipe {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct Steps {
     pub uuid: Option<Uuid>,
-    pub step: MaxStr<1024>,
+    pub step: MaxStr<256>,
     pub index: i16,
 }
 

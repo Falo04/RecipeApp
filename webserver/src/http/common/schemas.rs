@@ -68,7 +68,7 @@ pub struct GetPageRequest {
 }
 
 fn default_limit() -> u64 {
-    50
+    999
 }
 fn default_offset() -> u64 {
     0

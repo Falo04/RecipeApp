@@ -20,7 +20,7 @@ pub struct RecipeSteps {
     #[rorm(on_delete = "Cascade")]
     pub recipe: ForeignModel<Recipe>,
 
-    pub step: MaxStr<1024>,
+    pub step: MaxStr<256>,
 
     pub index: i16,
 }
