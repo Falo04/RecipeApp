@@ -13,6 +13,8 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from ".
 import React from "react";
 import { type ColumnFiltersState, getFilteredRowModel } from "@tanstack/table-core";
 import { Input } from "@/components/ui/input.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 
 /**
  * The properties for {@link DataTable}
@@ -28,12 +30,15 @@ export type DataTableProps<TData extends { uuid: string }, TValue> = {
  */
 export function DataTable<TData extends { uuid: string }, TValue>(props: DataTableProps<TData, TValue>) {
     const [tg] = useTranslation();
+
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const isMobile = useIsMobile();
 
     const table = useReactTable({
         data: props.data,
         columns: props.columns,
+        initialState: { pagination: { pageSize: isMobile ? 5 : 50 } },
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -47,53 +52,72 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
     });
 
     return (
-        <div className="w-full">
-            <div className={"flex items-center py-4"}>
-                <Input
-                    placeholder={props.filterTag}
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-                    className={"max-w-sm"}
-                />
-            </div>
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                );
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
+        <div className="flex h-full w-full flex-col justify-between">
+            <div className={"flex flex-col gap-2"}>
+                <div className={"flex items-center py-4"}>
+                    <Input
+                        placeholder={props.filterTag}
+                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        className={"max-w-sm"}
+                    />
+                </div>
+                <Table containerClassName={"h-[45vh] lg:h-[60vh] overflow-y-auto"}>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={props.columns.length} className="h-24 text-center">
-                                {tg("table.no-result")}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="space-x-2">
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={props.columns.length} className="h-24 text-center">
+                                    {tg("table.no-result")}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className={"flex items-center justify-between"}>
+                <Select
+                    onValueChange={(e) => {
+                        table.setPageSize(Number(e));
+                    }}
+                    value={String(table.getState().pagination.pageSize)}
+                >
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {[5, 10, 25, 50, 100].map((pageSize) => (
+                            <SelectItem key={pageSize} value={String(pageSize)}>
+                                {pageSize}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className="flex items-center justify-end space-x-2">
                     <Button
                         variant="outline"
                         size="sm"
