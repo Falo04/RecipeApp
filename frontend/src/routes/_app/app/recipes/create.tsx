@@ -9,18 +9,12 @@ export function CreateRecipe() {
     const navigate = useNavigate();
 
     return (
-        <div className="mx-auto w-4xl">
-            <SubmenuLayout
-                heading={t("heading.create-heading")}
-                headingDescription={t("heading.create-description")}
-                navigate={() => navigate({ to: "/app/recipes" })}
-            >
-                <RecipeForm
-                    navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
-                    onClose={() => navigate({ to: "/app/recipes" })}
-                />
-            </SubmenuLayout>
-        </div>
+        <SubmenuLayout heading={t("heading.create-heading")} navigate={() => navigate({ to: "/app/recipes" })}>
+            <RecipeForm
+                navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
+                onClose={() => navigate({ to: "/app/recipes" })}
+            />
+        </SubmenuLayout>
     );
 }
 

@@ -30,63 +30,61 @@ function RecipeDetail(_props: RecipeDetailProps) {
     }
 
     return (
-        <div className="mx-auto w-4xl px-4">
-            <SubmenuLayout
-                heading={data.name}
-                headingDescription={data.description}
-                navigate={() => navigate({ to: "/app/recipes" })}
-                editButton={() => navigate({ to: "/app/recipes/$recipeId/update", params: { recipeId: recipeId } })}
-            >
-                <ScrollArea className="h-[75vh]">
-                    <div className="flex flex-col gap-8">
-                        <div className={"flex flex-col gap-2"}>
-                            <Subheading>{t("heading.tags")}</Subheading>
-                            <div className={"flex gap-2"}>
-                                {data.tags.map((tag) => (
-                                    <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
-                                        <Badge
-                                            variant={
-                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
-                                            }
-                                            key={tag.uuid}
-                                        >
-                                            {tag.name}
-                                        </Badge>
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                        <div className={"flex flex-col gap-2"}>
-                            <Subheading>{t("heading.ingredients")}</Subheading>
-                            <div className="px-2">
-                                <ul
-                                    className={
-                                        "list-inside list-disc gap-2 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400"
-                                    }
-                                >
-                                    {data.ingredients.map((ingredient) => (
-                                        <li key={ingredient.uuid}>
-                                            {ingredient.amount} {ingredient.unit} {ingredient.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Subheading>{t("heading.steps")}</Subheading>
-                            {data.steps.map((step) => (
-                                <div key={step.uuid} className={"flex items-start gap-2"}>
-                                    <Subheading>{step.index + 1}</Subheading>
-                                    <div className="px-2">
-                                        <Text>{step.step}</Text>
-                                    </div>
-                                </div>
+        <SubmenuLayout
+            heading={data.name}
+            headingDescription={data.description}
+            navigate={() => navigate({ to: "/app/recipes" })}
+            editButton={() => navigate({ to: "/app/recipes/$recipeId/update", params: { recipeId: recipeId } })}
+        >
+            <ScrollArea className="h-[65vh]">
+                <div className="flex flex-col gap-8">
+                    <div className={"flex flex-col gap-2"}>
+                        <Subheading>{t("heading.tags")}</Subheading>
+                        <div className={"flex gap-2"}>
+                            {data.tags.map((tag) => (
+                                <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                                    <Badge
+                                        variant={
+                                            tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
+                                        }
+                                        key={tag.uuid}
+                                    >
+                                        {tag.name}
+                                    </Badge>
+                                </Link>
                             ))}
                         </div>
                     </div>
-                </ScrollArea>
-            </SubmenuLayout>
-        </div>
+                    <div className={"flex flex-col gap-2"}>
+                        <Subheading>{t("heading.ingredients")}</Subheading>
+                        <div className="px-2">
+                            <ul
+                                className={
+                                    "list-inside list-disc gap-2 text-base/6 text-zinc-500 sm:text-sm/6 dark:text-zinc-400"
+                                }
+                            >
+                                {data.ingredients.map((ingredient) => (
+                                    <li key={ingredient.uuid}>
+                                        {ingredient.amount} {ingredient.unit} {ingredient.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Subheading>{t("heading.steps")}</Subheading>
+                        {data.steps.map((step) => (
+                            <div key={step.uuid} className={"flex items-start gap-2"}>
+                                <Subheading>{step.index + 1}</Subheading>
+                                <div className="px-2">
+                                    <Text>{step.step}</Text>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </ScrollArea>
+        </SubmenuLayout>
     );
 }
 

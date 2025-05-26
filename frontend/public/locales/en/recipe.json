@@ -8,15 +8,22 @@
     "steps": "Instruction:",
     "step": "Step: ",
     "create-heading": "Create Recipe",
-    "create-description": "Create a recipe with the following form"
+    "create-description": "Create a recipe with the following form",
+    "tags": "Tags:"
   },
   "button": {
-    "create": "Create Recipe"
+    "add-tags": "Add Tags",
+    "create": "Create Recipe",
+    "next": "Next",
+    "back": "Back"
   },
   "error": {
     "amount-not-zero": "Ingredients amount should not be zero",
     "step-length-zero": "Step cannot be empty",
-    "step-length-1024": "Step cannot be longer than 1024 characters"
+    "step-length-1024": "Step cannot be longer than 1024 characters",
+    "ingre-name": "Please provide a name",
+    "ingre-amount": "Ingredients can not be empty or zero",
+    "ingre-unit": "Please provide a unit"
   },
   "input": {
     "filter": "Search Recipe"

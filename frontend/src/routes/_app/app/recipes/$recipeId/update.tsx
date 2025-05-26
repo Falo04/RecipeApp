@@ -19,20 +19,16 @@ function UpdateRecipe() {
     console.log(data);
 
     return (
-        <div className={"mx-auto w-4xl"}>
-            {" "}
-            <SubmenuLayout
-                heading={t("heading.udate-heading")}
-                headingDescription={t("heading.create-description")}
-                navigate={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
-            >
-                <RecipeForm
-                    formData={data}
-                    navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
-                    onClose={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
-                />
-            </SubmenuLayout>
-        </div>
+        <SubmenuLayout
+            heading={t("heading.udate-heading")}
+            navigate={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
+        >
+            <RecipeForm
+                formData={data}
+                navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
+                onClose={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
+            />
+        </SubmenuLayout>
     );
 }
 

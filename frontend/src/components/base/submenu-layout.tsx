@@ -36,7 +36,7 @@ export type SubmenuLayoutProps = {
  */
 export default function SubmenuLayout(props: SubmenuLayoutProps) {
     return (
-        <div className={clsx("flex w-full flex-col gap-6", props.className)}>
+        <div className={clsx("flex h-full w-full flex-col gap-4", props.className)}>
             <div
                 className={clsx(
                     // Base

@@ -4,14 +4,13 @@ import type { CreateRecipeRequest, FullRecipe, UpdateRecipeRequest } from "@/api
 import { Button } from "@/components/ui/button";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
 import USER_CONTEXT from "@/context/user";
 import { useForm } from "@tanstack/react-form";
-import { MinusIcon, PlusIcon, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, MinusIcon, PlusIcon, X } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -19,6 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CommandEmpty, CommandItem, Command, CommandGroup, CommandList, CommandInput } from "./ui/command";
 import { Badge, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
+import { Text } from "@/components/base/text.tsx";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
 /**
  * The properties for {@link RecipeForm}
@@ -37,6 +38,13 @@ export function RecipeForm(props: RecipeFormProps) {
     const [tg] = useTranslation();
 
     const [open, setOpen] = React.useState(false);
+    const [state, setState] = React.useState(0);
+    const [ingreName, setIngreName] = React.useState<string>("");
+    const [ingreNameError, setIngreNameError] = React.useState<string | undefined>(undefined);
+    const [ingreAmount, setIngreAmount] = React.useState<number>(0);
+    const [ingreAmountError, setIngreAmountError] = React.useState<string | undefined>(undefined);
+    const [ingreUnit, setIngreUnit] = React.useState<Units>(Units.Gram);
+    const [ingreUnitError, setIngreUnitError] = React.useState<string | undefined>(undefined);
 
     const tagContext = React.useContext(TAGS_CONTEXT);
     const userContext = React.useContext(USER_CONTEXT);
@@ -45,7 +53,7 @@ export function RecipeForm(props: RecipeFormProps) {
         defaultValues: {
             name: props.formData ? props.formData.name : "",
             description: props.formData ? props.formData.description : "",
-            ingredients: props.formData ? props.formData.ingredients : [{ name: "", amount: 0, unit: Units.Teaspoon }],
+            ingredients: props.formData ? props.formData.ingredients : [],
             steps: props.formData ? props.formData.steps : [{ step: "" }],
             tags: props.formData ? props.formData.tags : [],
         },
@@ -62,7 +70,6 @@ export function RecipeForm(props: RecipeFormProps) {
                 toast.promise(Api.recipe.update(props.formData.uuid, payload), {
                     loading: tg("toast.loading"),
                     success: (result) => {
-                        console.log(result);
                         if (result.error) {
                             toast.error(result.error.message);
                             return;
@@ -107,9 +114,9 @@ export function RecipeForm(props: RecipeFormProps) {
                 e.preventDefault();
                 form.handleSubmit();
             }}
-            className="flex h-full flex-col gap-5 px-4"
+            className="flex h-full flex-col justify-between gap-4 lg:h-fit lg:justify-start lg:px-8"
         >
-            <ScrollArea className="h-[70vh] pr-4">
+            {state === 0 && (
                 <div className="flex flex-col gap-5 pb-4">
                     <form.Field
                         name="name"
@@ -159,14 +166,9 @@ export function RecipeForm(props: RecipeFormProps) {
                             </div>
                         )}
                     </form.Field>
-                </div>
-
-                <form.Field name={"tags"}>
-                    {(field) => (
-                        <div className={"flex flex-col"}>
-                            <div className={"flex justify-between"}>
-                                <FormLabel htmlFor="description">{tg("label.tags")}</FormLabel>
-
+                    <form.Field name={"tags"}>
+                        {(field) => (
+                            <div className={"flex gap-4"}>
                                 <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
                                         <Button
@@ -175,7 +177,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                             aria-expanded={open}
                                             className="w-fit"
                                         >
-                                            <PlusIcon />
+                                            <PlusIcon /> {t("button.add-tags")}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0" side={"bottom"} align={"end"}>
@@ -208,198 +210,244 @@ export function RecipeForm(props: RecipeFormProps) {
                                         </Command>
                                     </PopoverContent>
                                 </Popover>
-                            </div>
-                            <div className={"flex gap-4"}>
-                                {field.state.value.map((item, index) => (
-                                    <Badge
-                                        variant={
-                                            item.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
-                                        }
-                                        key={item.uuid}
-                                    >
-                                        {item.name}
-                                        <button
-                                            type={"button"}
-                                            className={"hover:text-blue-200"}
-                                            onClick={() => field.removeValue(index)}
+                                <div className={"flex flex-wrap gap-4"}>
+                                    {field.state.value.map((item, index) => (
+                                        <Badge
+                                            variant={
+                                                item.color.toLowerCase() as VariantProps<
+                                                    typeof badgeVariants
+                                                >["variant"]
+                                            }
+                                            key={item.uuid}
                                         >
-                                            <X className={"size-4"} />
-                                        </button>
-                                    </Badge>
-                                ))}
+                                            {item.name}
+                                            <button
+                                                type={"button"}
+                                                className={"hover:text-blue-200"}
+                                                onClick={() => field.removeValue(index)}
+                                            >
+                                                <X className={"size-4"} />
+                                            </button>
+                                        </Badge>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </form.Field>
+                        )}
+                    </form.Field>
+                </div>
+            )}
 
+            {state === 1 && (
                 <form.Field
                     name="ingredients"
                     mode="array"
                     children={(ingredients) => (
-                        <div>
-                            <div className="mt-8 flex justify-between">
+                        <div className={"flex flex-col gap-6"}>
+                            <div className={"flex justify-between"}>
                                 <h2>{tg("label.ingredients-title")}</h2>
                                 <Button
                                     type="button"
-                                    onClick={() =>
-                                        ingredients.pushValue({
-                                            name: "",
-                                            amount: 0,
-                                            unit: Units.Teaspoon,
-                                        })
-                                    }
+                                    onClick={() => {
+                                        if (ingreName.length === 0) {
+                                            setIngreNameError(t("error.ingre-name"));
+                                        }
+                                        if (ingreAmount === 0) {
+                                            setIngreAmountError(t("error.ingre-amount"));
+                                        }
+                                        if (!ingreUnit) {
+                                            setIngreUnitError(t("error.ingre-unit"));
+                                        }
+                                        if (ingreAmountError && ingreNameError && ingreUnitError) {
+                                            return;
+                                        }
+                                        if (ingreName && ingreAmount && ingreUnit) {
+                                            ingredients.pushValue({
+                                                name: ingreName ?? "nothing",
+                                                amount: ingreAmount ?? 0,
+                                                unit: ingreUnit ?? Units.Teaspoon,
+                                            });
+                                            setIngreName("");
+                                            setIngreAmount(0);
+                                            setIngreUnit(Units.Gram);
+                                        }
+                                    }}
                                 >
                                     <PlusIcon />
                                 </Button>
                             </div>
+                            <div className="flex justify-between">
+                                <div className={"grid grid-cols-2 gap-4 lg:grid-cols-3"}>
+                                    <div className={"col-span-2 flex flex-col gap-2 lg:col-span-1"}>
+                                        <Input
+                                            onChange={(e) => {
+                                                setIngreName(e.target.value);
+                                                setIngreNameError(undefined);
+                                            }}
+                                            value={ingreName}
+                                            placeholder="Name"
+                                        />
+                                        {ingreNameError && <p className="text-sm text-red-500">{ingreNameError}</p>}
+                                    </div>
+                                    <div className={"flex flex-col gap-2"}>
+                                        <Input
+                                            type="number"
+                                            onChange={(e) => {
+                                                setIngreAmount(parseInt(e.target.value));
+                                                setIngreAmountError(undefined);
+                                            }}
+                                            value={ingreAmount}
+                                            placeholder="Amount"
+                                        />
+                                        {ingreAmountError && <p className="text-sm text-red-500">{ingreAmountError}</p>}
+                                    </div>
+                                    <div className={"flex flex-col gap-2"}>
+                                        <Select
+                                            onValueChange={(e) => {
+                                                setIngreUnit(e as Units);
+                                                setIngreUnitError(undefined);
+                                            }}
+                                            value={ingreUnit}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select unit" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.values(Units).map((unit) => (
+                                                    <SelectItem key={unit} value={unit}>
+                                                        {unit}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {ingreUnitError && <p className="text-sm text-red-500">{ingreUnitError}</p>}
+                                    </div>
+                                </div>
+                            </div>
 
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{tg("label.ingredients-name")}</TableHead>
-                                        <TableHead>{tg("label.ingredients-amount")}</TableHead>
-                                        <TableHead>{tg("label.ingredients-unit")}</TableHead>
-                                        <TableHead />
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {ingredients.state.value.map((_, index) => (
-                                        <TableRow key={index}>
-                                            <form.Field name={`ingredients[${index}].name`}>
-                                                {(f) => (
-                                                    <TableCell>
-                                                        <Input
-                                                            value={f.state.value}
-                                                            onChange={(e) => f.handleChange(e.target.value)}
-                                                            placeholder="Name"
-                                                        />
-                                                    </TableCell>
-                                                )}
-                                            </form.Field>
-
+                            <ScrollArea className={"h-52"}>
+                                <Table className={"border-t"}>
+                                    <TableBody>
+                                        {ingredients.state.value.map((ingre, index) => (
+                                            <TableRow key={index} className={"grid grid-cols-[1fr_1fr_1fr_auto] gap-2"}>
+                                                <TableCell>
+                                                    <Text>{ingre.name}</Text>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Text>{ingre.amount}</Text>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Text>{ingre.unit}</Text>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        onClick={() => ingredients.removeValue(index)}
+                                                    >
+                                                        <MinusIcon />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
+                        </div>
+                    )}
+                />
+            )}
+            {state === 2 && (
+                <div className={"flex flex-col gap-4"}>
+                    <div className="flex justify-between">
+                        <h2>{tg("label.step-title")}</h2>
+                        <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
+                            <PlusIcon />
+                        </Button>
+                    </div>
+                    <ScrollArea className={"h-[55vh]"}>
+                        <form.Field name="steps">
+                            {(fieldArray) => (
+                                <div className="flex flex-col gap-4">
+                                    {fieldArray.state.value.map((_, index) => (
+                                        <div className={"relative"} key={index}>
                                             <form.Field
-                                                name={`ingredients[${index}].amount`}
+                                                name={`steps[${index}].step`}
                                                 validators={{
                                                     onSubmit: ({ value }) =>
-                                                        value === 0 ? t("error.amount-not-zero") : undefined,
+                                                        value.length === 0 ? t("error.step-length-zero") : undefined,
+                                                    onChange: ({ value }) =>
+                                                        value.length > 255 ? t("error.step-length-1024") : undefined,
                                                 }}
                                             >
                                                 {(f) => (
-                                                    <TableCell>
-                                                        <Input
-                                                            type="number"
+                                                    <div>
+                                                        <FormLabel
+                                                            htmlFor={"step" + index}
+                                                        >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
+                                                        <Textarea
+                                                            id={"step" + index}
                                                             value={f.state.value}
-                                                            onChange={(e) => f.handleChange(Number(e.target.value))}
-                                                            placeholder="Amount"
+                                                            onChange={(e) => f.handleChange(e.target.value)}
+                                                            placeholder="Step"
+                                                            className="h-[100px] resize-none"
                                                         />
                                                         {f.state.meta.errors?.[0] && (
                                                             <p className="text-sm text-red-500">
                                                                 {f.state.meta.errors[0]}
                                                             </p>
                                                         )}
-                                                    </TableCell>
+                                                    </div>
                                                 )}
                                             </form.Field>
 
-                                            <form.Field name={`ingredients[${index}].unit`}>
-                                                {(f) => (
-                                                    <TableCell className="min-w-[140px]">
-                                                        <Select
-                                                            value={f.state.value}
-                                                            onValueChange={(val) => f.setValue(val as Units)}
-                                                        >
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select unit" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {Object.values(Units).map((unit) => (
-                                                                    <SelectItem key={unit} value={unit}>
-                                                                        {unit}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </TableCell>
-                                                )}
-                                            </form.Field>
-
-                                            <TableCell>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    onClick={() => ingredients.removeValue(index)}
-                                                >
-                                                    <MinusIcon />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
+                                            <Button
+                                                type="button"
+                                                className="absolute top-6 right-1"
+                                                variant="ghost"
+                                                onClick={() => form.removeFieldValue("steps", index)}
+                                            >
+                                                <MinusIcon />
+                                            </Button>
+                                        </div>
                                     ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    )}
-                />
-                <div className="mt-8 flex justify-between">
-                    <h2>{tg("label.step-title")}</h2>
-                    <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
-                        <PlusIcon />
-                    </Button>
-                </div>
-
-                <form.Field name="steps">
-                    {(fieldArray) => (
-                        <div>
-                            {fieldArray.state.value.map((_, index) => (
-                                <div className="relative my-4" key={index}>
-                                    <form.Field
-                                        name={`steps[${index}].step`}
-                                        validators={{
-                                            onSubmit: ({ value }) =>
-                                                value.length === 0 ? t("error.step-length-zero") : undefined,
-                                            onChange: ({ value }) =>
-                                                value.length > 255 ? t("error.step-length-1024") : undefined,
-                                        }}
-                                    >
-                                        {(f) => (
-                                            <div>
-                                                <FormLabel
-                                                    htmlFor={"step" + index}
-                                                >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
-                                                <Textarea
-                                                    id={"step" + index}
-                                                    value={f.state.value}
-                                                    onChange={(e) => f.handleChange(e.target.value)}
-                                                    placeholder="Step"
-                                                    className="h-[100px] resize-none"
-                                                />
-                                                {f.state.meta.errors?.[0] && (
-                                                    <p className="text-sm text-red-500">{f.state.meta.errors[0]}</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </form.Field>
-
-                                    <Button
-                                        type="button"
-                                        className="absolute top-6 right-1"
-                                        variant="ghost"
-                                        onClick={() => form.removeFieldValue("steps", index)}
-                                    >
-                                        <MinusIcon />
-                                    </Button>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </form.Field>
-            </ScrollArea>
-            <div className="flex justify-between">
-                <Button type="button" variant="secondary" onClick={() => props.onClose()}>
-                    {tg("button.close")}
-                </Button>
-                <Button type="submit" variant="primary" className="self-end">
-                    {props.formData ? tg("button.update") : tg("button.create")}
-                </Button>
+                            )}
+                        </form.Field>
+                    </ScrollArea>
+                </div>
+            )}
+            <div className="flex justify-end">
+                {state === 0 && (
+                    <Button
+                        type={"button"}
+                        variant={"secondary"}
+                        className={"self-end"}
+                        onClick={() => setState(state + 1)}
+                    >
+                        {t("button.next")} <ArrowRight />
+                    </Button>
+                )}
+                {state === 1 && (
+                    <div className={"flex w-full justify-between gap-2 lg:w-fit"}>
+                        <Button type={"button"} variant={"secondary"} onClick={() => setState(state - 1)}>
+                            <ArrowLeft />
+                            {t("button.back")}
+                        </Button>
+                        <Button type={"button"} variant={"secondary"} onClick={() => setState(state + 1)}>
+                            {t("button.next")} <ArrowRight />
+                        </Button>
+                    </div>
+                )}
+                {state === 2 && (
+                    <div className={"flex w-full justify-between gap-2 lg:w-fit"}>
+                        <Button type={"button"} variant={"secondary"} onClick={() => setState(state - 1)}>
+                            <ArrowLeft /> {t("button.back")}
+                        </Button>
+                        <Button type={"submit"} variant={"primary"}>
+                            {props.formData ? tg("button.update") : tg("button.create")}
+                        </Button>
+                    </div>
+                )}
             </div>
         </form>
     );
