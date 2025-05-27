@@ -1,21 +1,61 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { useEffect, useRef } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
-interface ExtendedTableProps extends React.ComponentProps<"table"> {
-    containerClassName?: string;
-}
-
-function Table({ className, containerClassName, ...props }: ExtendedTableProps) {
+function Table({ className, ...props }: React.ComponentProps<"table">) {
     return (
-        <div data-slot="table-container" className={cn("relative w-full overflow-x-auto", containerClassName)}>
+        <div data-slot="table-container" className={"relative w-full overflow-x-auto"}>
             <table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
         </div>
     );
 }
 
+function TableStickyHeader({ className, ...props }: React.ComponentProps<"table">) {
+    const tableRef = useRef<HTMLDivElement>(null);
+
+    const [tableHeight, setTableHeight] = React.useState(0);
+
+    const getTableHeight = () => {
+        if (tableRef.current === null) {
+            return;
+        }
+        const newHeight = tableRef.current.getBoundingClientRect().height;
+        setTableHeight(newHeight);
+    };
+
+    useEffect(() => {
+        window.addEventListener("resize", getTableHeight);
+        getTableHeight();
+
+        return () => {
+            window.removeEventListener("resize", getTableHeight);
+        };
+    }, []);
+
+    console.log(tableHeight);
+    return (
+        <div data-slot="table-container" className={"block h-full w-full overflow-x-auto"} ref={tableRef}>
+            <ScrollArea style={{ height: `${tableHeight}px` }}>
+                <table
+                    data-slot="table"
+                    className={cn("w-full table-fixed caption-bottom text-sm", className)}
+                    {...props}
+                />
+            </ScrollArea>
+        </div>
+    );
+}
+
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-    return <thead data-slot="table-header" className={cn("[&_tr]:border-b", className)} {...props} />;
+    return (
+        <thead
+            data-slot="table-header"
+            className={cn("sticky top-0 bg-zinc-900 [&_tr]:border-b", className)}
+            {...props}
+        />
+    );
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
@@ -74,4 +114,4 @@ function TableCaption({ className, ...props }: React.ComponentProps<"caption">) 
     );
 }
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+export { Table, TableStickyHeader, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };

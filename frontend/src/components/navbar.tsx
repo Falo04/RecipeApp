@@ -59,7 +59,7 @@ export function Navbar(props: NavbarProps) {
                     ))}
                 </ul>
 
-                <div className="hidden w-1/5 md:block">
+                <div className="hidden w-1/5 md:flex">
                     <RecipeSearch />
                 </div>
                 {isMobile && (

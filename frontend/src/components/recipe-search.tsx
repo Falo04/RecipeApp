@@ -4,12 +4,18 @@ import { Api } from "@/api/api";
 import type { RecipeSearchResponse } from "@/api/model/recipe.interface";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {Search} from "lucide-react";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command.tsx";
-import {useIsMobile} from "@/hooks/use-mobile.ts";
-import {clsx} from "clsx";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { Search } from "lucide-react";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 export function RecipeSearch() {
     const [tg] = useTranslation();
@@ -35,7 +41,6 @@ export function RecipeSearch() {
             }
             if (res.data) {
                 setSuggestions(res.data.list);
-
             }
         });
         setLoading(false);
@@ -44,25 +49,42 @@ export function RecipeSearch() {
     return (
         <div className="group">
             <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button variant={isMobile ? "ghost" : "outline"} role={"combobox"} aria-expanded={open} className={(clsx( isMobile ? "w-fit" : "w-[200px]"))}>
+                <PopoverTrigger asChild className={"px-5"}>
+                    <Button
+                        variant={isMobile ? "ghost" : "outline"}
+                        role={"combobox"}
+                        aria-expanded={open}
+                        className={"w-fit"}
+                    >
                         {isMobile ? "" : tg("search.recipe")}
                         <Search />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className={"w-[200px] p-0"} align={"end"}>
                     <Command>
-                        <CommandInput value={query} onValueChange={setQuery} placeholder={tg("search.recipe")} className={"h-9"} />
+                        <CommandInput
+                            value={query}
+                            onValueChange={setQuery}
+                            placeholder={tg("search.recipe")}
+                            className={"h-9"}
+                        />
                         <CommandList>
                             <CommandEmpty>{tg("search.recipe-empty")}</CommandEmpty>
                             <CommandGroup>
                                 {suggestions.map((recipe) => (
-                                    <CommandItem key={recipe.uuid} value={recipe.name} onSelect={() => {
-                                        navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipe.uuid }});
-                                        setOpen(false);
-                                        setQuery("");
-                                        return;
-                                    }}>
+                                    <CommandItem
+                                        key={recipe.uuid}
+                                        value={recipe.name}
+                                        onSelect={() => {
+                                            navigate({
+                                                to: "/app/recipes/$recipeId",
+                                                params: { recipeId: recipe.uuid },
+                                            });
+                                            setOpen(false);
+                                            setQuery("");
+                                            return;
+                                        }}
+                                    >
                                         {recipe.name}
                                     </CommandItem>
                                 ))}

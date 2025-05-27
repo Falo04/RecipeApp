@@ -28,7 +28,7 @@ export type HeadingLayoutProps = {
  */
 export default function HeadingLayout(props: HeadingLayoutProps) {
     return (
-        <div className={clsx("flex h-full w-full flex-col gap-6", props.className)}>
+        <div className={clsx("flex h-full w-full flex-col gap-2 lg:gap-4", props.className)}>
             <div
                 className={clsx(
                     // Base

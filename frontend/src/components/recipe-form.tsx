@@ -343,7 +343,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                         </div>
                                     </div>
 
-                                    <ScrollArea className={"h-52"}>
+                                    <ScrollArea className={"h-[40vh]"}>
                                         <Table className={"border-t"}>
                                             <TableBody>
                                                 {ingredients.state.value.map((ingre, index) => (

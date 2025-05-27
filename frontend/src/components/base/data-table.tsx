@@ -9,12 +9,12 @@ import {
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table";
-import React from "react";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableStickyHeader } from "../ui/table";
 import { type ColumnFiltersState, getFilteredRowModel } from "@tanstack/table-core";
 import { Input } from "@/components/ui/input.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
+import React from "react";
 
 /**
  * The properties for {@link DataTable}
@@ -33,6 +33,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+
     const isMobile = useIsMobile();
 
     const table = useReactTable({
@@ -52,8 +53,8 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
     });
 
     return (
-        <div className="flex h-full w-full flex-col justify-between">
-            <div className={"flex flex-col gap-2"}>
+        <div className={"flex h-full w-full flex-col justify-between gap-4"}>
+            <div className={"flex h-full flex-col gap-2"}>
                 <div className={"flex items-center py-4"}>
                     <Input
                         placeholder={props.filterTag}
@@ -62,42 +63,44 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                         className={"max-w-sm"}
                     />
                 </div>
-                <Table containerClassName={"h-[45vh] lg:h-[60vh] overflow-y-auto"}>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
+                <div className={"block h-full"}>
+                    <TableStickyHeader>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(header.column.columnDef.header, header.getContext())}
+                                            </TableHead>
+                                        );
+                                    })}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={props.columns.length} className="h-24 text-center">
-                                    {tg("table.no-result")}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={props.columns.length} className="h-24 text-center">
+                                        {tg("table.no-result")}
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </TableStickyHeader>
+                </div>
             </div>
             <div className={"flex items-center justify-between"}>
                 <Select
