@@ -12,7 +12,7 @@ let USER_PROVIDER: UserProvider | null = null;
 /** Data provided by the {@link USER_CONTEXT} */
 export type UserContext = {
     /** The currently logged-in user */
-    user: SimpleUser | null;
+    user: SimpleUser | undefined;
 
     /** Reload the user's information */
     reset: () => void;
@@ -20,7 +20,7 @@ export type UserContext = {
 
 /** {@link React.Context} to access {@link FullUser user information} */
 const USER_CONTEXT = React.createContext<UserContext>({
-    user: null,
+    user: undefined,
 
     /**
      * Reset the user's information
@@ -156,7 +156,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
                 return (
                     <USER_CONTEXT.Provider
                         value={{
-                            user: this.state.user === "disabled" ? null : this.state.user,
+                            user: this.state.user === "disabled" ? undefined : this.state.user,
                             reset: this.fetchConfig,
                         }}
                     >

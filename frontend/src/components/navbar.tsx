@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { RecipeSearch } from "./recipe-search";
+import { motion } from "framer-motion";
 
 export interface NavItem {
     title: string;
@@ -71,34 +72,36 @@ export function Navbar(props: NavbarProps) {
                 )}
             </div>
 
-            {isMobile && (
-                <div
-                    className={clsx(
-                        "mt-8 flex-1 justify-self-center pb-3 transition-all duration-300 ease-in-out md:mt-0 md:block md:pb-0", // Transition for smooth effect
-                        mobileNavbar ? "flex translate-y-0 opacity-100" : "hidden translate-y-4 opacity-0",
-                    )}
+            {isMobile && mobileNavbar && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                 >
-                    <ul className="items-center justify-center space-y-4 md:flex">
+                    <div
+                        className={clsx(
+                            "bg-card border-b-primary/20 fixed right-0 left-0 grid grid-cols-2 gap-4 border-b p-5 shadow-xl",
+                        )}
+                    >
                         {props.navItems.map((item) => (
-                            <li key={item.url}>
-                                <button onClick={() => setMobileNavbar(!mobileNavbar)}>
-                                    <Link to={item.url}>
-                                        <span
-                                            className={clsx(
-                                                pathname === item.url
-                                                    ? "border-sidebar-primary border-b-2 pb-1 text-zinc-900 dark:text-zinc-100"
-                                                    : "text-zinc-500 dark:text-zinc-400",
-                                                "hover:text-zinc-900 dark:hover:text-zinc-100",
-                                            )}
-                                        >
-                                            {item.title}
-                                        </span>
-                                    </Link>
-                                </button>
-                            </li>
+                            <button onClick={() => setMobileNavbar(!mobileNavbar)}>
+                                <Link to={item.url}>
+                                    <span
+                                        className={clsx(
+                                            pathname === item.url
+                                                ? "border-sidebar-primary border-b-2 pb-1 text-zinc-900 dark:text-zinc-100"
+                                                : "text-zinc-500 dark:text-zinc-400",
+                                            "block w-full self-end hover:text-zinc-900 dark:hover:text-zinc-100",
+                                        )}
+                                    >
+                                        {item.title}
+                                    </span>
+                                </Link>
+                            </button>
                         ))}
-                    </ul>
-                </div>
+                    </div>
+                </motion.div>
             )}
         </nav>
     );

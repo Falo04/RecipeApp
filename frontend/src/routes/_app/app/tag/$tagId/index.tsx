@@ -35,9 +35,8 @@ function TagDetail(_props: TagDetailProps) {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/tag/$tagId"} params={{ tagId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                            {" "}
+                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[80ch]">
                             <span>{row.original.name}</span>
                         </div>
                     </Link>
@@ -47,9 +46,8 @@ function TagDetail(_props: TagDetailProps) {
                 accessorKey: "description",
                 header: () => <span>{tg("table.description")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/recipes"} params={{ tagId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                            {" "}
+                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[40ch]">
                             <span>{row.original.description}</span>
                         </div>
                     </Link>

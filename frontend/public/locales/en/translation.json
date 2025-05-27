@@ -1,49 +1,50 @@
 {
-    "label": {
-        "name": "Name",
-        "color": "Color",
-        "description": "Description",
-        "email": "Email",
-        "password": "Password",
-        "ingredients-title": "Ingredients:",
-        "ingredients-name": "Name",
-        "ingredients-amount": "Amount",
-        "ingredients-unit": "Unit",
-        "step-title": "Steps:",
-        "steps": "Step",
-        "tags": "Tags"
-    },
-    "placeholder": {
-        "email": "test@test.com",
-        "password": "****"
-    },
-    "button": {
-        "close": "Cancel",
-        "login": "Log in",
-        "create": "Create",
-        "update": "Update"
-    },
-    "search-recipe": "Search Recipe",
-    "table": {
-        "action": "Action",
-        "name": "Name",
-        "color": "Color",
-        "description": "Description",
-        "no-result": "Looks empty..."
-    },
-    "toast": {
-        "loading": "Loading...",
-        "created-success": "Succesfully created",
-        "updated-success": "Succesfully updated",
-        "deleted-success": "Succesfully deleted",
-        "general-error": "Something failed..."
-    },
-    "login": {
-        "title": "Recipe App",
-        "description": "Log in"
-    },
-    "search": {
-        "recipe": "Search recipe",
-        "recipe-empty": "No recipe found"
-    }
+  "label": {
+    "name": "Name",
+    "color": "Color",
+    "description": "Description",
+    "email": "Email",
+    "password": "Password",
+    "ingredients-title": "Ingredients:",
+    "ingredients-name": "Name",
+    "ingredients-amount": "Amount",
+    "ingredients-unit": "Unit",
+    "step-title": "Steps:",
+    "steps": "Step",
+    "tags": "Tags"
+  },
+  "placeholder": {
+    "email": "test@test.com",
+    "password": "****"
+  },
+  "button": {
+    "close": "Cancel",
+    "login": "Log in",
+    "create": "Create",
+    "update": "Update"
+  },
+  "search-recipe": "Search Recipe",
+  "table": {
+    "action": "Action",
+    "name": "Name",
+    "color": "Color",
+    "description": "Description",
+    "no-result": "Looks empty...",
+    "tags": "Tags"
+  },
+  "toast": {
+    "loading": "Loading...",
+    "created-success": "Succesfully created",
+    "updated-success": "Succesfully updated",
+    "deleted-success": "Succesfully deleted",
+    "general-error": "Something failed..."
+  },
+  "login": {
+    "title": "Recipe App",
+    "description": "Log in"
+  },
+  "search": {
+    "recipe": "Search recipe",
+    "recipe-empty": "No recipe found"
+  }
 }

@@ -32,7 +32,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[80ch]">
                             <span>{row.original.name}</span>
                         </div>
                     </Link>
@@ -43,7 +43,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 header: () => <span>{tg("table.description")}</span>,
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
+                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[40ch]">
                             <span className={"text-primary/60 w-[60ch]"}>{row.original.description}</span>
                         </div>
                     </Link>
@@ -93,8 +93,6 @@ function FoodOverview(_props: FoodOverviewProps) {
 
 export const Route = createFileRoute("/_app/app/recipes/")({
     component: FoodOverview,
-    // loaderDeps: ({ search: { offset, limit } }) => ({ offset, limit }),
-    // loader: async ({ deps: { offset, limit } }) => {
     loader: async () => {
         const res = await Api.recipe.getAll(50, 0);
 

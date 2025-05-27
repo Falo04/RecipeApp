@@ -3,12 +3,11 @@
     "overview-title": "Recipe Overview",
     "overview-description": "All recipes are listed here",
     "detail-heading": "Recipe Details",
-    "detail-description": "Here is the full recipe:",
     "ingredients": "List of all Ingredients",
     "steps": "Instruction:",
     "step": "Step: ",
     "create-heading": "Create Recipe",
-    "create-description": "Create a recipe with the following form",
+    "update-heading": "Update Recipe",
     "tags": "Tags:"
   },
   "button": {

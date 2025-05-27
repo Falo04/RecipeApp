@@ -19,7 +19,7 @@ export interface FullRecipe {
     uuid: string;
     name: string;
     description: string;
-    user: SimpleUser;
+    user?: SimpleUser;
     tags: SimpleTag[];
     ingredients: Ingredients[];
     steps: Steps[];
@@ -34,7 +34,7 @@ export interface Steps {
 export interface CreateRecipeRequest {
     name: string;
     description: string;
-    user: string;
+    user?: string;
     tags: string[];
     ingredients: Ingredients[];
     steps: Steps[];
@@ -43,7 +43,7 @@ export interface CreateRecipeRequest {
 export interface UpdateRecipeRequest {
     name: string;
     description: string;
-    user: string;
+    user?: string;
     tags: string[];
     ingredients: Ingredients[];
     steps: Steps[];

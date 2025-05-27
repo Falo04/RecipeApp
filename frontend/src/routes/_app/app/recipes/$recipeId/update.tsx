@@ -20,7 +20,7 @@ function UpdateRecipe() {
 
     return (
         <SubmenuLayout
-            heading={t("heading.udate-heading")}
+            heading={t("heading.update-heading")}
             navigate={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
         >
             <RecipeForm
