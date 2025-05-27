@@ -28,7 +28,7 @@ pub struct FullRecipe {
     pub uuid: Uuid,
     pub name: MaxStr<255>,
     pub description: MaxStr<1024>,
-    pub user: SimpleUser,
+    pub user: Option<SimpleUser>,
     pub tags: Vec<SimpleTag>,
     pub ingredients: Vec<Ingredients>,
     pub steps: Vec<Steps>,
@@ -45,7 +45,7 @@ pub struct Steps {
 pub struct CreateRecipeRequest {
     pub name: MaxStr<255>,
     pub description: MaxStr<1024>,
-    pub user: Uuid,
+    pub user: Option<Uuid>,
     pub tags: Vec<Uuid>,
     pub ingredients: Vec<Ingredients>,
     pub steps: Vec<Steps>,
@@ -55,7 +55,7 @@ pub struct CreateRecipeRequest {
 pub struct UpdateRecipeRequest {
     pub name: MaxStr<255>,
     pub description: MaxStr<1024>,
-    pub user: Uuid,
+    pub user: Option<Uuid>,
     pub tags: Vec<Uuid>,
     pub ingredients: Vec<Ingredients>,
     pub steps: Vec<Steps>,

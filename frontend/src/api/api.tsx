@@ -13,8 +13,13 @@ import type { CreateOrUpdateTag, SimpleTag } from "./model/tag.interface";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, List, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
+import type { MetaResponse } from "@/api/model/meta.interface.ts";
 
 export const Api = {
+    meta: {
+        get: async (): Promise<ApiResponse<MetaResponse>> =>
+            await callApi<MetaResponse>({ method: "GET", url: "/meta" }),
+    },
     jwt: {
         login: async (payload: UserSignInRequest): Promise<ApiResponse<TokenDataResponse>> =>
             await callApi<TokenDataResponse>({ method: "POST", url: "/jwt/login", data: payload }),

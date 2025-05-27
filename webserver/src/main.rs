@@ -4,6 +4,7 @@ use ::tracing::info;
 use bcrypt::hash;
 use bcrypt::DEFAULT_COST;
 use clap::Parser;
+use clap::Subcommand;
 use dotenv::dotenv;
 use global::GlobalChan;
 use global::GLOBAL;
@@ -18,17 +19,28 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
-use crate::cli::Cli;
-use crate::cli::Command;
 use crate::config::Config;
 use crate::tracing::opentelemetry_layer;
 
-mod cli;
 mod config;
 mod global;
 mod http;
 mod models;
 mod tracing;
+
+#[derive(Parser)]
+pub struct Cli {
+    #[clap(subcommand)]
+    pub command: Command,
+}
+
+#[derive(Subcommand)]
+pub enum Command {
+    Start,
+    Migrate { migrations_dir: String },
+    MakeMigrations { migrations_dir: String },
+    CreateUser { email: String, display_name: String },
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -58,6 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             GLOBAL.init(GlobalChan {
                 db,
                 jwt: config.jwt.clone(),
+                authentication_enabled: config.authentication_enabled,
             });
 
             server::run(&config).await?;

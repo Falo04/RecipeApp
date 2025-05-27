@@ -22,7 +22,7 @@ pub struct Recipe {
 
     pub description: MaxStr<1024>,
 
-    pub user: ForeignModel<User>,
+    pub user: Option<ForeignModel<User>>,
 
     pub tags: BackRef<field!(RecipeTag.recipe)>,
 
@@ -39,6 +39,6 @@ pub struct RecipePatch {
     pub uuid: Uuid,
     pub name: MaxStr<255>,
     pub description: MaxStr<1024>,
-    pub user: ForeignModel<User>,
+    pub user: Option<ForeignModel<User>>,
     pub created_at: OffsetDateTime,
 }

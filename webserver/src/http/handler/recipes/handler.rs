@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::ops::Deref;
+use std::ptr::read;
 use std::sync::LazyLock;
 
 use axum::extract::Path;
@@ -9,6 +11,7 @@ use regex::Regex;
 use rorm::conditions;
 use rorm::conditions::DynamicCollection;
 use rorm::model::Identifiable;
+use rorm::prelude::ForeignModel;
 use rorm::prelude::ForeignModelByField;
 use swaggapi::delete;
 use swaggapi::get;
@@ -16,6 +19,7 @@ use swaggapi::post;
 use swaggapi::put;
 use time::OffsetDateTime;
 use uuid::Uuid;
+use warp::test::request;
 
 use super::schema::CreateRecipeRequest;
 use crate::global::GLOBAL;
@@ -113,14 +117,19 @@ pub async fn get_recipe(
             Some("Recipe not found"),
         ))?;
 
-    let user = rorm::query(&mut tx, User)
-        .condition(User.uuid.equals(recipe.user.0))
-        .optional()
-        .await?
-        .ok_or(ApiError::server_error(
-            "NOT FOUND: User not found from recipe",
-            None,
-        ))?;
+    let user = match recipe.user {
+        Some(user_uuid) => Some(
+            rorm::query(&mut tx, User)
+                .condition(User.uuid.equals(user_uuid.0))
+                .optional()
+                .await?
+                .ok_or(ApiError::server_error(
+                    "NOT FOUND: User not found from recipe",
+                    None,
+                ))?,
+        ),
+        None => None,
+    };
 
     let tags: Vec<_> = rorm::query(&mut tx, RecipeTag.tag.query_as(Tag))
         .condition(RecipeTag.recipe.equals(recipe_uuid))
@@ -147,7 +156,10 @@ pub async fn get_recipe(
         uuid: recipe_uuid,
         name: recipe.name,
         description: recipe.description,
-        user: SimpleUser::from(user),
+        user: match user {
+            Some(user) => Some(SimpleUser::from(user)),
+            None => None,
+        },
         ingredients,
         steps,
         tags,
@@ -165,7 +177,7 @@ pub async fn create_recipe(
 
     // check for existing recipes with this name
     if rorm::query(&mut tx, Recipe)
-        .condition(Recipe.name.equals(&*request.name))
+        .condition(Recipe.name.equals(request.name.deref()))
         .optional()
         .await?
         .is_some()
@@ -182,7 +194,10 @@ pub async fn create_recipe(
             uuid: recipe_uuid,
             name: request.name,
             description: request.description,
-            user: ForeignModelByField(request.user),
+            user: match request.user {
+                Some(user) => Some(ForeignModelByField(user)),
+                None => None,
+            },
             created_at: OffsetDateTime::now_utc(),
         })
         .await?;

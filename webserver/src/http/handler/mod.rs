@@ -3,7 +3,9 @@ use swaggapi::ApiContext;
 use swaggapi::SwaggapiPageBuilder;
 
 use super::middleware::auth_required::AuthRequiredLayer;
+use crate::global::GLOBAL;
 
+pub mod meta;
 pub mod recipes;
 pub mod tags;
 pub mod users;
@@ -11,12 +13,19 @@ pub mod users;
 pub static FRONTEND_V1: SwaggapiPageBuilder = SwaggapiPageBuilder::new().title("Frontend");
 
 pub fn initialize() -> ApiContext<Router> {
-    let auth_not_required = ApiContext::new().nest(
-        "/jwt",
-        ApiContext::new()
-            .tag("Jwt")
-            .handler(users::handler::sign_in_me),
-    );
+    let auth_not_required = ApiContext::new()
+        .nest(
+            "/jwt",
+            ApiContext::new()
+                .tag("Jwt")
+                .handler(users::handler::sign_in_me),
+        )
+        .nest(
+            "/meta",
+            ApiContext::new()
+                .tag("meta")
+                .handler(meta::handler::get_meta),
+        );
 
     let auth_required = ApiContext::new()
         .nest(
@@ -47,10 +56,19 @@ pub fn initialize() -> ApiContext<Router> {
                 .handler(tags::handler::delete_tag),
         );
 
-    ApiContext::new().page(&FRONTEND_V1).nest(
-        "/v1",
-        ApiContext::new()
-            .merge(auth_required.layer(AuthRequiredLayer))
-            .merge(auth_not_required),
-    )
+    if GLOBAL.authentication_enabled {
+        ApiContext::new().page(&FRONTEND_V1).nest(
+            "/v1",
+            ApiContext::new()
+                .merge(auth_required.layer(AuthRequiredLayer))
+                .merge(auth_not_required),
+        )
+    } else {
+        ApiContext::new().page(&FRONTEND_V1).nest(
+            "/v1",
+            ApiContext::new()
+                .merge(auth_required)
+                .merge(auth_not_required),
+        )
+    }
 }

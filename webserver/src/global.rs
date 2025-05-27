@@ -9,6 +9,7 @@ pub type DB = Database;
 pub struct GlobalChan {
     pub db: DB,
     pub jwt: String,
+    pub authentication_enabled: bool,
 }
 
 pub struct GlobalOnceCell<T>(OnceLock<T>);
@@ -16,10 +17,6 @@ impl<T> GlobalOnceCell<T> {
     pub const fn new() -> Self {
         Self(OnceLock::new())
     }
-
-    // pub fn is_initalized(&self) -> bool {
-    //     self.0.get().is_some()
-    // }
 
     pub fn init(&self, value: T) {
         self.0
