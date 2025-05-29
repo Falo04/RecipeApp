@@ -11,7 +11,13 @@
     "ingredients-unit": "Unit",
     "step-title": "Steps:",
     "steps": "Step",
-    "tags": "Tags"
+    "tags": "Tags",
+    "dark": "Dark Mode",
+    "light": "Light Mode",
+    "language": "Select Language",
+    "appearance": "Select Appearance",
+    "en": "\uD83C\uDDFA\uD83C\uDDF8 English",
+    "de": "\uD83C\uDDE9\uD83C\uDDEA Deutsch"
   },
   "placeholder": {
     "email": "test@test.com",

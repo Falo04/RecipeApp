@@ -19,7 +19,7 @@
   "error": {
     "amount-not-zero": "Ingredients amount should not be zero",
     "step-length-zero": "Step cannot be empty",
-    "step-length-1024": "Step cannot be longer than 1024 characters",
+    "step-length-255": "Step cannot be longer than 255 characters",
     "ingre-name": "Please provide a name",
     "ingre-amount": "Ingredients can not be empty or zero",
     "ingre-unit": "Please provide a unit"

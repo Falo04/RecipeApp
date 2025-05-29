@@ -403,7 +403,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                                     : undefined,
                                                             onChange: ({ value }) =>
                                                                 value.length > 255
-                                                                    ? t("error.step-length-1024")
+                                                                    ? t("error.step-length-255")
                                                                     : undefined,
                                                         }}
                                                     >

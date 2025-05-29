@@ -78,8 +78,8 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link to={"/app/recipes"}>
+                        <SidebarMenuButton asChild isActive={pathName.includes("settings")}>
+                            <Link to={"/app/settings"} onClick={() => setOpenMobile(true)}>
                                 <SettingsIcon className={"size-4"} />
                                 <Subheading>{tg("sidebar.settings")}</Subheading>
                             </Link>

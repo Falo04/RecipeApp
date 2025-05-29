@@ -1,16 +1,64 @@
 {
-  "label": {
-    "name": "Name",
-    "color": "Color"
+  "breadcrumb": {
+    "create": "Erstellen",
+    "recipes": "Rezepte",
+    "tags": "Stichworte",
+    "update": "Aktualisieren"
   },
   "button": {
-    "close": "Abbrechen"
+    "login": "Einloggen"
+  },
+  "label": {
+    "appearance": "Aussehen wählen",
+    "color": "Farbe",
+    "dark": "Dunkler Modus",
+    "de": "🇩🇪 Deutsch",
+    "description": "Beschreibung",
+    "email": "E-Mail",
+    "en": "🇺🇸 Englisch",
+    "ingredients-amount": "Menge",
+    "ingredients-name": "Name",
+    "ingredients-title": "Zutaten:",
+    "ingredients-unit": "Einheit",
+    "language": "Sprache wählen",
+    "light": "Heller Modus",
+    "name": "Name",
+    "password": "Passwort",
+    "step-title": "Schritte:",
+    "steps": "Schritt",
+    "tags": "Stichworte"
+  },
+  "login": {
+    "description": "Einloggen",
+    "title": "Rezept-App"
+  },
+  "placeholder": {
+    "email": "test@test.com",
+    "password": "****"
+  },
+  "search": {
+    "recipe": "Rezept suchen",
+    "recipe-empty": "Kein Rezept gefunden"
+  },
+  "search-recipe": "Rezept suchen",
+  "sidebar": {
+    "recipes": "Rezepte",
+    "settings": "Einstellungen",
+    "tags": "Stichworte"
+  },
+  "table": {
+    "action": "Aktion",
+    "color": "Farbe",
+    "description": "Beschreibung",
+    "name": "Name",
+    "no-result": "Sieht leer aus...",
+    "tags": "Stichworte"
   },
   "toast": {
-    "loading": "Lädt...",
     "created-success": "Erfolgreich erstellt",
     "deleted-success": "Erfolgreich gelöscht",
-    "general-error": "Irgendwas ist schief gelaufen"
-  },
-  "search-recipe": "Suche Rezept"
+    "general-error": "Etwas ist schiefgelaufen...",
+    "loading": "Lade...",
+    "updated-success": "Erfolgreich aktualisiert"
+  }
 }

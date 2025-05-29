@@ -1,16 +1,21 @@
 {
-  "heading": {
-    "overview-title": "Tag Übersicht",
-    "overview-description": "Hier werden alle Tags aufgelistet",
-  },
   "button": {
-    "create": "Erstelle Tag",
-    "delete": "Lösche Tag"
+    "create": "Stichwort erstellen",
+    "delete": "Stichwort löschen"
   },
   "dialog": {
-  "create-title": "Erstelle einen Tag",
-    "create-description": "Beschreibung für erstellung eines Tags",
-    "delete-title": "Lösche den Tag: ",
-    "delete-description:": "Löscht den Tag und kann danach nicht mehr wiederhergestellt werden"
+    "create-description": "Beschreibung zum Erstellen eines Stichworts",
+    "create-title": "Ein Stichwort erstellen",
+    "delete-description": "Stichwort löschen, kann nicht wiederhergestellt werden",
+    "delete-title": "Stichwort löschen: "
+  },
+  "heading": {
+    "detail-description": "Hier siehst du alle Rezepte, die mit Stichworten verbunden sind",
+    "detail-title": "Stichwortdetails",
+    "overview-description": "Alle Stichworte sind hier aufgelistet",
+    "overview-title": "Stichwortübersicht"
+  },
+  "input": {
+    "filter": "Stichwort suchen"
   }
 }

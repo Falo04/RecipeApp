@@ -1,0 +1,30 @@
+{
+  "button": {
+    "add-tags": "Tags hinzufügen",
+    "back": "Zurück",
+    "create": "Rezept erstellen",
+    "next": "Weiter"
+  },
+  "error": {
+    "amount-not-zero": "Zutatenmenge darf nicht null sein",
+    "ingre-amount": "Zutaten dürfen nicht leer oder null sein",
+    "ingre-name": "Bitte gib einen Namen an",
+    "ingre-unit": "Bitte gib eine Einheit an",
+    "step-length-255": "Schritt darf nicht länger als 255 Zeichen sein",
+    "step-length-zero": "Schritt darf nicht leer sein"
+  },
+  "heading": {
+    "create-heading": "Rezept erstellen",
+    "detail-heading": "Rezeptdetails",
+    "ingredients": "Liste aller Zutaten",
+    "overview-description": "Alle Rezepte sind hier aufgelistet",
+    "overview-title": "Rezeptübersicht",
+    "step": "Schritt: ",
+    "steps": "Anleitung:",
+    "tags": "Stichworte:",
+    "update-heading": "Rezept aktualisieren"
+  },
+  "input": {
+    "filter": "Rezept suchen"
+  }
+}
