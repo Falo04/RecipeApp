@@ -15,17 +15,15 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command.tsx";
-import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 export function RecipeSearch() {
     const [tg] = useTranslation();
+    const navigate = useNavigate();
+
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
     const [suggestions, setSuggestions] = useState<RecipeSearchResponse[]>([]);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-
-    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (query.length < 3) {
@@ -47,52 +45,45 @@ export function RecipeSearch() {
     }, [query]);
 
     return (
-        <div className="group">
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild className={"px-5"}>
-                    <Button
-                        variant={isMobile ? "ghost" : "outline"}
-                        role={"combobox"}
-                        aria-expanded={open}
-                        className={"w-fit"}
-                    >
-                        {isMobile ? "" : tg("search.recipe")}
-                        <Search />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className={"w-[200px] p-0"} align={"end"}>
-                    <Command>
-                        <CommandInput
-                            value={query}
-                            onValueChange={setQuery}
-                            placeholder={tg("search.recipe")}
-                            className={"h-9"}
-                        />
-                        <CommandList>
-                            <CommandEmpty>{tg("search.recipe-empty")}</CommandEmpty>
-                            <CommandGroup>
-                                {suggestions.map((recipe) => (
-                                    <CommandItem
-                                        key={recipe.uuid}
-                                        value={recipe.name}
-                                        onSelect={() => {
-                                            navigate({
-                                                to: "/app/recipes/$recipeId",
-                                                params: { recipeId: recipe.uuid },
-                                            });
-                                            setOpen(false);
-                                            setQuery("");
-                                            return;
-                                        }}
-                                    >
-                                        {recipe.name}
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
-        </div>
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild className={"px-5"}>
+                <Button variant={"outline"} role={"combobox"} aria-expanded={open} className={"w-full"}>
+                    <Search />
+                    {tg("search.recipe")}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className={"w-[200px] p-0"}>
+                <Command>
+                    <CommandInput
+                        value={query}
+                        onValueChange={setQuery}
+                        placeholder={tg("search.recipe")}
+                        className={"h-9"}
+                    />
+                    <CommandList>
+                        <CommandEmpty>{tg("search.recipe-empty")}</CommandEmpty>
+                        <CommandGroup>
+                            {suggestions.map((recipe) => (
+                                <CommandItem
+                                    key={recipe.uuid}
+                                    value={recipe.name}
+                                    onSelect={() => {
+                                        navigate({
+                                            to: "/app/recipes/$recipeId",
+                                            params: { recipeId: recipe.uuid },
+                                        });
+                                        setOpen(false);
+                                        setQuery("");
+                                        return;
+                                    }}
+                                >
+                                    {recipe.name}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
     );
 }

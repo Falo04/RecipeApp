@@ -7,6 +7,7 @@ import { routeTree } from "./routeTree.gen";
 
 import "./i18n";
 import "./styles.css";
+import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
 
 // Create a new router instance

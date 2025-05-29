@@ -34,7 +34,6 @@ function TableStickyHeader({ className, ...props }: React.ComponentProps<"table"
         };
     }, []);
 
-    console.log(tableHeight);
     return (
         <div data-slot="table-container" className={"block h-full w-full overflow-x-auto"} ref={tableRef}>
             <ScrollArea style={{ height: `${tableHeight}px` }}>

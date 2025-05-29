@@ -1,26 +1,38 @@
 import type React from "react";
 import { Toaster } from "sonner";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 /**
  * The BaseLayout
  */
 export function BaseLayout({
-    navbar,
+    sidebar,
+    sideHeader,
     children,
 }: React.PropsWithChildren<{
-    navbar: React.ReactNode;
+    sidebar: React.ReactNode;
+    sideHeader: React.ReactNode;
 }>) {
+    const isMobile = useIsMobile();
     return (
-        <div className="relative isolate flex h-svh w-full flex-col overflow-hidden bg-white max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
-            <div className="mx-auto w-full max-w-6xl">{navbar}</div>
+        <SidebarProvider>
+            {sidebar}
 
-            <div className="dark:lg:rind-white/10 m-2 flex grow p-3 md:p-8 lg:rounded-lg lg:bg-white lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900">
-                <div className="mx-auto w-full lg:max-w-6xl">{children}</div>
-            </div>
+            <SidebarInset>
+                <div className={"flex flex-1 flex-col"}>
+                    <div className="@container/main flex flex-1 flex-col gap-2">
+                        <div className={"mx-auto flex w-full flex-1 flex-col lg:max-w-5xl"}>
+                            {isMobile && <div className={"bg-sidebar px-4 py-2"}>{sideHeader}</div>}
+                            <div className="h-full px-4 py-4 lg:px-0 lg:py-8">{children}</div>
+                        </div>
+                    </div>
+                </div>
+            </SidebarInset>
 
             <div className="absolute">
                 <Toaster richColors expand={true} />
             </div>
-        </div>
+        </SidebarProvider>
     );
 }

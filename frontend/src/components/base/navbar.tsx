@@ -1,15 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { MenuIcon, XIcon, type LucideIcon } from "lucide-react";
 import clsx from "clsx";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { RecipeSearch } from "./recipe-search";
+import { Button } from "../ui/button.tsx";
+import { RecipeSearch } from "../recipe-search.tsx";
 import { motion } from "framer-motion";
 
 export interface NavItem {
     title: string;
     url: string;
+    Icon: LucideIcon;
 }
 
 /**
@@ -27,8 +28,8 @@ export function Navbar(props: NavbarProps) {
     const isMobile = useIsMobile();
 
     return (
-        <nav className="bg-card w-full p-4 px-6">
-            <div className="flex flex-row items-center justify-between gap-6">
+        <nav className="h-full bg-zinc-100 p-4 px-6 dark:bg-zinc-950">
+            <div className="flex flex-col items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                         <props.icon className="size-4" />
@@ -40,7 +41,19 @@ export function Navbar(props: NavbarProps) {
                     </div>
                 </div>
 
-                <ul className="text-card-foreground hidden items-center gap-10 md:flex">
+                <div className="hidden w-1/5 md:flex">
+                    <RecipeSearch />
+                </div>
+                {isMobile && (
+                    <div className="flex">
+                        <RecipeSearch />
+                        <Button variant="ghost" onClick={() => setMobileNavbar(!mobileNavbar)}>
+                            {mobileNavbar ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
+                        </Button>
+                    </div>
+                )}
+
+                <ul className="text-card-foreground flex flex-col items-center gap-10">
                     {props.navItems.map((item) => (
                         <li key={item.url}>
                             <Link to={item.url}>
@@ -58,18 +71,6 @@ export function Navbar(props: NavbarProps) {
                         </li>
                     ))}
                 </ul>
-
-                <div className="hidden w-1/5 md:flex">
-                    <RecipeSearch />
-                </div>
-                {isMobile && (
-                    <div className="flex">
-                        <RecipeSearch />
-                        <Button variant="ghost" onClick={() => setMobileNavbar(!mobileNavbar)}>
-                            {mobileNavbar ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
-                        </Button>
-                    </div>
-                )}
             </div>
 
             {isMobile && mobileNavbar && (

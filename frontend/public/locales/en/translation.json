@@ -18,10 +18,7 @@
     "password": "****"
   },
   "button": {
-    "close": "Cancel",
-    "login": "Log in",
-    "create": "Create",
-    "update": "Update"
+    "login": "Log in"
   },
   "search-recipe": "Search Recipe",
   "table": {
@@ -46,5 +43,16 @@
   "search": {
     "recipe": "Search recipe",
     "recipe-empty": "No recipe found"
+  },
+  "breadcrumb": {
+    "recipes": "Recipes",
+    "create": "Creating",
+    "update": "Updating",
+    "tags": "Tags"
+  },
+  "sidebar": {
+    "settings": "Settings",
+    "recipes": "Recipes",
+    "tags": "Tags"
   }
 }

@@ -56,7 +56,7 @@ impl Config {
         let jwt = env::var("JWT_TOKEN").expect("JWT_TOKEN must be set");
 
         let authentication_enabled =
-            env::var("AUTHENTICATION_ENABLED").expect("AUTHENTICAION_ENABLED must be set");
+            env::var("AUTHENTICATION_ENABLED").expect("AUTHENTICATION_ENABLED must be set");
 
         Config {
             server: ServerConfig {
