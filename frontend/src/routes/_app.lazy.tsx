@@ -17,12 +17,12 @@ const data = {
     mainIcon: Soup,
     navMain: [
         {
-            title: "Recipes",
+            title: "recipes",
             url: "/app/recipes",
             Icon: BookText,
         },
         {
-            title: "Tag",
+            title: "tags",
             url: "/app/tag",
             Icon: TagIcon,
         },

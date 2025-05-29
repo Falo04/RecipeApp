@@ -3,7 +3,8 @@
     "add-tags": "Tags hinzufügen",
     "back": "Zurück",
     "create": "Rezept erstellen",
-    "next": "Weiter"
+    "next": "Weiter",
+    "update": "Rezept aktualisieren"
   },
   "error": {
     "amount-not-zero": "Zutatenmenge darf nicht null sein",
@@ -21,7 +22,7 @@
     "overview-title": "Rezeptübersicht",
     "step": "Schritt: ",
     "steps": "Anleitung:",
-    "tags": "Stichworte:",
+    "tags": "Tag:",
     "update-heading": "Rezept aktualisieren"
   },
   "input": {

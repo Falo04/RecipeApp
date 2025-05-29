@@ -128,7 +128,9 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                             <Button type="button" variant="secondary" onClick={() => props.onClose()}>
                                 {tg("button.close")}
                             </Button>
-                            <Button type="submit">{t("button.create")}</Button>
+                            <Button variant={"primary"} type="submit">
+                                {t("button.create")}
+                            </Button>
                         </div>
                     </DialogFooter>
                 </form>

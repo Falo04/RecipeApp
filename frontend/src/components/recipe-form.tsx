@@ -191,7 +191,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                     <PlusIcon /> {t("button.add-tags")}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0" side={"bottom"} align={"end"}>
+                                            <PopoverContent side={"bottom"}>
                                                 <Command>
                                                     <CommandInput placeholder="Search Tag..." className="h-9" />
                                                     <CommandList>
@@ -474,7 +474,7 @@ export function RecipeForm(props: RecipeFormProps) {
                             <ArrowLeft /> {t("button.back")}
                         </Button>
                         <Button type={"submit"} variant={"primary"}>
-                            {props.formData ? tg("button.update") : tg("button.create")}
+                            {props.formData ? t("button.update") : t("button.create")}
                         </Button>
                     </div>
                 )}

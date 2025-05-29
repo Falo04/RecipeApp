@@ -2,11 +2,12 @@
   "breadcrumb": {
     "create": "Erstellen",
     "recipes": "Rezepte",
-    "tags": "Stichworte",
+    "tags": "Tags",
     "update": "Aktualisieren"
   },
   "button": {
-    "login": "Einloggen"
+    "login": "Einloggen",
+    "close": "Schließe"
   },
   "label": {
     "appearance": "Aussehen wählen",
@@ -26,7 +27,7 @@
     "password": "Passwort",
     "step-title": "Schritte:",
     "steps": "Schritt",
-    "tags": "Stichworte"
+    "tags": "Tag"
   },
   "login": {
     "description": "Einloggen",
@@ -44,7 +45,7 @@
   "sidebar": {
     "recipes": "Rezepte",
     "settings": "Einstellungen",
-    "tags": "Stichworte"
+    "tags": "Tag"
   },
   "table": {
     "action": "Aktion",
@@ -52,7 +53,7 @@
     "description": "Beschreibung",
     "name": "Name",
     "no-result": "Sieht leer aus...",
-    "tags": "Stichworte"
+    "tags": "Tags"
   },
   "toast": {
     "created-success": "Erfolgreich erstellt",

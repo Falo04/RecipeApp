@@ -24,7 +24,8 @@
     "password": "****"
   },
   "button": {
-    "login": "Log in"
+    "login": "Log in",
+    "close": "Close"
   },
   "search-recipe": "Search Recipe",
   "table": {

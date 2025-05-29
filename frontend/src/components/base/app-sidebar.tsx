@@ -66,7 +66,7 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
                                     <SidebarMenuButton asChild isActive={pathName.includes(url)}>
                                         <Link to={url} onClick={() => setOpenMobile(false)}>
                                             <Icon className="size-4" />
-                                            <Subheading>{title}</Subheading>
+                                            <Subheading>{tg("sidebar." + title)}</Subheading>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

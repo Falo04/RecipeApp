@@ -14,7 +14,8 @@
     "add-tags": "Add Tags",
     "create": "Create Recipe",
     "next": "Next",
-    "back": "Back"
+    "back": "Back",
+    "update": "Update Recipe"
   },
   "error": {
     "amount-not-zero": "Ingredients amount should not be zero",
