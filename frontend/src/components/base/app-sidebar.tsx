@@ -17,6 +17,7 @@ import { Heading, Subheading } from "@/components/base/heading.tsx";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import { RecipeSearch } from "@/components/recipe-search.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 /**
  * The properties for {@link AppSidebar}
@@ -35,6 +36,7 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
     const { setOpenMobile } = useSidebar();
 
     const pathName = useRouterState().location.pathname;
+    const isMobile = useIsMobile();
 
     return (
         <Sidebar {...props}>
@@ -50,13 +52,15 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <RecipeSearch />
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
+                    {!isMobile && (
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <RecipeSearch />
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    )}
                 </SidebarGroup>
                 <SidebarGroup>
                     <SidebarGroupContent>
@@ -79,7 +83,7 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathName.includes("settings")}>
-                            <Link to={"/app/settings"} onClick={() => setOpenMobile(true)}>
+                            <Link to={"/app/settings"} onClick={() => setOpenMobile(false)}>
                                 <SettingsIcon className={"size-4"} />
                                 <Subheading>{tg("sidebar.settings")}</Subheading>
                             </Link>

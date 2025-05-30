@@ -5,7 +5,7 @@ import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
 import { BookText, Soup, TagIcon } from "lucide-react";
 import { Suspense } from "react";
 import AppSidebar from "@/components/base/app-sidebar.tsx";
-import SiteHeader from "@/components/base/site-header.tsx";
+import SideHeader from "@/components/base/side-header.tsx";
 
 /**
  * The properties for {@link FoodMenu}
@@ -38,7 +38,7 @@ export default function FoodMenu(_props: FoodMenuProps) {
             sidebar={
                 <AppSidebar variant={"inset"} appTitle={data.title} Icon={data.mainIcon} navItems={data.navMain} />
             }
-            sideHeader={<SiteHeader appTitle={data.title} icon={data.mainIcon} />}
+            sideHeader={<SideHeader appTitle={data.title} icon={data.mainIcon} />}
             children={
                 <Suspense>
                     <Outlet />

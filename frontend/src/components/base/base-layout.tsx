@@ -24,7 +24,7 @@ export function BaseLayout({
                     <div className="@container/main flex flex-1 flex-col gap-2">
                         <div className={"mx-auto flex w-full flex-1 flex-col lg:max-w-5xl"}>
                             {isMobile && <div className={"bg-sidebar px-4 py-2"}>{sideHeader}</div>}
-                            <div className="h-full px-4 py-4 lg:px-0 lg:py-8">{children}</div>
+                            <div className="h-full px-4 py-4 lg:py-8">{children}</div>
                         </div>
                     </div>
                 </div>

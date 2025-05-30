@@ -15,10 +15,12 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command.tsx";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function RecipeSearch() {
     const [tg] = useTranslation();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
@@ -46,13 +48,19 @@ export function RecipeSearch() {
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild className={"px-5"}>
-                <Button variant={"outline"} role={"combobox"} aria-expanded={open} className={"w-full"}>
+            <PopoverTrigger asChild className={"p-0 md:p-4"}>
+                <Button
+                    variant={"outline"}
+                    role={"combobox"}
+                    aria-expanded={open}
+                    size={"icon"}
+                    className={"size-7 md:w-full"}
+                >
                     <Search />
-                    {tg("search.recipe")}
+                    {!isMobile && tg("search.recipe")}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className={"w-[200px] p-0"}>
+            <PopoverContent className={"p-2"}>
                 <Command>
                     <CommandInput
                         value={query}
