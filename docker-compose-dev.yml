@@ -2,8 +2,8 @@ services:
   nginx-dev:
     restart: unless-stopped
     stop_signal: SIGKILL
-    depends_on: []
-    networks: [net-food]
+    depends_on: [ ]
+    networks: [ net-food-dev ]
     ports:
       - "127.0.0.1:8443:80"
     volumes:
@@ -18,16 +18,16 @@ services:
     depends_on:
       - postgres-dev
     networks:
-      - net-food
+      - net-food-dev
     volumes:
       - ./webserver/migrations:/migrations
-    env_file: [.env]
+    env_file: [ .env ]
 
   postgres-dev:
     shm_size: 128mb
     restart: unless-stopped
     networks:
-      - net-food
+      - net-food-dev
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
@@ -38,8 +38,8 @@ services:
       dockerfile: ./build/dockerfiles/postgres.Dockerfile
 
   jaeger-dev:
-    networks: [net-food]
-    env_file: [.env]
+    networks: [ net-food-dev ]
+    env_file: [ .env ]
     build:
       dockerfile: ./build/dockerfiles/jaeger.Dockerfile
 
@@ -48,14 +48,14 @@ services:
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
-    env_file: [.env]
-    networks: [net-food]
+    env_file: [ .env ]
+    networks: [ net-food-dev ]
     user: "${UID}:${GID}"
     build:
       dockerfile: ./build/dockerfiles/frontend-dev.Dockerfile
 
 networks:
-  net-food:
+  net-food-dev:
     driver: bridge
 
 volumes:
