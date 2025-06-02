@@ -1,7 +1,7 @@
 import React from "react";
-import { Heading } from "./heading";
+import { Heading } from "../ui/heading.tsx";
 import { clsx } from "clsx";
-import { Text } from "./text";
+import { Text } from "../ui/text.tsx";
 import { Button } from "../ui/button";
 import { Edit, X } from "lucide-react";
 
@@ -50,11 +50,16 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
                         <Heading>{props.heading} </Heading>
                         <div className="flex">
                             {props.editButton && (
-                                <Button onClick={() => props.editButton?.()} variant={"ghost"} className={"w-fit"}>
-                                    <Edit className={"size-6"} />
+                                <Button
+                                    size={"icon"}
+                                    onClick={() => props.editButton?.()}
+                                    variant={"ghost"}
+                                    className={"w-fit"}
+                                >
+                                    <Edit />
                                 </Button>
                             )}
-                            <Button onClick={() => props.navigate()} variant={"ghost"} className={"w-fit"}>
+                            <Button size={"icon"} onClick={() => props.navigate()} variant={"ghost"}>
                                 <X className={"size-6"} />
                             </Button>
                         </div>

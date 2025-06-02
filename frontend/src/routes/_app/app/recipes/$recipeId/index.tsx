@@ -1,7 +1,7 @@
 import { Api } from "@/api/api";
-import { Subheading } from "@/components/base/heading";
-import SubmenuLayout from "@/components/base/submenu-layout";
-import { Text } from "@/components/base/text";
+import { Subheading } from "@/components/ui/heading.tsx";
+import SubmenuLayout from "@/components/layouts/submenu-layout";
+import { Text } from "@/components/ui/text.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";

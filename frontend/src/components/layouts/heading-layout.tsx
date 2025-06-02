@@ -1,7 +1,7 @@
 import React from "react";
-import { Heading } from "./heading";
+import { Heading } from "../ui/heading.tsx";
 import { clsx } from "clsx";
-import { Text } from "./text";
+import { Text } from "../ui/text.tsx";
 
 /**
  * The properties for {@link HeadingLayout}

@@ -1,4 +1,4 @@
-import SubmenuLayout from "@/components/base/submenu-layout";
+import SubmenuLayout from "@/components/layouts/submenu-layout";
 import { RecipeForm } from "@/components/recipe-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";

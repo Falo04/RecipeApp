@@ -1,18 +1,18 @@
-import { BaseLayout } from "@/components/base/base-layout";
+import { BaseLayout } from "@/components/layouts/base-layout";
 import { TagsProvider } from "@/context/tags";
 import { UserProvider } from "@/context/user";
 import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
 import { BookText, Soup, TagIcon } from "lucide-react";
 import { Suspense } from "react";
-import AppSidebar from "@/components/base/app-sidebar.tsx";
-import SideHeader from "@/components/base/side-header.tsx";
+import AppSidebar from "@/components/layouts/app-sidebar.tsx";
+import SideHeader from "@/components/layouts/side-header.tsx";
 
 /**
  * The properties for {@link FoodMenu}
  */
 export type FoodMenuProps = {};
 
-const data = {
+export const app_meta_data = {
     title: "Recipe App",
     mainIcon: Soup,
     navMain: [
@@ -36,9 +36,14 @@ export default function FoodMenu(_props: FoodMenuProps) {
     return (
         <BaseLayout
             sidebar={
-                <AppSidebar variant={"inset"} appTitle={data.title} Icon={data.mainIcon} navItems={data.navMain} />
+                <AppSidebar
+                    variant={"inset"}
+                    appTitle={app_meta_data.title}
+                    Icon={app_meta_data.mainIcon}
+                    navItems={app_meta_data.navMain}
+                />
             }
-            sideHeader={<SideHeader appTitle={data.title} icon={data.mainIcon} />}
+            sideHeader={<SideHeader appTitle={app_meta_data.title} icon={app_meta_data.mainIcon} />}
             children={
                 <Suspense>
                     <Outlet />

@@ -54,7 +54,7 @@ export function RecipeSearch() {
                     role={"combobox"}
                     aria-expanded={open}
                     size={"icon"}
-                    className={"size-7 md:w-full"}
+                    className={"lg:w-full"}
                 >
                     <Search />
                     {!isMobile && tg("search.recipe")}

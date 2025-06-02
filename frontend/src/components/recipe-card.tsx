@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface.ts";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
-import { Text } from "@/components/base/text.tsx";
+import { Text } from "@/components/ui/text.tsx";
 import type { VariantProps } from "class-variance-authority";
 
 /**

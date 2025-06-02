@@ -1,5 +1,4 @@
 import type React from "react";
-import { Toaster } from "sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 
@@ -24,15 +23,11 @@ export function BaseLayout({
                     <div className="@container/main flex flex-1 flex-col gap-2">
                         <div className={"mx-auto flex w-full flex-1 flex-col lg:max-w-5xl"}>
                             {isMobile && <div className={"bg-sidebar px-4 py-2"}>{sideHeader}</div>}
-                            <div className="h-full px-4 py-4 lg:py-8">{children}</div>
+                            <div className="h-full px-6 py-6 lg:py-10">{children}</div>
                         </div>
                     </div>
                 </div>
             </SidebarInset>
-
-            <div className="absolute">
-                <Toaster richColors expand={true} />
-            </div>
         </SidebarProvider>
     );
 }

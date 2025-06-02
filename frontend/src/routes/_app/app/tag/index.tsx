@@ -1,6 +1,6 @@
 import type { SimpleTag } from "@/api/model/tag.interface";
-import HeadingLayout from "@/components/base/heading-layout";
-import { DataTable } from "@/components/base/data-table";
+import HeadingLayout from "@/components/layouts/heading-layout";
+import { DataTable } from "@/components/ui/data-table.tsx";
 import { CreateTagDialog } from "@/components/dialogs/create-tag";
 import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,11 +77,7 @@ function TagsOverview(_props: TagsOverviewProps) {
         <HeadingLayout
             heading={t("heading.overview-title")}
             headingDescription={t("heading.overview-description")}
-            headingChildren={
-                <Button variant="primary" onClick={() => setOpenCreateTag(true)}>
-                    {t("button.create")}
-                </Button>
-            }
+            headingChildren={<Button onClick={() => setOpenCreateTag(true)}>{t("button.create")}</Button>}
         >
             <DataTable filterTag={t("input.filter")} data={tagContext.tags.items} columns={columns} />
 

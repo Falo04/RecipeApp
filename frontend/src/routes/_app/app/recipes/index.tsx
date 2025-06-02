@@ -2,14 +2,15 @@ import { Api } from "@/api/api";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import HeadingLayout from "@/components/base/heading-layout";
+import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
-import { DataTable } from "@/components/base/data-table.tsx";
+import { DataTable } from "@/components/ui/data-table.tsx";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface";
 import { useMemo } from "react";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
+import { Text } from "@/components/ui/text.tsx";
 
 /**
  * The properties for {@link FoodOverview}
@@ -32,9 +33,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[80ch]">
-                            <span>{row.original.name}</span>
-                        </div>
+                        <Text className="overflow-hidden text-ellipsis">{row.original.name}</Text>
                     </Link>
                 ),
             },
@@ -43,9 +42,7 @@ function FoodOverview(_props: FoodOverviewProps) {
                 header: () => <span>{tg("table.description")}</span>,
                 cell: ({ row }) => (
                     <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[40ch]">
-                            <span className={"text-primary/60 w-[60ch]"}>{row.original.description}</span>
-                        </div>
+                        <Text className={"overflow-hidden text-ellipsis"}>{row.original.description}</Text>
                     </Link>
                 ),
             },
@@ -82,7 +79,7 @@ function FoodOverview(_props: FoodOverviewProps) {
             headingDescription={t("heading.overview-description")}
             headingChildren={
                 <Link to={"/app/recipes/create"}>
-                    <Button variant="primary">{t("button.create")}</Button>
+                    <Button>{t("button.create")}</Button>
                 </Link>
             }
         >

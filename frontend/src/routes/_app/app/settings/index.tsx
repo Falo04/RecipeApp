@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import HeadingLayout from "@/components/base/heading-layout.tsx";
+import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { useForm } from "@tanstack/react-form";
 import { FormLabel } from "@/components/ui/form.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
@@ -98,9 +98,7 @@ export default function Settings(_props: SettingsProps) {
                     </form.Field>
                 </div>
                 <div className={"flex justify-end p-4"}>
-                    <Button type={"submit"} variant={"primary"}>
-                        {t("button.update")}
-                    </Button>
+                    <Button type={"submit"}>{t("button.update")}</Button>
                 </div>
             </form>
         </HeadingLayout>

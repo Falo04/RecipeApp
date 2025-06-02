@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/sidebar.tsx";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { type LucideIcon, SettingsIcon } from "lucide-react";
-import type { NavItem } from "@/components/base/navbar.tsx";
-import { Heading, Subheading } from "@/components/base/heading.tsx";
+import type { NavItem } from "@/components/layouts/navbar.tsx";
+import { Heading, Subheading } from "@/components/ui/heading.tsx";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import { RecipeSearch } from "@/components/recipe-search.tsx";

@@ -1,7 +1,7 @@
 import { Api } from "@/api/api";
 import type { SimpleRecipe } from "@/api/model/recipe.interface";
-import { DataTable } from "@/components/base/data-table";
-import SubmenuLayout from "@/components/base/submenu-layout";
+import { DataTable } from "@/components/ui/data-table.tsx";
+import SubmenuLayout from "@/components/layouts/submenu-layout";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";

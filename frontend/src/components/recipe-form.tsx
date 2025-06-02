@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CommandEmpty, CommandItem, Command, CommandGroup, CommandList, CommandInput } from "./ui/command";
 import { Badge, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import { Text } from "@/components/base/text.tsx";
+import { Text } from "@/components/ui/text.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -473,9 +473,7 @@ export function RecipeForm(props: RecipeFormProps) {
                         <Button type={"button"} variant={"secondary"} onClick={() => setState(state - 1)}>
                             <ArrowLeft /> {t("button.back")}
                         </Button>
-                        <Button type={"submit"} variant={"primary"}>
-                            {props.formData ? t("button.update") : t("button.create")}
-                        </Button>
+                        <Button type={"submit"}>{props.formData ? t("button.update") : t("button.create")}</Button>
                     </div>
                 )}
             </div>

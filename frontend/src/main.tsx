@@ -1,6 +1,6 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { RouterProvider, createRouter, useNavigate } from "@tanstack/react-router";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -9,6 +9,7 @@ import "./i18n";
 import "./styles.css";
 import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
+import { Toaster } from "sonner";
 
 // Create a new router instance
 const router = createRouter({
@@ -16,6 +17,13 @@ const router = createRouter({
     defaultPreload: "intent",
     scrollRestoration: true,
     defaultStructuralSharing: true,
+    defaultNotFoundComponent: () => {
+        const navigate = useNavigate();
+        useEffect(() => {
+            navigate({ to: "/app/recipes" });
+        }, [navigate]);
+        return null;
+    },
 });
 
 // Register the router instance for type safety
@@ -31,6 +39,7 @@ if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <StrictMode>
+            <Toaster richColors expand={true} />
             <RouterProvider router={router} />
         </StrictMode>,
     );

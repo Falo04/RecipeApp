@@ -8,8 +8,8 @@ import {
     type SortingState,
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { Button } from "../ui/button";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableStickyHeader } from "../ui/table";
+import { Button } from "./button.tsx";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableStickyHeader } from "./table.tsx";
 import { type ColumnFiltersState, getFilteredRowModel } from "@tanstack/table-core";
 import { Input } from "@/components/ui/input.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";

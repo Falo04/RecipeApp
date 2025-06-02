@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import SubmenuLayout from "@/components/base/submenu-layout.tsx";
+import SubmenuLayout from "@/components/layouts/submenu-layout.tsx";
 import { RecipeForm } from "@/components/recipe-form";
 import { Api } from "@/api/api";
 import { toast } from "sonner";
