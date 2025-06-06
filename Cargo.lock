@@ -635,6 +635,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dotenv"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
+
+[[package]]
 name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -886,9 +892,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "galvyn"
+version = "0.1.0"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=aa37f232a62fea4d8440e5cdeb81ab978c851d5d#aa37f232a62fea4d8440e5cdeb81ab978c851d5d"
+dependencies = [
+ "axum 0.8.1",
+ "futures-lite",
+ "galvyn-core",
+ "galvyn-macros",
+ "openapiv3",
+ "rorm",
+ "serde_json",
+ "signal-hook",
+ "signal-hook-tokio",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "galvyn-core"
 version = "0.1.0"
-source = "git+https://github.com/myOmikron/galvyn.git?rev=e34db9f916cb74b37737c688108f75b51165394b#e34db9f916cb74b37737c688108f75b51165394b"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=aa37f232a62fea4d8440e5cdeb81ab978c851d5d#aa37f232a62fea4d8440e5cdeb81ab978c851d5d"
 dependencies = [
  "async-trait",
  "axum 0.8.1",
@@ -911,6 +937,17 @@ dependencies = [
  "tower-sessions",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "galvyn-macros"
+version = "0.2.0"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=aa37f232a62fea4d8440e5cdeb81ab978c851d5d#aa37f232a62fea4d8440e5cdeb81ab978c851d5d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "rorm-macro-impl",
+ "syn",
 ]
 
 [[package]]
@@ -1601,6 +1638,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "multimap"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
+
+[[package]]
 name = "nix"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1703,9 +1746,9 @@ checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "openapiv3"
-version = "2.0.0"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc02deea53ffe807708244e5914f6b099ad7015a207ee24317c22112e17d9c5c"
+checksum = "5c8d427828b22ae1fff2833a03d8486c2c881367f1c336349f307f321e7f4d05"
 dependencies = [
  "indexmap 2.7.1",
  "serde",
@@ -1855,6 +1898,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
+name = "petgraph"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3672b37090dbd86368a4145bc067582552b29c27377cad4e0a306c97f9bd7772"
+dependencies = [
+ "fixedbitset",
+ "indexmap 2.7.1",
+]
+
+[[package]]
 name = "pin-project"
 version = "1.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1929,6 +1982,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "prettyplease"
+version = "0.2.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dee91521343f4c5c6a63edd65e54f31f5c92fe8978c40a4282f8372194c6a7d"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1948,6 +2011,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "prost-build"
+version = "0.13.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be769465445e8c1474e9c5dac2018218498557af32d9ed057325ec9a41ae81bf"
+dependencies = [
+ "heck 0.5.0",
+ "itertools",
+ "log",
+ "multimap",
+ "once_cell",
+ "petgraph",
+ "prettyplease",
+ "prost",
+ "prost-types",
+ "regex",
+ "syn",
+ "tempfile",
+]
+
+[[package]]
 name = "prost-derive"
 version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1958,6 +2041,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "prost-types"
+version = "0.13.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52c2c1bf36ddb1a1c396b3601a3cec27c2462e45f07c386894ec3ccf5332bd16"
+dependencies = [
+ "prost",
 ]
 
 [[package]]
@@ -2119,6 +2211,7 @@ dependencies = [
  "serde_json",
  "time",
  "tracing",
+ "url",
  "uuid",
 ]
 
@@ -2555,9 +2648,9 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "signal-hook"
-version = "0.3.17"
+version = "0.3.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8621587d4798caf8eb44879d42e56b9a93ea5dcd315a6487c357130095b62801"
+checksum = "d881a16cf4426aa584979d30bd82cb33429027e42122b169753d6ef1085ed6e2"
 dependencies = [
  "libc",
  "signal-hook-registry",
@@ -2910,35 +3003,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
-name = "swaggapi"
-version = "0.2.2"
-source = "git+https://github.com/gammelalf/swaggapi#f1a7b92e6feb01a4f0fb5d68d717299888551df6"
-dependencies = [
- "axum 0.8.1",
- "bytes",
- "indexmap 2.7.1",
- "log",
- "mime",
- "openapiv3",
- "regex",
- "schemars",
- "serde",
- "serde_json",
- "swaggapi-macro",
- "tower 0.4.13",
-]
-
-[[package]]
-name = "swaggapi-macro"
-version = "0.2.0"
-source = "git+https://github.com/gammelalf/swaggapi#f1a7b92e6feb01a4f0fb5d68d717299888551df6"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "syn"
 version = "2.0.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3226,6 +3290,20 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
+]
+
+[[package]]
+name = "tonic-build"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9557ce109ea773b399c9b9e5dca39294110b74f1f342cb347a80d1fce8c26a11"
+dependencies = [
+ "prettyplease",
+ "proc-macro2",
+ "prost-build",
+ "prost-types",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -3674,8 +3752,9 @@ dependencies = [
  "axum 0.8.1",
  "bcrypt",
  "clap",
+ "dotenv",
  "futures-lite",
- "galvyn-core",
+ "galvyn",
  "jsonwebtoken",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -3688,13 +3767,11 @@ dependencies = [
  "serde_json",
  "serde_plain",
  "serde_repr",
- "signal-hook",
- "signal-hook-tokio",
- "swaggapi",
  "thiserror 2.0.12",
  "time",
  "tokio",
  "tonic",
+ "tonic-build",
  "tower 0.5.2",
  "tower-http",
  "tower-sessions",

@@ -10,12 +10,12 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use futures_lite::FutureExt;
+use galvyn::core::stuff::api_json::ApiJson;
 use tower::Service;
 use tracing::info;
 
 use crate::http::common::schemas::ApiErrorResponse;
 use crate::http::common::schemas::ApiStatusCode;
-use crate::http::extractors::api_json::ApiJson;
 use crate::impl_axum_layer;
 
 /// Middleware which catches stack unwinding cased by a panic

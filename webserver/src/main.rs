@@ -1,15 +1,17 @@
 use std::fs;
+use std::net::SocketAddr;
 
 use ::tracing::info;
 use bcrypt::hash;
 use bcrypt::DEFAULT_COST;
 use clap::Parser;
 use clap::Subcommand;
+use dotenv::dotenv;
+use galvyn::core::DatabaseSetup;
 use http::server;
 use models::user::User;
 use rorm::Database;
 use rorm::DatabaseConfiguration;
-use rorm::DatabaseDriver;
 use tracing::init_tracing_panic_hook;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -17,7 +19,8 @@ use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
 use crate::config::DB;
-use crate::config::JWT;
+use crate::config::SERVER_ADDRESS;
+use crate::config::SERVER_PORT;
 use crate::tracing::opentelemetry_layer;
 
 mod config;
@@ -41,6 +44,7 @@ pub enum Command {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenv().ok();
     if let Err(errors) = config::init() {
         for error in errors {
             eprintln!("error: {}", error);
@@ -105,12 +109,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn start() -> Result<(), Box<dyn std::error::Error>> {
-    galvyn_core::module::registry::Registry::builder()
-        .register_module::<Database>(Default::default())
-        .init()
+    galvyn::Galvyn::new()
+        .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
+            DB.clone(),
+        )))
+        .init_modules()
+        .await?
+        .add_routes(server::initialize())
+        .start(SocketAddr::new(SERVER_ADDRESS.clone(), *SERVER_PORT))
         .await?;
-
-    server::run().await?;
 
     Ok(())
 }

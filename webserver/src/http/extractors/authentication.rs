@@ -1,8 +1,8 @@
 use axum::extract::FromRequestParts;
 use axum::http::header;
 use axum::http::request::Parts;
-use galvyn_core::re_exports::rorm::Database;
-use galvyn_core::Module;
+use galvyn::core::Module;
+use galvyn::rorm::Database;
 use jsonwebtoken::decode;
 use jsonwebtoken::DecodingKey;
 use jsonwebtoken::TokenData;

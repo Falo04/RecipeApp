@@ -16,6 +16,7 @@ services:
       dockerfile: ./build/dockerfiles/webserver-dev.Dockerfile
     restart: unless-stopped
     depends_on:
+      
       - postgres-dev
     networks:
       - net-food-dev
@@ -29,8 +30,8 @@ services:
     networks:
       - net-food-dev
     environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres-dev:/var/lib/postgresql/data

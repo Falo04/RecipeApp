@@ -2,21 +2,19 @@
 name = "webserver"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [dependencies]
 thiserror = "~2"
 rand = "0.9.1"
+dotenv = "0.15.0"
 
 # Webframework
 axum = { version = "~0.8", features = ["ws"] } # Main web library
-galvyn-core = { version = "0.1.0", git = "https://github.com/myOmikron/galvyn.git", rev = "e34db9f916cb74b37737c688108f75b51165394b", default-features = false }
+galvyn = { git = "https://github.com/myOmikron/galvyn.git", rev = "aa37f232a62fea4d8440e5cdeb81ab978c851d5d" }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
 tower-sessions = { version = "~0.14" } # Cookie based sessions
-swaggapi = { version = "*", default-features = false, features = [
-    "axum",
-    "tracing-instrument",
-], git = "https://github.com/gammelalf/swaggapi" } # Auto-generate OpenAPI
 schemars = { version = "~0.8", features = [
     "uuid1",
     "raw_value",
@@ -45,8 +43,6 @@ rorm = { version = "~0.7", default-features = false, features = ["postgres-only"
 
 # Async
 tokio = { version = "~1", features = ["full"] }
-signal-hook = { version = "~0.3" }
-signal-hook-tokio = { version = "~0.3", features = ["futures-v0_3"] }
 futures-lite = { version = "~2" }
 
 # Json
@@ -70,6 +66,4 @@ rpassword = "7.3.1"
 # Authentication
 
 [build-dependencies]
-
-[features]
-non_docker_build = []
+tonic-build = "~0.12"

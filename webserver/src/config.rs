@@ -1,14 +1,11 @@
 use std::clone::Clone;
 use std::net::IpAddr;
 use std::net::Ipv4Addr;
-use std::ops::Deref;
-use std::str::FromStr;
 use std::sync::LazyLock;
 
 use rand::distr::Alphanumeric;
 use rand::distr::SampleString;
 use rorm::DatabaseDriver;
-use serde::de::DeserializeOwned;
 
 use crate::config::env::EnvError;
 use crate::config::env::EnvVar;
@@ -38,9 +35,9 @@ pub fn init() -> Result<(), Vec<&'static EnvError>> {
 }
 
 pub static SERVER_ADDRESS: EnvVar<IpAddr> =
-    EnvVar::optional("SERVER_ADDRESS", || IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
+    EnvVar::optional("SERVER_ADDRESS", || IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)));
 
-pub static SERVER_PORT: EnvVar<u16> = EnvVar::optional("SERVER_PORT", || 8080);
+pub static SERVER_PORT: EnvVar<u16> = EnvVar::optional("SERVER_PORT", || 8432);
 
 pub static DB_HOST: EnvVar = EnvVar::required("DB_HOST");
 pub static DB_PORT: EnvVar<u16> = EnvVar::required("DB_PORT");
@@ -53,7 +50,7 @@ pub static JWT: EnvVar =
     EnvVar::optional("JWT", || Alphanumeric.sample_string(&mut rand::rng(), 32));
 
 pub static AUTHENTICATION_ENABLED: EnvVar<bool> =
-    EnvVar::optional("AUTHENTICATION_ENABLED", || true);
+    EnvVar::optional("AUTHENTICATION_ENABLED", || false);
 
 pub static OTEL_ENDPOINT: EnvVar =
     EnvVar::optional("OTEL_ENDPOINT", || "http://jaeger-dev:4317".to_string());
@@ -121,7 +118,7 @@ mod env {
                                 }
                             }
                         }
-                        Err(VarError::NotUnicode(err)) => {
+                        Err(VarError::NotUnicode(_err)) => {
                             return Err(EnvError {
                                 name: self.name,
                                 reason: EnvErrorReason::Missing,
@@ -133,7 +130,7 @@ mod env {
                     match serde_plain::from_str::<T>(&value) {
                         Ok(value) => Ok(value),
                         Err(err) => match self.default {
-                            Some(default) => Ok(default()),
+                            Some(default) if is_empty => Ok(default()),
                             _ => Err(EnvError {
                                 name: self.name,
                                 reason: EnvErrorReason::Malformed(err.to_string()),
@@ -160,7 +157,7 @@ mod env {
     }
 
     #[derive(Debug, Error, Clone)]
-    enum EnvErrorReason {
+    pub enum EnvErrorReason {
         #[error("not set")]
         Missing,
 

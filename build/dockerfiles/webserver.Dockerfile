@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.84.0
+ARG RUST_VERSION=1.85.0
 
 FROM rust:${RUST_VERSION}-slim-bookworm AS buildrust
 
@@ -18,7 +18,7 @@ RUN --mount=type=bind,source=webserver/,target=webserver/ \
     --mount=type=cache,target=/app/target/ \
     <<EOF
 set -e
-cargo build --locked
+cargo build --release --locked
 cp ./target/debug/webserver /bin/server
 EOF
 

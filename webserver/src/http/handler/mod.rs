@@ -1,6 +1,4 @@
-use axum::Router;
-use swaggapi::ApiContext;
-use swaggapi::SwaggapiPageBuilder;
+use galvyn::core::GalvynRouter;
 
 use super::middleware::auth_required::AuthRequiredLayer;
 use crate::config::AUTHENTICATION_ENABLED;
@@ -10,28 +8,21 @@ pub mod recipes;
 pub mod tags;
 pub mod users;
 
-pub static FRONTEND_V1: SwaggapiPageBuilder = SwaggapiPageBuilder::new().title("Frontend");
-
-pub fn initialize() -> ApiContext<Router> {
-    let auth_not_required = ApiContext::new()
+pub fn initialize() -> GalvynRouter {
+    let auth_not_required = GalvynRouter::new()
         .nest(
             "/jwt",
-            ApiContext::new()
-                .tag("Jwt")
-                .handler(users::handler::sign_in_me),
+            GalvynRouter::new().handler(users::handler::sign_in_me),
         )
         .nest(
             "/meta",
-            ApiContext::new()
-                .tag("meta")
-                .handler(meta::handler::get_meta),
+            GalvynRouter::new().handler(meta::handler::get_meta),
         );
 
-    let auth_required = ApiContext::new()
+    let auth_required = GalvynRouter::new()
         .nest(
             "/recipes",
-            ApiContext::new()
-                .tag("Recipes")
+            GalvynRouter::new()
                 .handler(recipes::handler::get_all_recipes)
                 .handler(recipes::handler::get_recipe)
                 .handler(recipes::handler::create_recipe)
@@ -41,15 +32,13 @@ pub fn initialize() -> ApiContext<Router> {
         )
         .nest(
             "/users",
-            ApiContext::new()
-                .tag("User")
+            GalvynRouter::new()
                 .handler(users::handler::get_all_users)
                 .handler(users::handler::get_me),
         )
         .nest(
             "/tags",
-            ApiContext::new()
-                .tag("Tags")
+            GalvynRouter::new()
                 .handler(tags::handler::get_all_tags)
                 .handler(tags::handler::get_recipes_by_tag)
                 .handler(tags::handler::create_tag)
@@ -57,16 +46,16 @@ pub fn initialize() -> ApiContext<Router> {
         );
 
     if AUTHENTICATION_ENABLED.clone() {
-        ApiContext::new().page(&FRONTEND_V1).nest(
+        GalvynRouter::new().nest(
             "/v1",
-            ApiContext::new()
+            GalvynRouter::new()
                 .merge(auth_required.layer(AuthRequiredLayer))
                 .merge(auth_not_required),
         )
     } else {
-        ApiContext::new().page(&FRONTEND_V1).nest(
+        GalvynRouter::new().nest(
             "/v1",
-            ApiContext::new()
+            GalvynRouter::new()
                 .merge(auth_required)
                 .merge(auth_not_required),
         )

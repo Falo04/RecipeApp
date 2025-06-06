@@ -1,8 +1,8 @@
-use swaggapi::get;
+use galvyn::core::stuff::api_json::ApiJson;
+use galvyn::get;
 
 use crate::config::AUTHENTICATION_ENABLED;
 use crate::http::common::errors::ApiResult;
-use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::meta::schema::MetaResponse;
 
 #[get("/")]

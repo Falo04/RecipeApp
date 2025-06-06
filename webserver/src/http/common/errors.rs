@@ -8,22 +8,19 @@ use std::panic::Location;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
+use galvyn::core::handler::response_body::ResponseBody;
+use galvyn::core::handler::response_body::ShouldBeResponseBody;
+use galvyn::core::re_exports::mime;
+use galvyn::core::schema_generator::SchemaGenerator;
+use galvyn::core::stuff::api_json::ApiJson;
 use rorm::crud::update::UpdateBuilder;
-use swaggapi::as_responses::simple_responses;
-use swaggapi::as_responses::AsResponses;
-use swaggapi::as_responses::SimpleResponse;
-use swaggapi::internals::SchemaGenerator;
-use swaggapi::re_exports::mime;
-use swaggapi::re_exports::openapiv3;
-use swaggapi::re_exports::openapiv3::MediaType;
-use swaggapi::re_exports::openapiv3::Responses;
+use schemars::schema::Schema;
 use thiserror::Error;
 use tracing::debug;
 use tracing::error;
 
 use crate::http::common::schemas::ApiErrorResponse;
 use crate::http::common::schemas::ApiStatusCode;
-use crate::http::extractors::api_json::ApiJson;
 
 /// A type alias that includes the ApiError
 pub type ApiResult<T> = Result<T, ApiError>;
@@ -174,27 +171,22 @@ impl IntoResponse for ApiError {
     }
 }
 
-impl AsResponses for ApiError {
-    fn responses(generator: &mut SchemaGenerator) -> Responses {
-        let media_type = Some(MediaType {
-            schema: Some(generator.generate::<ApiErrorResponse>()),
-            ..Default::default()
-        });
-
-        simple_responses([
-            SimpleResponse {
-                status_code: openapiv3::StatusCode::Code(400),
-                mime_type: mime::APPLICATION_JSON,
-                description: "Client side error".to_string(),
-                media_type: media_type.clone(),
-            },
-            SimpleResponse {
-                status_code: openapiv3::StatusCode::Code(500),
-                mime_type: mime::APPLICATION_JSON,
-                description: "Server side error".to_string(),
-                media_type,
-            },
-        ])
+impl ShouldBeResponseBody for ApiError {}
+impl ResponseBody for ApiError {
+    fn body(
+        generator: &mut SchemaGenerator,
+    ) -> Vec<(StatusCode, Option<(mime::Mime, Option<Schema>)>)> {
+        let schema = generator.generate::<ApiErrorResponse>();
+        vec![
+            (
+                StatusCode::BAD_REQUEST,
+                Some((mime::APPLICATION_JSON, Some(schema.clone()))),
+            ),
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Some((mime::APPLICATION_JSON, Some(schema))),
+            ),
+        ]
     }
 }
 
