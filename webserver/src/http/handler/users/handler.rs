@@ -1,9 +1,12 @@
 use axum::extract::Query;
 use bcrypt::verify;
 use futures_lite::StreamExt;
+use galvyn_core::re_exports::rorm::Database;
+use galvyn_core::Module;
 use jsonwebtoken::encode;
 use jsonwebtoken::EncodingKey;
 use jsonwebtoken::Header;
+use serde_json::error::Category::Data;
 use swaggapi::get;
 use swaggapi::post;
 use time::Duration;
@@ -12,7 +15,7 @@ use time::OffsetDateTime;
 use super::schema::SimpleUser;
 use super::schema::TokenDataReponse;
 use super::schema::UserSignInRequest;
-use crate::global::GLOBAL;
+use crate::config::JWT;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
@@ -25,14 +28,16 @@ use crate::models::user::User;
 pub async fn get_all_users(
     pagination: Query<GetPageRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleUser>>> {
-    let items = rorm::query(&GLOBAL.db, User)
+    let items = rorm::query(Database::global(), User)
         .limit(pagination.limit)
         .offset(pagination.offset)
         .stream()
         .map(|result| result.map(SimpleUser::from))
         .try_collect()
         .await?;
-    let total = rorm::query(&GLOBAL.db, User.uuid.count()).one().await?;
+    let total = rorm::query(Database::global(), User.uuid.count())
+        .one()
+        .await?;
     Ok(ApiJson(Page {
         items,
         limit: pagination.limit,
@@ -50,7 +55,7 @@ pub async fn get_me(user: User) -> ApiResult<ApiJson<SimpleUser>> {
 pub async fn sign_in_me(
     ApiJson(request): ApiJson<UserSignInRequest>,
 ) -> ApiResult<ApiJson<TokenDataReponse>> {
-    let mut tx = GLOBAL.db.start_transaction().await?;
+    let mut tx = Database::global().start_transaction().await?;
 
     let user = match rorm::query(&mut tx, User)
         .condition(User.mail.equals(&request.email))
@@ -58,13 +63,13 @@ pub async fn sign_in_me(
         .await?
     {
         Some(user) => user,
-        None => return Err(ApiError::server_error("NOT FOUND: user", None)),
+        None => return Err(ApiError::server_error("user id invalid")),
     };
 
     if !verify(&request.password, &user.password)
-        .map_err(|_| ApiError::server_error("bycrpt error", None))?
+        .map_err(|_| ApiError::server_error("bycrpt error"))?
     {
-        return Err(ApiError::bad_request("Wrong password", None));
+        return Err(ApiError::bad_request("Wrong password"));
     }
 
     let exp = OffsetDateTime::now_utc()
@@ -76,10 +81,10 @@ pub async fn sign_in_me(
         uuid: user.uuid,
         exp,
     };
-    let key = EncodingKey::from_secret(GLOBAL.jwt.as_bytes());
+    let key = EncodingKey::from_secret(JWT.clone().as_bytes());
 
     let token = encode(&Header::default(), &claims, &key)
-        .map_err(|_| ApiError::server_error("jwt encode error", None))?;
+        .map_err(|_| ApiError::server_error("jwt encode error"))?;
 
     Ok(ApiJson(TokenDataReponse { token }))
 }

@@ -1,6 +1,6 @@
 use swaggapi::get;
 
-use crate::global::GLOBAL;
+use crate::config::AUTHENTICATION_ENABLED;
 use crate::http::common::errors::ApiResult;
 use crate::http::extractors::api_json::ApiJson;
 use crate::http::handler::meta::schema::MetaResponse;
@@ -8,6 +8,6 @@ use crate::http::handler::meta::schema::MetaResponse;
 #[get("/")]
 pub async fn get_meta() -> ApiResult<ApiJson<MetaResponse>> {
     Ok(ApiJson(MetaResponse {
-        authentication_enabled: GLOBAL.authentication_enabled,
+        authentication_enabled: AUTHENTICATION_ENABLED.clone(),
     }))
 }

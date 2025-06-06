@@ -5,21 +5,21 @@ edition = "2021"
 
 [dependencies]
 thiserror = "~2"
-regex = "~1"
-dotenv = "0.15.0"
+rand = "0.9.1"
 
 # Webframework
 axum = { version = "~0.8", features = ["ws"] } # Main web library
+galvyn-core = { version = "0.1.0", git = "https://github.com/myOmikron/galvyn.git", rev = "e34db9f916cb74b37737c688108f75b51165394b", default-features = false }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
 tower-sessions = { version = "~0.14" } # Cookie based sessions
 swaggapi = { version = "*", default-features = false, features = [
-  "axum",
-  "tracing-instrument",
+    "axum",
+    "tracing-instrument",
 ], git = "https://github.com/gammelalf/swaggapi" } # Auto-generate OpenAPI
 schemars = { version = "~0.8", features = [
-  "uuid1",
-  "raw_value",
+    "uuid1",
+    "raw_value",
 ] } # Derive json schema description
 
 # Cli
@@ -28,8 +28,8 @@ clap = { version = "~4", features = ["derive"] }
 # Logging
 tracing = { version = "~0.1" } # Base API
 tracing-subscriber = { version = "~0.3", features = [
-  "tracing-log",
-  "env-filter",
+    "tracing-log",
+    "env-filter",
 ] }
 tracing-opentelemetry = { version = "0.25" }
 opentelemetry = { version = "0.24" }
@@ -39,50 +39,37 @@ opentelemetry-otlp = { version = "0.17" }
 # Datatypes
 uuid = { version = "~1", features = ["serde", "v4"] }
 time = { version = "~0.3" }
-bytes = { version = "~1" }
 
 # Database
-rorm = { version = "~0.6", git = "https://github.com/rorm-orm/rorm.git", tag = "v0.7.0-pre-2", default-features = false, features = [
-  "postgres-only",
-  "cli",
-  "time",
-  "uuid",
-  "schemars",
-] }
+rorm = { version = "~0.7", default-features = false, features = ["postgres-only", "cli", "time", "uuid", "schemars"] }
 
 # Async
 tokio = { version = "~1", features = ["full"] }
 signal-hook = { version = "~0.3" }
 signal-hook-tokio = { version = "~0.3", features = ["futures-v0_3"] }
 futures-lite = { version = "~2" }
-futures-sink = { version = "~0.3" }
-async-trait = "~0.1"
 
 # Json
 serde = { version = "~1", features = ["derive"] }
 serde_repr = { version = "~0.1" }
 serde_json = { version = "~1" }
-
+serde_plain = "1.0.0"
 
 # GRPC
 tonic = { version = "~0.12", default-features = false, features = [
-  "channel",
-  "codegen",
-  "prost",
-  "tls",
-  "tls-native-roots",
+    "channel",
+    "codegen",
+    "prost",
+    "tls",
+    "tls-native-roots",
 ] }
-prost = { version = "~0.13" }
-prost-types = { version = "~0.13" }
 jsonwebtoken = "9.3.1"
-warp = "0.3.7"
 bcrypt = "0.17.0"
 rpassword = "7.3.1"
 
 # Authentication
 
 [build-dependencies]
-tonic-build = "~0.12"
 
 [features]
 non_docker_build = []

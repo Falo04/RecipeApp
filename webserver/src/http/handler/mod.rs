@@ -3,7 +3,7 @@ use swaggapi::ApiContext;
 use swaggapi::SwaggapiPageBuilder;
 
 use super::middleware::auth_required::AuthRequiredLayer;
-use crate::global::GLOBAL;
+use crate::config::AUTHENTICATION_ENABLED;
 
 pub mod meta;
 pub mod recipes;
@@ -56,7 +56,7 @@ pub fn initialize() -> ApiContext<Router> {
                 .handler(tags::handler::delete_tag),
         );
 
-    if GLOBAL.authentication_enabled {
+    if AUTHENTICATION_ENABLED.clone() {
         ApiContext::new().page(&FRONTEND_V1).nest(
             "/v1",
             ApiContext::new()

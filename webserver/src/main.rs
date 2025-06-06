@@ -5,9 +5,6 @@ use bcrypt::hash;
 use bcrypt::DEFAULT_COST;
 use clap::Parser;
 use clap::Subcommand;
-use dotenv::dotenv;
-use global::GlobalChan;
-use global::GLOBAL;
 use http::server;
 use models::user::User;
 use rorm::Database;
@@ -19,11 +16,11 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
-use crate::config::Config;
+use crate::config::DB;
+use crate::config::JWT;
 use crate::tracing::opentelemetry_layer;
 
 mod config;
-mod global;
 mod http;
 mod models;
 mod tracing;
@@ -44,14 +41,18 @@ pub enum Command {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenv().ok();
-    let config = Config::init();
+    if let Err(errors) = config::init() {
+        for error in errors {
+            eprintln!("error: {}", error);
+        }
+        return Err("Failed to load configuration".into());
+    }
 
     let registry = tracing_subscriber::registry()
         .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("INFO")))
         .with(tracing_subscriber::fmt::layer());
 
-    let registry = registry.with(opentelemetry_layer(&config)?);
+    let registry = registry.with(opentelemetry_layer()?);
 
     registry.init();
     init_tracing_panic_hook();
@@ -59,29 +60,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::Start => {
-            let db = Database::connect(DatabaseConfiguration {
-                driver: get_db_driver(&config),
-                min_connections: 2,
-                max_connections: 8,
-            })
-            .await?;
-
-            GLOBAL.init(GlobalChan {
-                db,
-                jwt: config.jwt.clone(),
-                authentication_enabled: config.authentication_enabled,
-            });
-
-            server::run(&config).await?;
-
-            GLOBAL.db.clone().close().await;
-        }
+        Command::Start => start().await?,
         Command::Migrate { migrations_dir } => {
             rorm::cli::migrate::run_migrate_custom(
                 rorm::cli::config::DatabaseConfig {
                     last_migration_table_name: None,
-                    driver: get_db_driver(&config),
+                    driver: DB.clone(),
                 },
                 migrations_dir,
                 false,
@@ -114,48 +98,55 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::CreateUser {
             email,
             display_name,
-        } => {
-            let db = Database::connect(DatabaseConfiguration {
-                driver: get_db_driver(&config),
-                min_connections: 2,
-                max_connections: 2,
-            })
-            .await?;
-            let mut tx = db.start_transaction().await?;
-            let mut password;
-            loop {
-                password = rpassword::prompt_password("Password: ").unwrap();
-                if password == rpassword::prompt_password("Confirm Password: ").unwrap() {
-                    break;
-                }
-                println!("Password is incorrect, try again");
-            }
-            let hash = hash(password, DEFAULT_COST)?;
-            info!("user with {email}, {display_name}, {hash} will be inserted");
-            let uuid = rorm::insert(&mut tx, User)
-                .return_primary_key()
-                .single(&User {
-                    uuid: Uuid::new_v4(),
-                    display_name,
-                    mail: email,
-                    password: hash,
-                })
-                .await?;
-            info!("created user with uuid: {uuid}");
-            tx.commit().await?;
-            db.close().await;
-        }
+        } => create_user(email, display_name).await?,
     }
 
     Ok(())
 }
 
-fn get_db_driver(config: &Config) -> DatabaseDriver {
-    DatabaseDriver::Postgres {
-        name: config.database.name.clone(),
-        host: config.database.host.clone(),
-        port: config.database.port,
-        user: config.database.user.clone(),
-        password: config.database.password.clone(),
+async fn start() -> Result<(), Box<dyn std::error::Error>> {
+    galvyn_core::module::registry::Registry::builder()
+        .register_module::<Database>(Default::default())
+        .init()
+        .await?;
+
+    server::run().await?;
+
+    Ok(())
+}
+
+async fn create_user(
+    email: String,
+    display_name: String,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let db = Database::connect(DatabaseConfiguration {
+        driver: DB.clone(),
+        min_connections: 2,
+        max_connections: 2,
+    })
+    .await?;
+    let mut tx = db.start_transaction().await?;
+    let mut password;
+    loop {
+        password = rpassword::prompt_password("Password: ").unwrap();
+        if password == rpassword::prompt_password("Confirm Password: ").unwrap() {
+            break;
+        }
+        println!("Password is incorrect, try again");
     }
+    let hash = hash(password, DEFAULT_COST)?;
+    info!("user with {email}, {display_name}, {hash} will be inserted");
+    let uuid = rorm::insert(&mut tx, User)
+        .return_primary_key()
+        .single(&User {
+            uuid: Uuid::new_v4(),
+            display_name,
+            mail: email,
+            password: hash,
+        })
+        .await?;
+    info!("created user with uuid: {uuid}");
+    tx.commit().await?;
+    db.close().await;
+    Ok(())
 }

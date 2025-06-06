@@ -1,17 +1,18 @@
 use axum::extract::FromRequestParts;
 use axum::http::header;
 use axum::http::request::Parts;
+use galvyn_core::re_exports::rorm::Database;
+use galvyn_core::Module;
 use jsonwebtoken::decode;
 use jsonwebtoken::DecodingKey;
 use jsonwebtoken::TokenData;
 use jsonwebtoken::Validation;
 use serde::Deserialize;
 use serde::Serialize;
-use swaggapi::re_exports::openapiv3::StatusCode;
 use tracing::info;
 use uuid::Uuid;
 
-use crate::global::GLOBAL;
+use crate::config::JWT;
 use crate::http::common::errors::ApiError;
 use crate::http::common::schemas::ApiStatusCode;
 use crate::models::user::User;
@@ -38,30 +39,27 @@ where
                 ApiError::new(
                     ApiStatusCode::Unauthenticated,
                     "Authorization header was not given",
-                    Some("Authorization header was not given"),
                 )
             })?
             .to_str()
-            .map_err(|_| ApiError::server_error("Invalid AUTHORIZATION header format", None))?;
+            .map_err(|_| ApiError::server_error("Invalid AUTHORIZATION header format"))?;
 
         if auth_header.is_empty() {
             return Err(ApiError::new(
                 ApiStatusCode::Unauthenticated,
                 "No valid token format, empty string",
-                Some("No valid token format"),
             ));
         }
 
         if !auth_header.starts_with("Bearer ") {
-            info!("auth_header: {auth_header}");
-            return Err(ApiError::server_error("Invalid token format", None));
+            return Err(ApiError::server_error("Invalid token format"));
         }
 
         let token = auth_header[BEARER.len()..].trim();
 
         let token_data = decode_jwt(token)?;
 
-        let Some(user) = rorm::query(&GLOBAL.db, User)
+        let Some(user) = rorm::query(Database::global(), User)
             .condition(User.uuid.equals(token_data.claims.uuid))
             .optional()
             .await?
@@ -69,8 +67,7 @@ where
             info!("user uuid not found: {}", token_data.claims.uuid);
             return Err(ApiError::new(
                 ApiStatusCode::Unauthenticated,
-                "Unknown user UUID in session",
-                None,
+                "Unknown user uuid in session",
             ));
         };
 
@@ -79,7 +76,7 @@ where
 }
 
 fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, ApiError> {
-    let secret = GLOBAL.jwt.to_string();
+    let secret = JWT.clone().to_string();
 
     decode(
         jwt,
@@ -91,7 +88,6 @@ fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, ApiError> {
         ApiError::new(
             ApiStatusCode::Unauthenticated,
             "You are not an authorized user",
-            None,
         )
     })
 }

@@ -35,12 +35,12 @@ where
         let bytes = <Bytes as FromRequest<S>>::from_request(req, state)
             .await
             .map_err(|err| {
-                ApiError::server_error("Failed to buffer request body", None).with_source(err)
+                ApiError::server_error("Failed to buffer request body").with_source(err)
             })?;
         serde_json::from_slice(bytes.as_ref())
             .map(Self)
             .map_err(|error| {
-                ApiError::bad_request("Failed to deserialize request body", None).with_source(error)
+                ApiError::bad_request("Failed to deserialize request body").with_source(error)
             })
     }
 }
@@ -59,7 +59,7 @@ impl<T: Serialize> IntoResponse for ApiJson<T> {
                 buf,
             )
                 .into_response(),
-            Err(err) => ApiError::server_error("Failed to serialize response body", None)
+            Err(err) => ApiError::server_error("Failed to serialize response body")
                 .with_source(err)
                 .into_response(),
         }

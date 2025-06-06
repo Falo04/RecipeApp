@@ -18,21 +18,20 @@ use tracing::Subscriber;
 use tracing_subscriber::registry::LookupSpan;
 use tracing_subscriber::Layer;
 
-use crate::config::Config;
+use crate::config::OTEL_ENDPOINT;
 
 /// Tracing layer exporting OpenTelemetry traces
 ///
 /// The layer is not configurable yet and only suited for development.
 /// It should simply work out of the box with a local jaeger instance.
 pub fn opentelemetry_layer<S: Subscriber + for<'span> LookupSpan<'span>>(
-    config: &Config,
 ) -> Result<impl Layer<S>, TraceError> {
     let provider = opentelemetry_otlp::new_pipeline()
         .tracing()
         .with_exporter(
             opentelemetry_otlp::new_exporter()
                 .tonic()
-                .with_endpoint(config.otel_exporter_otlp_endpoint.clone()),
+                .with_endpoint(OTEL_ENDPOINT.clone()),
         )
         .with_trace_config(
             trace::Config::default().with_resource(Resource::new([KeyValue {

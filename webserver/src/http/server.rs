@@ -22,13 +22,13 @@ use tracing::Instrument;
 use tracing::Level;
 
 use super::middleware::catch_unwind::CatchUnwindLayer;
-use crate::config::Config;
+use crate::config::SERVER_ADDRESS;
+use crate::config::SERVER_PORT;
 use crate::http::handler;
 use crate::http::handler::FRONTEND_V1;
-use crate::http::middleware::auth_required::AuthRequiredLayer;
 
 #[instrument(skip_all, ret)]
-pub async fn run(config: &Config) -> std::io::Result<()> {
+pub async fn run() -> std::io::Result<()> {
     let router = Router::new()
         .merge(ApiContext::new().nest("/api", handler::initialize()))
         .nest("/docs", {
@@ -53,7 +53,7 @@ pub async fn run(config: &Config) -> std::io::Result<()> {
                 .layer(CatchUnwindLayer),
         );
 
-    let socket_addr = SocketAddr::new(config.server.address, config.server.port);
+    let socket_addr = SocketAddr::new(SERVER_ADDRESS.clone(), *SERVER_PORT);
 
     info!("Start to listen on http://{socket_addr}");
     let listener = TcpListener::bind(socket_addr).await?;
