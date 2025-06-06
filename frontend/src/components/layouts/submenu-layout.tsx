@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { Text } from "../ui/text.tsx";
 import { Button } from "../ui/button";
 import { Edit, X } from "lucide-react";
+import { Separator } from "@/components/ui/separator.tsx";
 
 /**
  * The properties for {@link SubmenuLayout}
@@ -70,6 +71,7 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
                     <div className={"flex justify-end gap-4"}>{props.headingChildren}</div>
                 ) : undefined}
             </div>
+            <Separator />
             {props.children}
         </div>
     );

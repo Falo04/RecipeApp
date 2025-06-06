@@ -2,6 +2,7 @@ import React from "react";
 import { Heading } from "../ui/heading.tsx";
 import { clsx } from "clsx";
 import { Text } from "../ui/text.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 
 /**
  * The properties for {@link HeadingLayout}
@@ -45,6 +46,7 @@ export default function HeadingLayout(props: HeadingLayoutProps) {
                     <div className={"flex justify-end gap-4"}>{props.headingChildren}</div>
                 ) : undefined}
             </div>
+            <Separator />
             {props.children}
         </div>
     );
