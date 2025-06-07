@@ -1,4 +1,5 @@
 use rorm::fields::types::MaxStr;
+use rorm::prelude::ForeignModel;
 use rorm::DbEnum;
 use rorm::Model;
 use schemars::JsonSchema;
@@ -6,37 +7,34 @@ use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::models::recipes::Recipe;
+
+pub mod impls;
+
 #[derive(Model)]
-pub struct Tag {
+pub struct Ingredients {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
-    #[rorm(unique)]
+    #[rorm(on_delete = "Cascade")]
+    pub recipe: ForeignModel<Recipe>,
+
     pub name: MaxStr<255>,
 
-    pub color: TagColors,
+    pub amount: i32,
+
+    pub unit: Units,
 }
 
 #[derive(
     DbEnum, Debug, Copy, Clone, Serialize, Deserialize, JsonSchema, PartialEq, PartialOrd, Eq, Ord,
 )]
-pub enum TagColors {
-    Red = 0,
-    Orange = 1,
-    Amber = 2,
-    Yellow = 3,
-    Lime = 4,
-    Green = 5,
-    Emerald = 6,
-    Teal = 7,
-    Cyan = 8,
-    Sky = 9,
-    Blue = 10,
-    Indigo = 11,
-    Violet = 12,
-    Purple = 13,
-    Fuchsia = 14,
-    Pink = 15,
-    Rose = 16,
-    Zinc = 17,
+pub enum Units {
+    Cup = 0,
+    Gram = 1,
+    Kilogram = 2,
+    Liter = 3,
+    Milliliter = 4,
+    Tablespoon = 5,
+    Teaspoon = 6,
 }

@@ -1,10 +1,10 @@
-use super::schema::Ingredients;
+use super::schema::RecipeIngredients;
 use super::schema::RecipeSearchResponse;
 use super::schema::SimpleRecipe;
 use super::schema::Steps;
-use crate::models::recipe::Recipe;
-use crate::models::recipe_ingredients::RecipeIngredients;
-use crate::models::recipe_steps::RecipeSteps;
+use crate::models::ingredients::Ingredients;
+use crate::models::recipes::Recipe;
+use crate::models::recipes::RecipeSteps;
 
 impl From<Recipe> for SimpleRecipe {
     fn from(value: Recipe) -> Self {
@@ -35,8 +35,8 @@ impl From<RecipeSteps> for Steps {
     }
 }
 
-impl From<RecipeIngredients> for Ingredients {
-    fn from(value: RecipeIngredients) -> Self {
+impl From<Ingredients> for RecipeIngredients {
+    fn from(value: Ingredients) -> Self {
         Self {
             uuid: Some(value.uuid),
             name: value.name,

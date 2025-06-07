@@ -14,11 +14,11 @@ axum = { version = "~0.8", features = ["ws"] } # Main web library
 galvyn = { git = "https://github.com/myOmikron/galvyn.git", rev = "aa37f232a62fea4d8440e5cdeb81ab978c851d5d" }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
-tower-sessions = { version = "~0.14" } # Cookie based sessions
+tower-sessions = { version = "~0.14" }
 schemars = { version = "~0.8", features = [
     "uuid1",
     "raw_value",
-] } # Derive json schema description
+] }
 
 # Cli
 clap = { version = "~4", features = ["derive"] }
@@ -48,7 +48,6 @@ futures-lite = { version = "~2" }
 # Json
 serde = { version = "~1", features = ["derive"] }
 serde_repr = { version = "~0.1" }
-serde_json = { version = "~1" }
 serde_plain = "1.0.0"
 
 # GRPC
@@ -59,6 +58,7 @@ tonic = { version = "~0.12", default-features = false, features = [
     "tls",
     "tls-native-roots",
 ] }
+
 jsonwebtoken = "9.3.1"
 bcrypt = "0.17.0"
 rpassword = "7.3.1"
@@ -66,4 +66,3 @@ rpassword = "7.3.1"
 # Authentication
 
 [build-dependencies]
-tonic-build = "~0.12"

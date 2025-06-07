@@ -36,18 +36,15 @@ pub fn opentelemetry_layer<S: Subscriber + for<'span> LookupSpan<'span>>(
         .with_trace_config(
             trace::Config::default().with_resource(Resource::new([KeyValue {
                 key: Key::from_static_str("service.name"),
-                value: Value::from("food-dev"),
+                value: Value::from("recipes-dev"),
             }])),
         )
         .install_batch(runtime::Tokio)
         .expect("Couldn't create OTLP tracer");
 
-    let tracer = provider.tracer("food-dev");
+    let tracer = provider.tracer("recipes-dev");
 
-    Ok(tracing_opentelemetry::layer()
-        // .with_threads(false) // It's a tokio worker anyway
-        // .with_tracked_inactivity(false)
-        .with_tracer(tracer))
+    Ok(tracing_opentelemetry::layer().with_tracer(tracer))
 }
 
 /// Initializes the global panic hook to output tracing events instead of writing to stdout

@@ -1,5 +1,5 @@
 use super::schema::SimpleUser;
-use crate::models::user::User;
+use crate::models::users::User;
 
 impl From<User> for SimpleUser {
     fn from(value: User) -> Self {

@@ -1,3 +1,5 @@
+mod impls;
+
 use rorm::field;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::BackRef;
@@ -7,10 +9,9 @@ use rorm::Patch;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use super::recipe_ingredients::RecipeIngredients;
-use super::recipe_steps::RecipeSteps;
-use super::recipe_tag::RecipeTag;
-use super::user::User;
+use super::users::User;
+use crate::models::ingredients::Ingredients;
+use crate::models::tags::Tag;
 
 #[derive(Model)]
 pub struct Recipe {
@@ -26,11 +27,36 @@ pub struct Recipe {
 
     pub tags: BackRef<field!(RecipeTag.recipe)>,
 
-    pub ingredients: BackRef<field!(RecipeIngredients.recipe)>,
+    pub ingredients: BackRef<field!(Ingredients.recipe)>,
 
     pub steps: BackRef<field!(RecipeSteps.recipe)>,
 
     pub created_at: OffsetDateTime,
+}
+
+#[derive(Model)]
+pub struct RecipeSteps {
+    #[rorm(primary_key)]
+    pub uuid: Uuid,
+
+    #[rorm(on_delete = "Cascade")]
+    pub recipe: ForeignModel<Recipe>,
+
+    pub step: MaxStr<256>,
+
+    pub index: i16,
+}
+
+#[derive(Model)]
+pub struct RecipeTag {
+    #[rorm(primary_key)]
+    pub uuid: Uuid,
+
+    #[rorm(on_delete = "Cascade")]
+    pub recipe: ForeignModel<Recipe>,
+
+    #[rorm(on_delete = "Cascade")]
+    pub tag: ForeignModel<Tag>,
 }
 
 #[derive(Patch)]

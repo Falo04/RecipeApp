@@ -21,7 +21,7 @@ use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::Page;
 use crate::http::extractors::authentication::Claims;
-use crate::models::user::User;
+use crate::models::users::User;
 
 #[get("/")]
 pub async fn get_all_users(

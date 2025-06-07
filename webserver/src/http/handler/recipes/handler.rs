@@ -20,6 +20,7 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::schema::CreateRecipeRequest;
+use super::schema::RecipeIngredients;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
@@ -27,7 +28,6 @@ use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::handler::recipes::schema::FullRecipe;
-use crate::http::handler::recipes::schema::Ingredients;
 use crate::http::handler::recipes::schema::RecipeSearchRequest;
 use crate::http::handler::recipes::schema::RecipeSearchResponse;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
@@ -35,13 +35,13 @@ use crate::http::handler::recipes::schema::Steps;
 use crate::http::handler::recipes::schema::UpdateRecipeRequest;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
-use crate::models::recipe::Recipe;
-use crate::models::recipe::RecipePatch;
-use crate::models::recipe_ingredients::RecipeIngredients;
-use crate::models::recipe_steps::RecipeSteps;
-use crate::models::recipe_tag::RecipeTag;
+use crate::models::ingredients::Ingredients;
+use crate::models::recipes::Recipe;
+use crate::models::recipes::RecipePatch;
+use crate::models::recipes::RecipeSteps;
+use crate::models::recipes::RecipeTag;
 use crate::models::tags::Tag;
-use crate::models::user::User;
+use crate::models::users::User;
 
 #[get("/")]
 pub async fn get_all_recipes(
@@ -113,7 +113,7 @@ pub async fn get_recipe(
         .condition(Recipe.uuid.equals(recipe_uuid))
         .optional()
         .await?
-        .ok_or(ApiError::bad_request("recipe id not found"))?;
+        .ok_or(ApiError::bad_request("recipes id not found"))?;
 
     let user = match recipe.user {
         Some(user_uuid) => Some(
@@ -121,7 +121,7 @@ pub async fn get_recipe(
                 .condition(User.uuid.equals(user_uuid.0))
                 .optional()
                 .await?
-                .ok_or(ApiError::server_error("User not found from recipe"))?,
+                .ok_or(ApiError::server_error("User not found from recipes"))?,
         ),
         None => None,
     };
@@ -133,10 +133,10 @@ pub async fn get_recipe(
         .try_collect()
         .await?;
 
-    let ingredients: Vec<_> = rorm::query(&mut tx, RecipeIngredients)
-        .condition(RecipeIngredients.recipe.equals(recipe_uuid))
+    let ingredients: Vec<_> = rorm::query(&mut tx, Ingredients)
+        .condition(Ingredients.recipe.equals(recipe_uuid))
         .stream()
-        .map(|result| result.map(Ingredients::from))
+        .map(|result| result.map(RecipeIngredients::from))
         .try_collect()
         .await?;
 
@@ -195,8 +195,8 @@ pub async fn create_recipe(
         .await?;
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeIngredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
     RecipeSteps::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
+    Ingredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     tx.commit().await?;
     Ok(ApiJson(SingleUuid { uuid: recipe_uuid }))
@@ -213,11 +213,11 @@ pub async fn update_recipe(
         .condition(Recipe.uuid.equals(recipe_uuid))
         .optional()
         .await?
-        .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
+        .ok_or(ApiError::bad_request("Invalid recipes uuid"))?;
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeIngredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
     RecipeSteps::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
+    Ingredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     rorm::update(&mut tx, Recipe)
         .begin_dyn_set()
@@ -241,7 +241,7 @@ pub async fn delete_recipe(
         .condition(Recipe.uuid.equals(recipe_uuid))
         .optional()
         .await?
-        .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
+        .ok_or(ApiError::bad_request("Invalid recipes uuid"))?;
 
     rorm::delete(&mut tx, Recipe)
         .condition(recipe.as_condition())

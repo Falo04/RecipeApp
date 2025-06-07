@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
-use crate::models::recipe_ingredients::Units;
+use crate::models::ingredients::Units;
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct SimpleRecipe {
@@ -30,7 +30,7 @@ pub struct FullRecipe {
     pub description: MaxStr<1024>,
     pub user: Option<SimpleUser>,
     pub tags: Vec<SimpleTag>,
-    pub ingredients: Vec<Ingredients>,
+    pub ingredients: Vec<RecipeIngredients>,
     pub steps: Vec<Steps>,
 }
 
@@ -47,7 +47,7 @@ pub struct CreateRecipeRequest {
     pub description: MaxStr<1024>,
     pub user: Option<Uuid>,
     pub tags: Vec<Uuid>,
-    pub ingredients: Vec<Ingredients>,
+    pub ingredients: Vec<RecipeIngredients>,
     pub steps: Vec<Steps>,
 }
 
@@ -57,12 +57,12 @@ pub struct UpdateRecipeRequest {
     pub description: MaxStr<1024>,
     pub user: Option<Uuid>,
     pub tags: Vec<Uuid>,
-    pub ingredients: Vec<Ingredients>,
+    pub ingredients: Vec<RecipeIngredients>,
     pub steps: Vec<Steps>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct Ingredients {
+pub struct RecipeIngredients {
     pub uuid: Option<Uuid>,
     pub name: MaxStr<255>,
     pub unit: Units,

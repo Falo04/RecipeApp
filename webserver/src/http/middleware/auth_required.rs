@@ -6,7 +6,7 @@ use axum::response::IntoResponse;
 use axum::response::Response;
 
 use crate::impl_simple_axum_layer;
-use crate::models::user::User;
+use crate::models::users::User;
 
 #[derive(Copy, Clone, Debug)]
 pub struct AuthRequiredLayer;

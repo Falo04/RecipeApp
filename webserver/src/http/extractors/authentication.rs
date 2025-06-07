@@ -15,7 +15,7 @@ use uuid::Uuid;
 use crate::config::JWT;
 use crate::http::common::errors::ApiError;
 use crate::http::common::schemas::ApiStatusCode;
-use crate::models::user::User;
+use crate::models::users::User;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
