@@ -6,7 +6,7 @@ import { RecipeSearch } from "@/components/recipe-search.tsx";
 import { Link } from "@tanstack/react-router";
 
 /**
- * The properties for {@link SideHeader}
+ * The properties for {@link Header}
  */
 export type SiteHeaderProps = {
     icon: LucideIcon;
@@ -16,7 +16,7 @@ export type SiteHeaderProps = {
 /**
  * The header for closing the sidebar
  */
-export default function SideHeader(props: SiteHeaderProps) {
+export default function Header(props: SiteHeaderProps) {
     const [tg] = useTranslation();
     return (
         <header className="flex h-12 shrink-0 items-center justify-between px-2">

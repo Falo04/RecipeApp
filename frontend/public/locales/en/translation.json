@@ -48,8 +48,8 @@
     "description": "Log in"
   },
   "search": {
-    "recipe": "Search recipe",
-    "recipe-empty": "No recipe found"
+    "recipes": "Search recipe",
+    "recipes-empty": "No recipe found"
   },
   "breadcrumb": {
     "recipes": "Recipes",

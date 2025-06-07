@@ -128,7 +128,6 @@ export function RecipeForm(props: RecipeFormProps) {
                             <form.Field
                                 name="name"
                                 validators={{
-                                    onChangeListenTo: ["name"],
                                     onChange: ({ value }) =>
                                         !value ? "Name is required" : value.length > 255 ? "Too long" : undefined,
                                 }}
@@ -152,7 +151,6 @@ export function RecipeForm(props: RecipeFormProps) {
                             <form.Field
                                 name="description"
                                 validators={{
-                                    onChangeListenTo: ["description"],
                                     onChange: ({ value }) =>
                                         !value
                                             ? "Description is required"

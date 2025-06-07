@@ -57,7 +57,7 @@ export function RecipeSearch() {
                     className={"lg:w-full"}
                 >
                     <Search />
-                    {!isMobile && tg("search.recipe")}
+                    {!isMobile && tg("search.recipes")}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className={"p-2"}>
@@ -65,11 +65,11 @@ export function RecipeSearch() {
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder={tg("search.recipe")}
+                        placeholder={tg("search.recipes")}
                         className={"h-9"}
                     />
                     <CommandList>
-                        <CommandEmpty>{tg("search.recipe-empty")}</CommandEmpty>
+                        <CommandEmpty>{tg("search.recipes-empty")}</CommandEmpty>
                         <CommandGroup>
                             {suggestions.map((recipe) => (
                                 <CommandItem

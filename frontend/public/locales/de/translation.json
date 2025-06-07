@@ -38,8 +38,8 @@
     "password": "****"
   },
   "search": {
-    "recipe": "Rezept suchen",
-    "recipe-empty": "Kein Rezept gefunden"
+    "recipes": "Rezept suchen",
+    "recipes-empty": "Kein Rezept gefunden"
   },
   "search-recipe": "Rezept suchen",
   "sidebar": {

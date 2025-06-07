@@ -12,7 +12,7 @@ export type RecipeCardProps = {
 };
 
 /**
- * Card component for a recipe
+ * Card component for a recipes
  */
 export default function RecipeCard(props: RecipeCardProps) {
     return (

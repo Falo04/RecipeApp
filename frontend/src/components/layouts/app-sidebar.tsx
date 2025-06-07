@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import React from "react";
 import { RecipeSearch } from "@/components/recipe-search.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import { Separator } from "@/components/ui/separator.tsx";
 
 /**
  * The properties for {@link AppSidebar}
@@ -62,6 +63,7 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
                         </SidebarGroupContent>
                     )}
                 </SidebarGroup>
+                <Separator />
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
@@ -80,6 +82,7 @@ export default function AppSidebar({ appTitle, Icon, navItems, ...props }: AppSi
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
+                <Separator />
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathName.includes("settings")}>
