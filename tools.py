@@ -78,7 +78,6 @@ def main():
         subparser.add_parser(c)
 
     # special subcommands
-    subparser.add_parser("db")
     subparser.add_parser("make-migratios")
     subparser.add_parser("create-user")
 
@@ -93,12 +92,7 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    if args.command == "db":
-        docker_compose_dev(
-            "exec",
-            ["-it", "postgres-dev", "psql", "-U", "$DB_USERNAME", "-d", "$DB_DATABASE"],
-        )
-    elif args.command == "make-migratios":
+    if args.command == "make-migratios":
         webserver_name = get_webserver_service()
         if webserver_name is None:
             print("No service is running. Please run `up` first")

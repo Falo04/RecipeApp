@@ -18,6 +18,7 @@ use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
 use crate::config::DB;
+use crate::config::JWT;
 use crate::config::SERVER_ADDRESS;
 use crate::config::SERVER_PORT;
 use crate::http::server;
@@ -126,6 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// This function initializes the Galvyn server with the provided database configuration
 /// and routes, then starts the server listening on the specified address and port.
 async fn start() -> Result<(), Box<dyn std::error::Error>> {
+    info!("jwt token: {:?}", JWT.clone());
     galvyn::Galvyn::new()
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
             DB.clone(),
