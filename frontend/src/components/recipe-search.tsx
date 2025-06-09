@@ -50,7 +50,7 @@ export function RecipeSearch() {
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild className={"p-0 md:p-4"}>
                 <Button
-                    variant={"outline"}
+                    variant={"secondary"}
                     role={"combobox"}
                     aria-expanded={open}
                     size={"icon"}

@@ -51,12 +51,7 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
                         <Heading>{props.heading} </Heading>
                         <div className="flex">
                             {props.editButton && (
-                                <Button
-                                    size={"icon"}
-                                    onClick={() => props.editButton?.()}
-                                    variant={"ghost"}
-                                    className={"w-fit"}
-                                >
+                                <Button size={"icon"} onClick={() => props.editButton?.()} variant={"ghost"}>
                                     <Edit />
                                 </Button>
                             )}
