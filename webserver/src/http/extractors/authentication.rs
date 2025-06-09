@@ -1,3 +1,5 @@
+//! This module handles user authentication using JWT tokens.
+//! It retrieves user information based on a provided JWT token.
 use axum::extract::FromRequestParts;
 use axum::http::header;
 use axum::http::request::Parts;
@@ -17,12 +19,21 @@ use crate::http::common::errors::ApiError;
 use crate::http::common::schemas::ApiStatusCode;
 use crate::models::users::User;
 
+/// Represents a set of claims.
+///
+/// This struct is used to store claims related to authentication or authorization.
+/// It contains the user Uuid identifier and an expiration time
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
+    /// Represent the user uuid.
     pub uuid: Uuid,
+
+    /// The expiration time of the claims.
     pub exp: usize,
 }
 
+/// This constant defines the prefix "Bearer " which is commonly used in
+/// Authorization headers for API requests;
 const BEARER: &str = "Bearer ";
 
 impl<S> FromRequestParts<S> for User
@@ -31,6 +42,15 @@ where
 {
     type Rejection = ApiError;
 
+    /// Parses an HTTP request part to authenticate a user.
+    ///
+    /// This function takes a mutable `Parts` struct containing HTTP request parts
+    /// and attempts to decode a JWT token from the Authorization header.
+    ///
+    /// # Arguments
+    ///
+    /// * `parts`: A mutable reference to a `Parts` struct containing the HTTP request parts.
+    /// * `s`: A reference to a context object (unused in this implementation).
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         let auth_header = parts
             .headers
@@ -75,6 +95,11 @@ where
     }
 }
 
+/// Decodes a JWT token and returns the decoded token data.
+///
+/// # Arguments
+///
+/// * `jwt`: The JWT token string to decode.
 fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, ApiError> {
     let secret = JWT.clone().to_string();
 

@@ -80,19 +80,12 @@ impl ApiError {
     }
 
     /// Adds a source to the `ApiError`
-    pub fn with_source(self, source: impl Error + Send + Sync + 'static) -> Self {
-        self.with_boxed_source(source.into())
-    }
-
-    /// Adds a source to the `ApiError`
-    pub fn with_boxed_source(mut self, source: Box<dyn Error + Send + Sync + 'static>) -> Self {
-        self.source = Some(source);
+    pub fn with_source(mut self, source: impl Error + Send + Sync + 'static) -> Self {
+        self.source = Some(source.into());
         self
     }
 
     /// Creates a closure for wrapping any error into an `ApiError::server_error`
-    ///
-    /// This is just a less noisy shorthand for `|error| ApiError::server_error("...").with_source(error)`.
     #[track_caller]
     pub fn map_server_error<E: Error + Send + Sync + 'static>(
         context: &'static str,

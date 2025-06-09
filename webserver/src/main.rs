@@ -28,12 +28,18 @@ mod http;
 mod models;
 mod tracing;
 
+/// Represents the command-line arguments parsed by the program.
+///
+/// This struct holds the parsed command and any subcommands.
 #[derive(Parser)]
 pub struct Cli {
     #[clap(subcommand)]
     pub command: Command,
 }
 
+/// Represents a command with subcommands.
+///
+/// This enum defines the different commands available in the application.
 #[derive(Subcommand)]
 pub enum Command {
     Start,
@@ -42,6 +48,10 @@ pub enum Command {
     CreateUser { email: String, display_name: String },
 }
 
+/// Main function to start the application.
+///
+/// This function initializes the configuration, logging, and handles the application's main command-line interaction.
+/// It parses command-line arguments and executes the corresponding command.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
@@ -80,7 +90,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::MakeMigrations { migrations_dir } => {
             use std::io::Write;
 
-            // Temporay file to store models in
+            /// Defines the path to the model JSON file.
+            ///
+            /// This constant specifies the location of the JSON file containing model definitions.
+            /// The file is expected to be located at "/tmp/.models.json".
             const MODELS: &str = "/tmp/.models.json";
 
             let mut file = fs::File::create(MODELS)?;
@@ -108,6 +121,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Starts the Galvyn server.
+///
+/// This function initializes the Galvyn server with the provided database configuration
+/// and routes, then starts the server listening on the specified address and port.
 async fn start() -> Result<(), Box<dyn std::error::Error>> {
     galvyn::Galvyn::new()
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
@@ -122,6 +139,10 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Creates a new user account.
+///
+/// This function prompts the user for a password,
+/// hashes it, and inserts the user data into the database.
 async fn create_user(
     email: String,
     display_name: String,

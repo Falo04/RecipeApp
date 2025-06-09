@@ -19,8 +19,8 @@ use rorm::prelude::ForeignModelByField;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use super::schema::CreateRecipeRequest;
-use super::schema::RecipeIngredients;
+use super::schema::CreateOrUpdateRecipe;
+use super::schema::RecipeIngredient as RecipeIngredientsDto;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
@@ -31,15 +31,15 @@ use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::RecipeSearchRequest;
 use crate::http::handler::recipes::schema::RecipeSearchResponse;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
-use crate::http::handler::recipes::schema::Steps;
-use crate::http::handler::recipes::schema::UpdateRecipeRequest;
+use crate::http::handler::recipes::schema::Step;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
-use crate::models::ingredients::Ingredients;
+use crate::models::ingredients::Ingredient;
+use crate::models::ingredients::RecipeIngredient;
 use crate::models::recipes::Recipe;
 use crate::models::recipes::RecipePatch;
-use crate::models::recipes::RecipeSteps;
-use crate::models::recipes::RecipeTag;
+use crate::models::recipes::RecipeStep;
+use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 use crate::models::users::User;
 
@@ -133,17 +133,27 @@ pub async fn get_recipe(
         .try_collect()
         .await?;
 
-    let ingredients: Vec<_> = rorm::query(&mut tx, Ingredients)
-        .condition(Ingredients.recipe.equals(recipe_uuid))
-        .stream()
-        .map(|result| result.map(RecipeIngredients::from))
-        .try_collect()
+    let ingredients: Vec<_> = rorm::query(&mut tx, RecipeIngredient)
+        .condition(RecipeIngredient.recipe.equals(recipe_uuid))
+        .all()
         .await?;
 
-    let steps: Vec<_> = rorm::query(&mut tx, RecipeSteps)
-        .condition(RecipeSteps.recipe.equals(recipe_uuid))
+    let mut recipe_ingredients = Vec::new();
+    for mapping in ingredients {
+        let Some(ingredient) = rorm::query(&mut tx, Ingredient)
+            .condition(Ingredient.uuid.equals(mapping.ingredients.0))
+            .optional()
+            .await?
+        else {
+            return Err(ApiError::server_error("Ingredient not found from recipes"));
+        };
+        recipe_ingredients.push(RecipeIngredientsDto::new(mapping, ingredient.name));
+    }
+
+    let steps: Vec<_> = rorm::query(&mut tx, RecipeStep)
+        .condition(RecipeStep.recipe.equals(recipe_uuid))
         .stream()
-        .map(|result| result.map(Steps::from))
+        .map(|result| result.map(Step::from))
         .try_collect()
         .await?;
 
@@ -155,7 +165,7 @@ pub async fn get_recipe(
             Some(user) => Some(SimpleUser::from(user)),
             None => None,
         },
-        ingredients,
+        ingredients: recipe_ingredients,
         steps,
         tags,
     };
@@ -165,7 +175,7 @@ pub async fn get_recipe(
 
 #[post("/")]
 pub async fn create_recipe(
-    ApiJson(request): ApiJson<CreateRecipeRequest>,
+    ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
 ) -> ApiResult<ApiJson<SingleUuid>> {
     let mut tx = Database::global().start_transaction().await?;
     let recipe_uuid = Uuid::new_v4();
@@ -195,8 +205,8 @@ pub async fn create_recipe(
         .await?;
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeSteps::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    Ingredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
+    RecipeIngredient::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     tx.commit().await?;
     Ok(ApiJson(SingleUuid { uuid: recipe_uuid }))
@@ -205,7 +215,7 @@ pub async fn create_recipe(
 #[put("/{uuid}")]
 pub async fn update_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
-    ApiJson(request): ApiJson<UpdateRecipeRequest>,
+    ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
 ) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
@@ -216,8 +226,8 @@ pub async fn update_recipe(
         .ok_or(ApiError::bad_request("Invalid recipes uuid"))?;
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeSteps::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    Ingredients::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
+    RecipeIngredient::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     rorm::update(&mut tx, Recipe)
         .begin_dyn_set()

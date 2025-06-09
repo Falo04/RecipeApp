@@ -1,3 +1,4 @@
+//! Defines data structures for API requests and responses.
 use schemars::JsonSchema;
 use schemars::JsonSchema_repr;
 use serde::Deserialize;
@@ -6,91 +7,79 @@ use serde_repr::Deserialize_repr;
 use serde_repr::Serialize_repr;
 use uuid::Uuid;
 
+/// Represents a single UUID.
+///
+/// This struct contains a single UUID value.
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, JsonSchema)]
 pub struct SingleUuid {
     #[allow(missing_docs)]
     pub uuid: Uuid,
 }
 
-/// # Optional
-/// A single field which might be `null`.
+/// Represents a list of items of type `T`.
 ///
-/// ## Rust Usage
-///
-/// If you want to return an `ApiJson<Option<T>>` from your handler,
-/// please use `ApiJson<Optional<T>>` instead.
-///
-/// It simply wraps the option into a struct with a single field
-/// to ensure the json returned from a handler is always an object.
-// #[derive(Debug, Clone, Copy, Deserialize, Serialize, JsonSchema)]
-// pub struct Optional<T> {
-//     #[allow(missing_docs)]
-//     pub optional: Option<T>,
-// }
-// impl<T> Optional<T> {
-//     /// Shorthand for `Optional { optional: Some(value) }`
-//     pub fn some(value: T) -> Self {
-//         Self {
-//             optional: Some(value),
-//         }
-//     }
-//
-//     /// Shorthand for `Optional { optional: None }`
-//     pub fn none() -> Self {
-//         Self { optional: None }
-//     }
-// }
-/// # List
-/// A single field which is an array.
-///
-/// ## Rust Usage
-///
-/// If you want to return an `ApiJson<Vec<T>>` from your handler,
-/// please use `ApiJson<List<T>>` instead.
-///
-/// It simply wraps the vector into a struct with a single field
-/// to ensure the json returned from a handler is always an object.
+/// This struct is designed to hold a collection of items,
+/// providing a structured way to represent lists in JSON and other data formats.
+/// It implements traits for debugging, cloning, JSON deserialization, and JSON schema validation.
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct List<T> {
     #[allow(missing_docs)]
     pub list: Vec<T>,
 }
 
+/// Represents the request structure for retrieving a paginated list of items.
+///
+/// This struct defines the parameters for requesting a specific page of data.
+
+/// Default values are provided for `limit` and `offset` using the
+/// `default_limit` and `default_offset` functions respectively.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetPageRequest {
-    /// The limit this page was requested with
+    /// The maximum number of items to return in this page.
     #[serde(default = "default_limit")]
     pub limit: u64,
 
-    /// The offset this page was requested with
+    /// The starting index of the items to return in this page.
     #[serde(default = "default_offset")]
     pub offset: u64,
 }
 
+/// Returns a default limit value of 999.
+///
+/// This function provides a sensible default value for a limit,
+/// often used in scenarios where a specific value isn't known or
+/// relevant.
 fn default_limit() -> u64 {
     999
 }
+
+/// Returns a default offset value.
+///
+/// This function simply returns 0 as the default offset.
 fn default_offset() -> u64 {
     0
 }
 
-/// A page of items
+/// Represents a paginated list of items.
+///
+/// This struct holds the items for a page, along with pagination metadata
+/// such as the limit, offset, and total number of items.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct Page<T> {
-    /// The page's items
+    /// A vector containing the items for this page.
     pub items: Vec<T>,
 
-    /// The limit this page was requested with
+    /// The maximum number of items requested in this page.
     pub limit: u64,
 
-    /// The offset this page was requested with
+    /// The starting offset for this page.
     pub offset: u64,
 
-    /// The total number of items this page is a subset of
+    /// The total number of items in the underlying dataset.
     pub total: i64,
 }
 
-/// The Status code that are returned throughout the API
+/// Represents different HTTP status codes used in the API.
 #[derive(Debug, Clone, Copy, Deserialize_repr, Serialize_repr, JsonSchema_repr)]
 #[repr(u16)]
 #[allow(missing_docs)]
@@ -102,7 +91,10 @@ pub enum ApiStatusCode {
     InternalServerError = 2000,
 }
 
-/// The response that is sent in a case of an error
+/// Represents a generic API error response.
+///
+/// This struct provides a consistent way to represent errors returned by
+/// the API, containing a status code and a human-readable message.
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 #[allow(missing_docs)]
 pub struct ApiErrorResponse {

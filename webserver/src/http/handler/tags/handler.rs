@@ -18,7 +18,7 @@ use crate::http::handler::recipes::schema::SimpleRecipe;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::recipes::Recipe;
-use crate::models::recipes::RecipeTag;
+use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 
 #[get("/")]
