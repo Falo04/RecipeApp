@@ -16,7 +16,7 @@ export type LoginProps = {
 };
 
 /**
- * The Login
+ * The Login view
  */
 export function Login(props: LoginProps) {
     const [tg] = useTranslation();

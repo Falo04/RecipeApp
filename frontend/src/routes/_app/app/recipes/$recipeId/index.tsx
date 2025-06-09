@@ -15,9 +15,9 @@ import type { VariantProps } from "class-variance-authority";
 export type RecipeDetailProps = {};
 
 /**
- * The RecipeDetails
+ * Displays detailed information about a recipe.
  */
-function RecipeDetail(_props: RecipeDetailProps) {
+export function RecipeDetail(_props: RecipeDetailProps) {
     const [t] = useTranslation("recipe");
 
     const navigate = useNavigate();

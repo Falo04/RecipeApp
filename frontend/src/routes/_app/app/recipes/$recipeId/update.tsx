@@ -5,7 +5,15 @@ import { RecipeForm } from "@/components/recipe-form";
 import { Api } from "@/api/api";
 import { toast } from "sonner";
 
-function UpdateRecipe() {
+/**
+ * The properties for {@link UpdateRecipe}
+ */
+export type UpdateRecipeProps = {};
+
+/**
+ * Updates the recipe data.
+ */
+export function UpdateRecipe(_props: UpdateRecipeProps) {
     const [t] = useTranslation("recipe");
     const { recipeId } = Route.useParams();
 

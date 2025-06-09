@@ -17,7 +17,15 @@ import {
 } from "@/components/ui/command.tsx";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export function RecipeSearch() {
+/**
+ * The properties for {@link RecipeSearch}
+ */
+export type RecipeSearchProps = {};
+
+/**
+ * Provides a recipe search component with suggestions.
+ */
+export function RecipeSearch(_props: RecipeSearchProps) {
     const [tg] = useTranslation();
     const navigate = useNavigate();
     const isMobile = useIsMobile();

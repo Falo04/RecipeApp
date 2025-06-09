@@ -26,13 +26,15 @@ import { AnimatePresence, motion } from "framer-motion";
  * The properties for {@link RecipeForm}
  */
 export type RecipeFormProps = {
+    /** FullRecipe data to update the recipe */
     formData?: FullRecipe;
+
+    /** Navigate to recipe details view if creating or updating was successful */
     navigate: (uuid: string) => void;
-    onClose: () => void;
 };
 
 /**
- * The RecipeForm
+ * The RecipeForm for creating or updating a recipe
  */
 export function RecipeForm(props: RecipeFormProps) {
     const [t] = useTranslation("recipe");

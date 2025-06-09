@@ -16,9 +16,9 @@ export type TagDetailProps = {
 };
 
 /**
- * The TagDetail
+ * Renders a recipe overview table that is assigned to a specific tag
  */
-function TagDetail(_props: TagDetailProps) {
+export function TagDetail(_props: TagDetailProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

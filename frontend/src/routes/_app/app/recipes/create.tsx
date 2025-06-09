@@ -3,7 +3,15 @@ import { RecipeForm } from "@/components/recipe-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-export function CreateRecipe() {
+/**
+ * The properties for {@link CreateRecipe}
+ */
+export type CreateRecipeProps = {};
+
+/**
+ * Renders a recipe creation form within a submenu layout.
+ */
+export function CreateRecipe(_props: CreateRecipeProps) {
     const [t] = useTranslation("recipe");
 
     const navigate = useNavigate();

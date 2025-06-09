@@ -18,9 +18,9 @@ import { Text } from "@/components/ui/text.tsx";
 export type FoodOverviewProps = {};
 
 /**
- * The FoodOverview
+ * Renders a food overview table.
  */
-function FoodOverview(_props: FoodOverviewProps) {
+export function FoodOverview(_props: FoodOverviewProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 

@@ -20,9 +20,9 @@ import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
 export type TagsOverviewProps = {};
 
 /**
- * The TagsOverview
+ * Renders a tag overview table.
  */
-function TagsOverview(_props: TagsOverviewProps) {
+export function TagsOverview(_props: TagsOverviewProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

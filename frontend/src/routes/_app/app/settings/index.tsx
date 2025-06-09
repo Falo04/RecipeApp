@@ -13,10 +13,7 @@ import { toast } from "sonner";
  */
 export type SettingsProps = {};
 
-/**
- * Here you can change your settings
- */
-export default function Settings(_props: SettingsProps) {
+export function Settings(_props: SettingsProps) {
     const [t] = useTranslation("settings");
     const [tg] = useTranslation();
 

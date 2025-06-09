@@ -30,7 +30,7 @@ export const app_meta_data = {
 };
 
 /**
- * The FoodMenu
+ * The root layout for the application
  */
 export default function FoodMenu(_props: FoodMenuProps) {
     return (
