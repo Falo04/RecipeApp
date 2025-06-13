@@ -1,7 +1,8 @@
+use axum::middleware;
 use galvyn::core::GalvynRouter;
 
-use super::middleware::auth_required::AuthRequiredLayer;
 use crate::config::AUTHENTICATION_ENABLED;
+use crate::http::middleware::auth_required_layer::auth_required_layer;
 
 pub mod meta;
 pub mod recipes;
@@ -49,7 +50,7 @@ pub fn initialize() -> GalvynRouter {
         GalvynRouter::new().nest(
             "/v1",
             GalvynRouter::new()
-                .merge(auth_required.layer(AuthRequiredLayer))
+                .merge(auth_required.layer(middleware::from_fn(auth_required_layer)))
                 .merge(auth_not_required),
         )
     } else {

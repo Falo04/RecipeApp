@@ -11,8 +11,8 @@ use tracing::info;
 use tracing::instrument;
 use tracing::Level;
 
-use super::middleware::catch_unwind::CatchUnwindLayer;
 use crate::http::handler;
+use crate::http::middleware::catch_unwind_layer::CatchUnwindLayer;
 
 #[get("/openapi.json")]
 pub async fn get_openapi() -> SchemalessJson<&'static OpenAPI> {

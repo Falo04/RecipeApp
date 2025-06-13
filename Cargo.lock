@@ -3685,6 +3685,7 @@ dependencies = [
  "clap",
  "dotenv",
  "futures-lite",
+ "futures-util",
  "galvyn",
  "jsonwebtoken",
  "opentelemetry",

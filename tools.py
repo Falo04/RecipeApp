@@ -44,8 +44,6 @@ def get_webserver_service() -> str | None:
     for line in lines.split("\n"):
         info = json.loads(line)
 
-        print(info["Name"])
-
         if "webserver" in info["Name"]:
             return info["Service"]
 
