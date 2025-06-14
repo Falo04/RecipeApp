@@ -109,7 +109,7 @@ fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, ApiError> {
         &Validation::default(),
     )
     .map_err(|e| {
-        info!("secret: {secret}, token: {jwt}, error: {e}");
+        info!("token: {jwt}, error: {e}");
         ApiError::new(
             ApiStatusCode::Unauthenticated,
             "You are not an authorized user",

@@ -82,7 +82,9 @@ This will start the following services:
 * API: [http://localhost:8443/api/v1](http://localhost:8443/api/v1)
 * Swagger Documentation (development
   only): [http://localhost:8443/swagger-ui/index.html](http://localhost:8443/swagger-ui/index.html)
-* Jaeger UI (development only): [http://localhost:8443/jaeger](http://localhost:8443/jaeger)
+* Jaeger UI:
+    * development: [http://localhost:8443/jaeger](http://localhost:8443/jaeger)
+    * production: [http://localhost:16686/jaeger](http://localhost:8443/jaeger)
 
 ## License
 

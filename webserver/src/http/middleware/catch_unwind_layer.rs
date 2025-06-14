@@ -30,17 +30,13 @@ impl<S> Layer<S> for CatchUnwindLayer {
 
     /// This method creates a new `CatchUnwindService` instance.
     fn layer(&self, inner: S) -> Self::Service {
-        CatchUnwindService {
-            layer: self.clone(),
-            inner,
-        }
+        CatchUnwindService { inner }
     }
 }
 
 /// Represents a service that manages unwind-safe execution.
 #[derive(Clone)]
 pub struct CatchUnwindService<S> {
-    layer: CatchUnwindLayer,
     inner: S,
 }
 
