@@ -2,8 +2,10 @@ use std::fs;
 use std::net::SocketAddr;
 
 use ::tracing::info;
-use bcrypt::hash;
-use bcrypt::DEFAULT_COST;
+use argon2::password_hash::rand_core::OsRng;
+use argon2::password_hash::SaltString;
+use argon2::Argon2;
+use argon2::PasswordHasher;
 use clap::Parser;
 use clap::Subcommand;
 use dotenv::dotenv;
@@ -18,7 +20,6 @@ use tracing_subscriber::EnvFilter;
 use uuid::Uuid;
 
 use crate::config::DB;
-use crate::config::JWT;
 use crate::config::SERVER_ADDRESS;
 use crate::config::SERVER_PORT;
 use crate::http::server;
@@ -163,7 +164,9 @@ async fn create_user(
         }
         println!("Password is incorrect, try again");
     }
-    let hash = hash(password, DEFAULT_COST)?;
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    let hash = argon2.hash_password(password.as_ref(), &salt)?.to_string();
     info!("user with {email}, {display_name}, {hash} will be inserted");
     let uuid = rorm::insert(&mut tx, User)
         .return_primary_key()

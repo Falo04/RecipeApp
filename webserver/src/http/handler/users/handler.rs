@@ -1,5 +1,7 @@
+use argon2::Argon2;
+use argon2::PasswordHash;
+use argon2::PasswordVerifier;
 use axum::extract::Query;
-use bcrypt::verify;
 use futures_lite::StreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
@@ -87,8 +89,12 @@ pub async fn sign_in_me(
         None => return Err(ApiError::server_error("user id invalid")),
     };
 
-    if !verify(&request.password, &user.password)
-        .map_err(|_| ApiError::server_error("bycrpt error"))?
+    let parsed_hash = PasswordHash::new(user.password.as_ref())
+        .map_err(|_err| ApiError::server_error("PasswordHash error"))?;
+
+    if !Argon2::default()
+        .verify_password(request.password.as_ref(), &parsed_hash)
+        .is_ok()
     {
         return Err(ApiError::bad_request("Wrong password"));
     }
