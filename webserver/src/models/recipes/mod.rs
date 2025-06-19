@@ -11,7 +11,7 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::users::User;
-use crate::models::ingredients::RecipeIngredient;
+use crate::models::ingredients::RecipeIngredientModel;
 use crate::models::tags::RecipeTag;
 
 /// Represents a recipe
@@ -40,7 +40,7 @@ pub struct Recipe {
     /// A back-reference to the `RecipeIngredients` model
     ///
     /// Representing the ingredients used in this recipe.
-    pub ingredients: BackRef<field!(RecipeIngredient.recipe)>,
+    pub ingredients: BackRef<field!(RecipeIngredientModel.recipe)>,
 
     /// A back-reference to the `RecipeSteps` model
     ///

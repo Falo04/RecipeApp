@@ -23,6 +23,13 @@ use crate::http::common::schemas::Page;
 use crate::http::extractors::authentication::Claims;
 use crate::models::users::User;
 
+/// Retrieves all users with pagination support.
+///
+/// This function queries the database for all `User` records and returns them as a paginated response.
+///
+/// # Arguments
+///
+/// * `Query<GetPageRequest>` - object containing pagination parameters such as limit and offset.
 #[get("/")]
 pub async fn get_all_users(
     pagination: Query<GetPageRequest>,
@@ -45,11 +52,26 @@ pub async fn get_all_users(
     }))
 }
 
+/// This function handles requests to the "/me" endpoint.
+///
+/// It takes a `User` object as input.
+///
+/// # Arguments
+///
+/// * `User` - a `User` object.
 #[get("/me")]
 pub async fn get_me(user: User) -> ApiResult<ApiJson<SimpleUser>> {
     Ok(ApiJson(SimpleUser::from(user)))
 }
 
+/// Signs in the current user and returns a JWT token.
+///
+/// This endpoint handles user login, verifies credentials, and returns a JWT token
+/// for subsequent requests.
+///
+/// # Arguments
+///
+/// * `ApiJson<UserSignInRequest>` - A JSON object containing the user's email and password.
 #[post("/login")]
 pub async fn sign_in_me(
     ApiJson(request): ApiJson<UserSignInRequest>,

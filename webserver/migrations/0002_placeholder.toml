@@ -1,0 +1,112 @@
+[Migration]
+Hash = "13156389702339323194"
+Initial = false
+Dependency = 1
+Replaces = []
+
+[[Migration.Operations]]
+Type = "CreateModel"
+Name = "recipeingredientmodel"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 35
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "amount"
+Type = "int32"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 45
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "unit"
+Type = "choices"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "choices"
+Value = [
+    "Cup",
+    "Gram",
+    "Kilogram",
+    "Liter",
+    "Milliliter",
+    "Tablespoon",
+    "Teaspoon",
+    "None",
+]
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 48
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateField"
+Model = "recipeingredientmodel"
+
+[Migration.Operations.Field]
+Name = "recipe"
+Type = "uuid"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "foreign_key"
+
+[Migration.Operations.Field.Annotations.Value]
+TableName = "recipe"
+ColumnName = "uuid"
+OnDelete = "Cascade"
+OnUpdate = "Restrict"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Field.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 39
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateField"
+Model = "recipeingredientmodel"
+
+[Migration.Operations.Field]
+Name = "ingredients"
+Type = "uuid"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "foreign_key"
+
+[Migration.Operations.Field.Annotations.Value]
+TableName = "ingredient"
+ColumnName = "uuid"
+OnDelete = "Restrict"
+OnUpdate = "Restrict"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Field.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 42
+Column = 9
+
+[[Migration.Operations]]
+Type = "DeleteModel"
+Name = "recipeingredient"

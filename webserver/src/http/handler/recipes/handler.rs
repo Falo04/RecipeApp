@@ -4,7 +4,8 @@ use std::ops::Deref;
 
 use axum::extract::Path;
 use axum::extract::Query;
-use futures_lite::StreamExt;
+use futures_util::StreamExt;
+use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::delete;
@@ -20,13 +21,13 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::schema::CreateOrUpdateRecipe;
-use super::schema::RecipeIngredient as RecipeIngredientsDto;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
+use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::RecipeSearchRequest;
 use crate::http::handler::recipes::schema::RecipeSearchResponse;
@@ -35,7 +36,7 @@ use crate::http::handler::recipes::schema::Step;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
 use crate::models::ingredients::Ingredient;
-use crate::models::ingredients::RecipeIngredient;
+use crate::models::ingredients::RecipeIngredientModel;
 use crate::models::recipes::Recipe;
 use crate::models::recipes::RecipePatch;
 use crate::models::recipes::RecipeStep;
@@ -43,6 +44,14 @@ use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 use crate::models::users::User;
 
+/// Retrieves all recipes with pagination support and associated tags.
+///
+/// This function handles retrieving recipes from the database, applying pagination,
+/// and fetching associated tags.
+///
+/// # Arguments
+///
+/// * `Query<GetPageRequest>` - object containing pagination parameters
 #[get("/")]
 pub async fn get_all_recipes(
     pagination: Query<GetPageRequest>,
@@ -62,8 +71,8 @@ pub async fn get_all_recipes(
     let mut map: HashMap<Uuid, Vec<SimpleTag>> =
         HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
 
-    if total != 0 {
-        rorm::query(
+    if !items.is_empty() {
+        let tags: Vec<_> = rorm::query(
             Database::global(),
             (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)),
         )
@@ -73,16 +82,14 @@ pub async fn get_all_recipes(
                 .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
                 .collect(),
         ))
-        .order_asc(RecipeTag.tag.name)
         .stream()
-        .try_for_each(|result| {
-            let (ForeignModelByField(recipe_uuid), tag) = result?;
-            map.entry(recipe_uuid)
-                .or_default()
-                .push(SimpleTag::from(tag));
-            Ok::<_, rorm::Error>(())
-        })
+        .map_ok(|(recipe, tag)| (recipe.0, SimpleTag::from(tag)))
+        .try_collect()
         .await?;
+
+        for (recipe_uuid, tag) in tags {
+            map.entry(recipe_uuid).or_default().push(tag);
+        }
     }
 
     let items = items
@@ -103,6 +110,15 @@ pub async fn get_all_recipes(
     }))
 }
 
+/// Retrieves a recipe by its UUID.
+///
+/// This function queries the database for a recipe based on the provided UUID.
+/// It also fetches associated data such as the recipe's user, tags,
+/// ingredients, and steps.
+///
+/// # Arguments
+///
+/// * `Path<SingleUuid>` - The UUID of the recipe to retrieve.
 #[get("/{uuid}")]
 pub async fn get_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
@@ -133,8 +149,8 @@ pub async fn get_recipe(
         .try_collect()
         .await?;
 
-    let ingredients: Vec<_> = rorm::query(&mut tx, RecipeIngredient)
-        .condition(RecipeIngredient.recipe.equals(recipe_uuid))
+    let ingredients: Vec<_> = rorm::query(&mut tx, RecipeIngredientModel)
+        .condition(RecipeIngredientModel.recipe.equals(recipe_uuid))
         .all()
         .await?;
 
@@ -147,7 +163,7 @@ pub async fn get_recipe(
         else {
             return Err(ApiError::server_error("Ingredient not found from recipes"));
         };
-        recipe_ingredients.push(RecipeIngredientsDto::new(mapping, ingredient.name));
+        recipe_ingredients.push(RecipeIngredients::new(mapping, ingredient.name));
     }
 
     let steps: Vec<_> = rorm::query(&mut tx, RecipeStep)
@@ -173,6 +189,15 @@ pub async fn get_recipe(
     Ok(ApiJson(full_recipe))
 }
 
+/// Creates a new recipe.
+///
+/// This endpoint handles the creation of a new recipe, performing validation,
+/// inserting the recipe into the database, and associating it with tags, steps,
+/// and ingredients.
+///
+/// # Arguments
+///
+/// * `ApiJson<CreateOrUpdateRecipe>` - The request body containing the recipe data.
 #[post("/")]
 pub async fn create_recipe(
     ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
@@ -206,12 +231,22 @@ pub async fn create_recipe(
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
     RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    RecipeIngredient::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeIngredientModel::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     tx.commit().await?;
     Ok(ApiJson(SingleUuid { uuid: recipe_uuid }))
 }
 
+/// Updates an existing recipe based on its UUID.
+///
+/// This function takes a UUID as input and updates the corresponding recipe
+/// in the database. It handles updates to the recipe's name, description,
+/// tags, steps, and ingredients.
+///
+/// # Arguments
+///
+/// * `Path<SingleUuid>` - The UUID of the recipe to update.
+/// * `ApiJson<CreateOrUpdateRecipe>` - The request body containing the recipe data.
 #[put("/{uuid}")]
 pub async fn update_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
@@ -227,7 +262,7 @@ pub async fn update_recipe(
 
     RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
     RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    RecipeIngredient::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeIngredientModel::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     rorm::update(&mut tx, Recipe)
         .begin_dyn_set()
@@ -241,6 +276,13 @@ pub async fn update_recipe(
     Ok(())
 }
 
+/// Deletes a recipe by its UUID.
+///
+/// This function deletes a recipe from the database based on the provided UUID.
+///
+/// # Arguments
+///
+/// * `Path<SingleUuid>` - The UUID of the recipe to delete.
 #[delete("/{uuid}")]
 pub async fn delete_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
@@ -261,6 +303,14 @@ pub async fn delete_recipe(
     Ok(())
 }
 
+/// Handles recipe search requests.
+///
+/// This function takes a search query and retrieves recipes from the database
+/// that match the query.
+///
+/// # Arguments
+///
+/// * `RecipeSearchRequest` - object containing the search term
 #[get("/search")]
 pub async fn search_recipes(
     search: Query<RecipeSearchRequest>,

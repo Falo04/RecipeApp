@@ -21,6 +21,15 @@ use crate::models::recipes::Recipe;
 use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 
+/// Retrieves all tags with pagination support.
+///
+/// This function queries the database for all `Tag` records, applying pagination
+/// based on the provided `pagination` request. It returns a paginated list of
+/// `SimpleTag` objects along with the total number of tags.
+///
+/// # Arguments
+///
+/// * `Query<GetPageRequest>` - object containing the pagination parameters
 #[get("/")]
 pub async fn get_all_tags(
     pagination: Query<GetPageRequest>,
@@ -46,6 +55,15 @@ pub async fn get_all_tags(
     }))
 }
 
+/// Retrieves a paginated list of recipes associated with a specific tag.
+///
+/// This function takes a UUID representing the tag and a pagination request as input.
+/// It queries the database for recipes linked to that tag, applies pagination.
+///
+/// # Arguments
+///
+/// * `Path<SingleUuid>` - The UUID of the tag to filter recipes by.
+/// * `Query<GetPageRequest>` - The pagination request.
 #[get("/{uuid}/recipes")]
 pub async fn get_recipes_by_tag(
     Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
@@ -74,6 +92,14 @@ pub async fn get_recipes_by_tag(
     }))
 }
 
+/// Creates or updates a tag.
+///
+/// This endpoint takes a JSON request body containing the tag's name and color.
+/// It inserts a new tag if one with the same name does not already exist.
+///
+/// # Arguments
+///
+/// * `ApiJson<CreateOrUpdateTag>` - The request body containing the tag data.
 #[post("/")]
 pub async fn create_tag(
     ApiJson(request): ApiJson<CreateOrUpdateTag>,
@@ -103,6 +129,13 @@ pub async fn create_tag(
     Ok(ApiJson(SingleUuid { uuid }))
 }
 
+/// Deletes a tag from the database based on its UUID.
+///
+/// This function takes a UUID as input and attempts to delete the corresponding tag from the database.
+///
+/// # Arguments
+///
+/// * `Path<SingleUuid>` - The UUID of the tag to delete.
 #[delete("/{uuid}")]
 pub async fn delete_tag(Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;

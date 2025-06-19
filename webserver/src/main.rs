@@ -127,7 +127,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// This function initializes the Galvyn server with the provided database configuration
 /// and routes, then starts the server listening on the specified address and port.
 async fn start() -> Result<(), Box<dyn std::error::Error>> {
-    info!("jwt token: {:?}", JWT.clone());
     galvyn::Galvyn::new()
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
             DB.clone(),

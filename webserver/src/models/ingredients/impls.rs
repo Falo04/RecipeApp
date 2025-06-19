@@ -8,11 +8,11 @@ use rorm::prelude::ForeignModelByField;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
-use crate::http::handler::recipes::schema::RecipeIngredient as RecipeIngredientsDto;
+use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::models::ingredients::Ingredient;
-use crate::models::ingredients::RecipeIngredient;
+use crate::models::ingredients::RecipeIngredientModel;
 
-impl RecipeIngredient {
+impl RecipeIngredientModel {
     /// Handles mapping ingredients to a recipe.
     ///
     /// It updates existing recipe ingredients mappings or inserts new ones as needed.
@@ -26,10 +26,10 @@ impl RecipeIngredient {
     pub async fn handle_mapping(
         transaction: &mut Transaction,
         recipe_uuid: Uuid,
-        ingredients: Vec<RecipeIngredientsDto>,
+        ingredients: Vec<RecipeIngredients>,
     ) -> Result<(), ApiError> {
-        let existing_mappings: Vec<_> = rorm::query(&mut *transaction, RecipeIngredient)
-            .condition(RecipeIngredient.recipe.equals(recipe_uuid))
+        let existing_mappings: Vec<_> = rorm::query(&mut *transaction, RecipeIngredientModel)
+            .condition(RecipeIngredientModel.recipe.equals(recipe_uuid))
             .stream()
             .try_collect()
             .await?;
@@ -43,25 +43,25 @@ impl RecipeIngredient {
                     if existing_mappings.iter().any(|map| map.uuid == uuid) {
                         let ingre_uuid =
                             Ingredient::ok_or_insert(&mut *transaction, item.name).await?;
-                        rorm::update(&mut *transaction, RecipeIngredient)
+                        rorm::update(&mut *transaction, RecipeIngredientModel)
                             .begin_dyn_set()
                             .set(
-                                RecipeIngredient.ingredients,
+                                RecipeIngredientModel.ingredients,
                                 ForeignModelByField(ingre_uuid),
                             )
-                            .set(RecipeIngredient.amount, item.amount)
-                            .set(RecipeIngredient.unit, item.unit)
+                            .set(RecipeIngredientModel.amount, item.amount)
+                            .set(RecipeIngredientModel.unit, item.unit)
                             .finish_dyn_set()?
-                            .condition(RecipeIngredient.uuid.equals(uuid))
+                            .condition(RecipeIngredientModel.uuid.equals(uuid))
                             .await?;
                         target_set.insert(uuid);
                     }
                 }
                 None => {
                     let ingre_uuid = Ingredient::ok_or_insert(&mut *transaction, item.name).await?;
-                    rorm::insert(&mut *transaction, RecipeIngredient)
+                    rorm::insert(&mut *transaction, RecipeIngredientModel)
                         .return_nothing()
-                        .single(&RecipeIngredient {
+                        .single(&RecipeIngredientModel {
                             uuid: Uuid::new_v4(),
                             recipe: ForeignModelByField(recipe_uuid),
                             ingredients: ForeignModelByField(ingre_uuid),
@@ -76,8 +76,8 @@ impl RecipeIngredient {
         let to_delete: Vec<Uuid> = existing_set.difference(&target_set).cloned().collect();
 
         for uuid in to_delete {
-            rorm::delete(&mut *transaction, RecipeIngredient)
-                .condition(RecipeIngredient.uuid.equals(uuid))
+            rorm::delete(&mut *transaction, RecipeIngredientModel)
+                .condition(RecipeIngredientModel.uuid.equals(uuid))
                 .await?;
         }
 

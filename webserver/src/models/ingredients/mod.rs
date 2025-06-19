@@ -30,7 +30,7 @@ pub struct Ingredient {
 /// This struct models the ingredients within a recipe, linking to the
 /// `Recipe` and `Ingredients` models using foreign keys.
 #[derive(Model)]
-pub struct RecipeIngredient {
+pub struct RecipeIngredientModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
