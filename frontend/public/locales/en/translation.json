@@ -1,65 +1,65 @@
 {
-  "label": {
-    "name": "Name",
-    "color": "Color",
-    "description": "Description",
-    "email": "Email",
-    "password": "Password",
-    "ingredients-title": "Ingredients:",
-    "ingredients-name": "Name",
-    "ingredients-amount": "Amount",
-    "ingredients-unit": "Unit",
-    "step-title": "Steps:",
-    "steps": "Step",
-    "tags": "Tags",
-    "dark": "Dark Mode",
-    "light": "Light Mode",
-    "language": "Select Language",
-    "appearance": "Select Appearance",
-    "en": "\uD83C\uDDFA\uD83C\uDDF8 English",
-    "de": "\uD83C\uDDE9\uD83C\uDDEA Deutsch"
-  },
-  "placeholder": {
-    "email": "test@test.com",
-    "password": "****"
-  },
-  "button": {
-    "login": "Log in",
-    "close": "Close"
-  },
-  "search-recipe": "Search Recipe",
-  "table": {
-    "action": "Action",
-    "name": "Name",
-    "color": "Color",
-    "description": "Description",
-    "no-result": "Looks empty...",
-    "tags": "Tags"
-  },
-  "toast": {
-    "loading": "Loading...",
-    "created-success": "Succesfully created",
-    "updated-success": "Succesfully updated",
-    "deleted-success": "Succesfully deleted",
-    "general-error": "Something failed..."
-  },
-  "login": {
-    "title": "Recipe App",
-    "description": "Log in"
-  },
-  "search": {
-    "recipes": "Search recipe",
-    "recipes-empty": "No recipe found"
-  },
-  "breadcrumb": {
-    "recipes": "Recipes",
-    "create": "Creating",
-    "update": "Updating",
-    "tags": "Tags"
-  },
-  "sidebar": {
-    "settings": "Settings",
-    "recipes": "Recipes",
-    "tags": "Tags"
-  }
+    "breadcrumb": {
+        "create": "Creating",
+        "recipes": "Recipes",
+        "tags": "Tags",
+        "update": "Updating"
+    },
+    "button": {
+        "close": "Close",
+        "login": "Log in"
+    },
+    "label": {
+        "appearance": "Select Appearance",
+        "color": "Color",
+        "dark": "Dark Mode",
+        "de": "\ud83c\udde9\ud83c\uddea Deutsch",
+        "description": "Description",
+        "email": "Email",
+        "en": "\ud83c\uddfa\ud83c\uddf8 English",
+        "ingredients-amount": "Amount",
+        "ingredients-name": "Name",
+        "ingredients-title": "Ingredients:",
+        "ingredients-unit": "Unit",
+        "language": "Select Language",
+        "light": "Light Mode",
+        "name": "Name",
+        "password": "Password",
+        "step-title": "Steps:",
+        "steps": "Step",
+        "tags": "Tags"
+    },
+    "login": {
+        "description": "Log in",
+        "title": "Recipe App"
+    },
+    "placeholder": {
+        "email": "test@test.com",
+        "password": "****"
+    },
+    "search": {
+        "recipes": "Search recipe",
+        "recipes-empty": "No recipe found"
+    },
+    "search-recipe": "Search Recipe",
+    "sidebar": {
+        "recipes": "Recipes",
+        "settings": "Settings",
+        "tags": "Tags"
+    },
+    "table": {
+        "action": "Action",
+        "color": "Color",
+        "description": "Description",
+        "name": "Name",
+        "no-result": "Looks empty...",
+        "tags": "Tags"
+    },
+    "toast": {
+        "created-success": "Succesfully created",
+        "deleted-success": "Succesfully deleted",
+        "general-error": "Something failed...",
+        "loading": "Loading...",
+        "updated-success": "Succesfully updated"
+    }
 }

@@ -1,21 +1,21 @@
 {
-  "button": {
-    "create": "Tag erstellen",
-    "delete": "Tag löschen"
-  },
-  "dialog": {
-    "create-description": "Beschreibung zum Erstellen eines Tags",
-    "create-title": "Ein Tag erstellen",
-    "delete-description": "Tag löschen, kann nicht wiederhergestellt werden",
-    "delete-title": "Tag löschen: "
-  },
-  "heading": {
-    "detail-description": "Hier siehst du alle Rezepte, die mit dem Tag verbunden sind",
-    "detail-title": "Tag Details",
-    "overview-description": "Alle Tags sind hier aufgelistet",
-    "overview-title": "Tag Übersicht"
-  },
-  "input": {
-    "filter": "Tag suchen"
-  }
+    "button": {
+        "create": "Tag erstellen",
+        "delete": "Tag l\u00f6schen"
+    },
+    "dialog": {
+        "create-description": "Beschreibung zum Erstellen eines Tags",
+        "create-title": "Ein Tag erstellen",
+        "delete-description": "Tag l\u00f6schen, kann nicht wiederhergestellt werden",
+        "delete-title": "Tag l\u00f6schen: "
+    },
+    "heading": {
+        "detail-description": "Hier siehst du alle Rezepte, die mit dem Tag verbunden sind",
+        "detail-title": "Tag Details",
+        "overview-description": "Alle Tags sind hier aufgelistet",
+        "overview-title": "Tag \u00dcbersicht"
+    },
+    "input": {
+        "filter": "Tag suchen"
+    }
 }

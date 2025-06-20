@@ -14,6 +14,7 @@ import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, List, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
 import type { MetaResponse } from "@/api/model/meta.interface.ts";
+import type { AllIngredientsRequest, SimpleIngredient } from "@/api/model/ingredients.interface.ts";
 
 export const Api = {
     meta: {
@@ -49,6 +50,19 @@ export const Api = {
         create: async (payload: CreateOrUpdateTag): Promise<ApiResponse<SingleUuid>> =>
             await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
         delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/tags/${uuid}` }),
+    },
+    ingredients: {
+        getAll: async (): Promise<ApiResponse<List<SimpleIngredient>>> =>
+            await callApi<List<SimpleIngredient>>({
+                method: "GET",
+                url: "/ingredients/all",
+            }),
+        getRecipes: async (payload: AllIngredientsRequest): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> =>
+            await callApi<Page<SimpleRecipeWithTags>>({
+                method: "POST",
+                url: "/ingredients/recipes",
+                data: payload,
+            }),
     },
 };
 

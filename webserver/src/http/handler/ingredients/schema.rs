@@ -11,7 +11,7 @@ use crate::models::ingredients::Units;
 
 /// Represent the request for all recipes with these ingredients
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
-pub struct IngredientsRequest {
+pub struct AllIngredientsRequest {
     /// List of ingredients uuids
     pub uuids: List<Uuid>,
 }
@@ -40,16 +40,9 @@ pub struct RecipeIngredients {
     pub amount: i32,
 }
 
-/// Represents a request for searching ingredient.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct IngredientSearchRequest {
-    /// The name of the ingredient to search for (string, maximum length 255).
-    pub name: MaxStr<255>,
-}
-
 /// Represents the response received after searching for ingredients.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct IngredientSearchResponse {
+pub struct SimpleIngredient {
     /// The UUID for the ingredient.
     pub uuid: Uuid,
     /// The name of the ingredient.

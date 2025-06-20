@@ -1,8 +1,7 @@
 use rorm::fields::types::MaxStr;
 
-use crate::http::handler::ingredients::schema::IngredientSearchResponse;
-use crate::http::handler::ingredients::schema::RecipeIngredients;
-use crate::http::handler::recipes::schema::RecipeSearchResponse;
+use super::schema::RecipeIngredients;
+use super::schema::SimpleIngredient;
 use crate::models::ingredients::Ingredient;
 use crate::models::ingredients::RecipeIngredientModel;
 
@@ -21,7 +20,7 @@ impl RecipeIngredients {
     }
 }
 
-impl From<Ingredient> for IngredientSearchResponse {
+impl From<Ingredient> for SimpleIngredient {
     /// Creates a new `IngredientSearchResponse` instance from a given `Ingredient` instance.
     fn from(value: Ingredient) -> Self {
         Self {

@@ -1,24 +1,21 @@
-use std::borrow::Cow;
 use std::collections::HashMap;
 
 use axum::extract::Query;
-use futures_util::StreamExt;
 use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::get;
-use rorm::conditions;
+use galvyn::post;
 use rorm::conditions::DynamicCollection;
 use rorm::Database;
 use uuid::Uuid;
 
+use super::schema::AllIngredientsRequest;
+use super::schema::SimpleIngredient;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
-use crate::http::handler::ingredients::schema::IngredientSearchRequest;
-use crate::http::handler::ingredients::schema::IngredientSearchResponse;
-use crate::http::handler::ingredients::schema::IngredientsRequest;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::ingredients::Ingredient;
@@ -32,10 +29,10 @@ use crate::models::tags::Tag;
 /// This function handles requests to `/recipes` and returns a list of recipes
 /// that contain the provided ingredients. It constructs a query using the
 /// provided UUIDs and then fetches all recipes matching the ingredient criteria.
-#[get("/recipes")]
+#[post("/recipes")]
 pub async fn get_recipes_by_ingredients(
     pagination: Query<GetPageRequest>,
-    ApiJson(request): ApiJson<IngredientsRequest>,
+    ApiJson(request): ApiJson<AllIngredientsRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let condition = DynamicCollection::or(
         request
@@ -133,23 +130,15 @@ pub async fn get_recipes_by_ingredients(
 /// # Arguments
 ///
 /// * `IngredientSearchRequest` - object containing the search term
-#[get("/search")]
-pub async fn search_recipes(
-    search: Query<IngredientSearchRequest>,
-) -> ApiResult<ApiJson<List<IngredientSearchResponse>>> {
+#[get("/all")]
+pub async fn get_all_ingredients() -> ApiResult<ApiJson<List<SimpleIngredient>>> {
     let items: Vec<_> = rorm::query(Database::global(), Ingredient)
-        .condition(conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(Ingredient.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!("%{}%", search.name))),
-        })
         .order_asc(Ingredient.name)
-        .stream()
-        .map(|result| result.map(IngredientSearchResponse::from))
-        .try_collect()
-        .await?;
+        .all()
+        .await?
+        .into_iter()
+        .map(|ingr| SimpleIngredient::from(ingr))
+        .collect();
 
     Ok(ApiJson(List { list: items }))
 }
-
-// SELECT "recipetag"."recipe" AS a, "b"."uuid" AS b, "b"."name" AS c, "b"."color" AS d FROM "recipetag" JOIN "tag" AS b ON ("b".uuid = "recipetag".tag) WHERE ();

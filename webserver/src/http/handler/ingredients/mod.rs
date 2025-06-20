@@ -7,5 +7,5 @@ pub mod schema;
 pub fn initialize() -> GalvynRouter {
     GalvynRouter::new()
         .handler(handler::get_recipes_by_ingredients)
-        .handler(handler::search_recipes)
+        .handler(handler::get_all_ingredients)
 }

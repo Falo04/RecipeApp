@@ -1,12 +1,12 @@
 {
-  "button": {
-    "update": "Einstellungen aktualisieren"
-  },
-  "heading": {
-    "description": "Ändere hier deine Einstellungen",
-    "title": "Einstellungen"
-  },
-  "toast": {
-    "success": "Einstellung erfolgreich aktualisiert"
-  }
+    "button": {
+        "update": "Einstellungen aktualisieren"
+    },
+    "heading": {
+        "description": "\u00c4ndere hier deine Einstellungen",
+        "title": "Einstellungen"
+    },
+    "toast": {
+        "success": "Einstellung erfolgreich aktualisiert"
+    }
 }

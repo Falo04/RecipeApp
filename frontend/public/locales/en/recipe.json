@@ -1,31 +1,31 @@
 {
-  "heading": {
-    "overview-title": "Recipe Overview",
-    "overview-description": "All recipes are listed here",
-    "detail-heading": "Recipe Details",
-    "ingredients": "List of all Ingredients",
-    "steps": "Instruction:",
-    "step": "Step: ",
-    "create-heading": "Create Recipe",
-    "update-heading": "Update Recipe",
-    "tags": "Tags:"
-  },
-  "button": {
-    "add-tags": "Add Tags",
-    "create": "Create Recipe",
-    "next": "Next",
-    "back": "Back",
-    "update": "Update Recipe"
-  },
-  "error": {
-    "amount-not-zero": "Ingredients amount should not be zero",
-    "step-length-zero": "Step cannot be empty",
-    "step-length-255": "Step cannot be longer than 255 characters",
-    "ingre-name": "Please provide a name",
-    "ingre-amount": "Ingredients can not be empty or zero",
-    "ingre-unit": "Please provide a unit"
-  },
-  "input": {
-    "filter": "Search Recipe"
-  }
+    "button": {
+        "add-tags": "Add Tags",
+        "back": "Back",
+        "create": "Create Recipe",
+        "next": "Next",
+        "update": "Update Recipe"
+    },
+    "error": {
+        "amount-not-zero": "Ingredients amount should not be zero",
+        "ingre-amount": "Ingredients can not be empty or zero",
+        "ingre-name": "Please provide a name",
+        "ingre-unit": "Please provide a unit",
+        "step-length-255": "Step cannot be longer than 255 characters",
+        "step-length-zero": "Step cannot be empty"
+    },
+    "heading": {
+        "create-heading": "Create Recipe",
+        "detail-heading": "Recipe Details",
+        "ingredients": "List of all Ingredients",
+        "overview-description": "All recipes are listed here",
+        "overview-title": "Recipe Overview",
+        "step": "Step: ",
+        "steps": "Instruction:",
+        "tags": "Tags:",
+        "update-heading": "Update Recipe"
+    },
+    "input": {
+        "filter": "Filter Recipes"
+    }
 }

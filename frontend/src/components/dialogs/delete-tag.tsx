@@ -39,7 +39,7 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
 
     return (
         <Dialog open={true} onOpenChange={props.onClose}>
-            <DialogContent className="max-w-[325px] sm:max-w-[425px]">
+            <DialogContent size={"sm"}>
                 <DialogHeader className="items-start">
                     <DialogTitle>{t("dialog.delete-title")} </DialogTitle>
                     <DialogDescription className="flex w-full flex-col items-start gap-2">

@@ -1,0 +1,15 @@
+{
+    "button": {
+        "search": "Select Ingredients to search for",
+        "select": "Search Ingredients"
+    },
+    "command": {
+        "empty": "Nothing selected"
+    },
+    "heading": {
+        "overview-title": "Search Recipes by Ingredients"
+    },
+    "input": {
+        "filter": "Filter Recipes"
+    }
+}

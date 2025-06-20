@@ -57,7 +57,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
 
     return (
         <Dialog open={true} onOpenChange={props.onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent size={"sm"}>
                 <DialogHeader>
                     <DialogTitle>{t("dialog.create-title")}</DialogTitle>
                     <DialogDescription>{t("dialog.create-description")}</DialogDescription>

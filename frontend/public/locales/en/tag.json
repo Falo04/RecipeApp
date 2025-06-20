@@ -1,21 +1,21 @@
 {
-  "heading": {
-    "overview-title": "Tag Overview",
-    "overview-description": "All tags are listed here",
-    "detail-title": "Tag Details",
-    "detail-description": "Here you see all recipes which are connected to tags"
-  },
-  "button": {
-    "create": "Create Tag",
-    "delete": "Delete Tag"
-  },
-  "dialog": {
-    "create-title": "Create a tag",
-    "create-description": "Description for creating a tag",
-    "delete-title": "Delete Tag: ",
-    "delete-description": "Delete tag, cannot be restored"
-  },
-  "input": {
-    "filter": "Search tag"
-  }
+    "button": {
+        "create": "Create Tag",
+        "delete": "Delete Tag"
+    },
+    "dialog": {
+        "create-description": "Description for creating a tag",
+        "create-title": "Create a tag",
+        "delete-description": "Delete tag, cannot be restored",
+        "delete-title": "Delete Tag: "
+    },
+    "heading": {
+        "detail-description": "Here you see all recipes which are connected to tags",
+        "detail-title": "Tag Details",
+        "overview-description": "All tags are listed here",
+        "overview-title": "Tag Overview"
+    },
+    "input": {
+        "filter": "Filter Tags"
+    }
 }

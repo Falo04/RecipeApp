@@ -1,12 +1,12 @@
 {
-  "heading": {
-    "title": "Settings",
-    "description": "Change your settings here"
-  },
-  "button": {
-    "update": "Update Settings"
-  },
-  "toast": {
-    "success": "Settings successfully updated"
-  }
+    "button": {
+        "update": "Update Settings"
+    },
+    "heading": {
+        "description": "Change your settings here",
+        "title": "Settings"
+    },
+    "toast": {
+        "success": "Settings successfully updated"
+    }
 }

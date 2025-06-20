@@ -18,10 +18,7 @@ export function CreateRecipe(_props: CreateRecipeProps) {
 
     return (
         <SubmenuLayout heading={t("heading.create-heading")} navigate={() => navigate({ to: "/app/recipes" })}>
-            <RecipeForm
-                navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
-                onClose={() => navigate({ to: "/app/recipes" })}
-            />
+            <RecipeForm navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })} />
         </SubmenuLayout>
     );
 }

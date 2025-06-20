@@ -1,3 +1,5 @@
+import type { List } from "@/api/model/global.interface.ts";
+
 export interface Ingredients {
     uuid?: string;
     name: string;
@@ -13,4 +15,13 @@ export enum Units {
     Tablespoon = "Tablespoon",
     Teaspoon = "Teaspoon",
     None = "None",
+}
+
+export interface SimpleIngredient {
+    uuid: string;
+    name: string;
+}
+
+export interface AllIngredientsRequest {
+    uuids: List<string>;
 }
