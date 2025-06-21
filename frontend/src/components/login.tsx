@@ -97,7 +97,7 @@ export function Login(props: LoginProps) {
                                     name="password"
                                     validators={{
                                         onChange: ({ value }) =>
-                                            value.length >= 3 ? undefined : tg("error.password-too-short"),
+                                            value.length >= 3 ? undefined : t("error.password-too-short"),
                                     }}
                                     children={(field) => (
                                         <div>

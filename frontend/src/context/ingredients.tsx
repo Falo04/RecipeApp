@@ -3,6 +3,7 @@ import type { List } from "@/api/model/global.interface";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
 import type { SimpleIngredient } from "@/api/model/ingredients.interface.ts";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 /**
  * Represents the context for managing and interacting with ingredients.
@@ -76,7 +77,11 @@ export function IngredientProvider(props: IngredientProviderProps) {
     }, []);
 
     if (ingredients === "loading") {
-        return <div>Loading...</div>;
+        return (
+            <div className={"flex h-screen items-center justify-center"}>
+                <Spinner />
+            </div>
+        );
     }
 
     return (

@@ -5,6 +5,7 @@ import { Login } from "@/components/login";
 import { Navigate } from "@tanstack/react-router";
 import React from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 /** The global {@link UserProvider} instance */
 let USER_PROVIDER: UserProvider | null = null;
@@ -140,7 +141,11 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
     render() {
         switch (this.state.user) {
             case "loading":
-                return <div>"Loading"</div>;
+                return (
+                    <div className={"flex h-screen items-center justify-center"}>
+                        <Spinner />
+                    </div>
+                );
             case "unauthenticated":
                 return (
                     <>

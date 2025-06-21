@@ -3,6 +3,7 @@ import type { Page } from "@/api/model/global.interface";
 import type { SimpleTag } from "@/api/model/tag.interface";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 /**
  * Represents the context for managing and interacting with tags.
@@ -81,7 +82,11 @@ export function TagsProvider(props: TagsProviderProps) {
     }, []);
 
     if (tags === "loading") {
-        return <div>Loading...</div>;
+        return (
+            <div className={"flex h-screen items-center justify-center"}>
+                <Spinner />
+            </div>
+        );
     }
 
     return (

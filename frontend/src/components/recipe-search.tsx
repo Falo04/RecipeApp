@@ -16,6 +16,7 @@ import {
     CommandList,
 } from "@/components/ui/command.tsx";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 /**
  * The properties for {@link RecipeSearch}
@@ -78,6 +79,7 @@ export function RecipeSearch(_props: RecipeSearchProps) {
                     />
                     <CommandList>
                         <CommandEmpty>{t("search.recipes-empty")}</CommandEmpty>
+                        <CommandGroup>{loading && <Spinner />}</CommandGroup>
                         <CommandGroup>
                             {suggestions.map((recipe) => (
                                 <CommandItem
