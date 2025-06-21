@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrashIcon } from "lucide-react";
 import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 
 /**
  * The properties for {@link TagsOverview}
@@ -59,13 +60,20 @@ export function TagsOverview(_props: TagsOverviewProps) {
                 header: () => <div className="flex justify-end">{tg("table.action")}</div>,
                 cell: ({ row }) => (
                     <div className="flex justify-end">
-                        <Button
-                            onClick={() => setOpenDeleteTag(row.original)}
-                            variant="ghost"
-                            className="cursor-pointer"
-                        >
-                            <TrashIcon />
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    onClick={() => setOpenDeleteTag(row.original)}
+                                    variant="ghost"
+                                    className="cursor-pointer"
+                                >
+                                    <TrashIcon />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tg("tooltip.delete")}</p>
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 ),
             },

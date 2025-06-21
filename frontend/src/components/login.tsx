@@ -19,6 +19,7 @@ export type LoginProps = {
  * The Login view
  */
 export function Login(props: LoginProps) {
+    const [t] = useTranslation("login");
     const [tg] = useTranslation();
 
     const form = useForm({
@@ -34,7 +35,7 @@ export function Login(props: LoginProps) {
 
             // Show loading toast while request is being processed
             toast.promise(Api.jwt.login(payload), {
-                loading: tg("toast.login-loading"), // The message shown while loading
+                loading: t("toast.login-loading"), // The message shown while loading
                 success: (result) => {
                     if (result.error) {
                         toast.error(result.error.message);
@@ -44,11 +45,11 @@ export function Login(props: LoginProps) {
                     if (result.data) {
                         localStorage.setItem("access_token", result.data.token);
                         props.onLogin();
-                        return tg("toast.login-success");
+                        return t("toast.login-success");
                     }
                 },
                 error: () => {
-                    return tg("toast.login-failed");
+                    return t("toast.login-failed");
                 },
             });
         },
@@ -60,8 +61,8 @@ export function Login(props: LoginProps) {
                 <div className="flex flex-col gap-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="test-2xl">{tg("login.title")}</CardTitle>
-                            <CardDescription>{tg("login.description")}</CardDescription>
+                            <CardTitle className="test-2xl">{t("login.title")}</CardTitle>
+                            <CardDescription>{t("login.description")}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form
@@ -75,14 +76,14 @@ export function Login(props: LoginProps) {
                                     name="email"
                                     validators={{
                                         onChange: ({ value }) =>
-                                            value.includes("@") ? undefined : tg("error.invalid-email"),
+                                            value.includes("@") ? undefined : t("error.invalid-email"),
                                     }}
                                     children={(field) => (
                                         <div>
                                             <FormLabel htmlFor="email">{tg("label.email")}</FormLabel>
                                             <Input
                                                 id="email"
-                                                placeholder={tg("placeholder.email")}
+                                                placeholder={t("placeholder.email")}
                                                 value={field.state.value}
                                                 onChange={(e) => field.handleChange(e.target.value)}
                                             />
@@ -103,7 +104,7 @@ export function Login(props: LoginProps) {
                                             <FormLabel htmlFor="password">{tg("label.password")}</FormLabel>
                                             <Input
                                                 id="password"
-                                                placeholder={tg("placeholder.password")}
+                                                placeholder={t("placeholder.password")}
                                                 value={field.state.value}
                                                 onChange={(e) => field.handleChange(e.target.value)}
                                             />
@@ -113,7 +114,7 @@ export function Login(props: LoginProps) {
                                         </div>
                                     )}
                                 />
-                                <Button type="submit">{tg("button.login")}</Button>
+                                <Button type="submit">{t("button.login")}</Button>
                             </form>
                         </CardContent>
                     </Card>

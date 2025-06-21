@@ -1,10 +1,4 @@
 {
-    "breadcrumb": {
-        "create": "Creating",
-        "recipes": "Recipes",
-        "tags": "Tags",
-        "update": "Updating"
-    },
     "button": {
         "close": "Close",
         "login": "Log in"
@@ -29,20 +23,8 @@
         "steps": "Step",
         "tags": "Tags"
     },
-    "login": {
-        "description": "Log in",
-        "title": "Recipe App"
-    },
-    "placeholder": {
-        "email": "test@test.com",
-        "password": "****"
-    },
-    "search": {
-        "recipes": "Search recipe",
-        "recipes-empty": "No recipe found"
-    },
-    "search-recipe": "Search Recipe",
     "sidebar": {
+        "ingredients": "Ingredients",
         "recipes": "Recipes",
         "settings": "Settings",
         "tags": "Tags"
@@ -61,5 +43,9 @@
         "general-error": "Something failed...",
         "loading": "Loading...",
         "updated-success": "Succesfully updated"
+    },
+    "tooltip": {
+        "close": "Close Menu",
+        "edit": "Edit"
     }
 }

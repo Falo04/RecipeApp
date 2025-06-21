@@ -5,6 +5,8 @@ import { Text } from "../ui/text.tsx";
 import { Button } from "../ui/button";
 import { Edit, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator.tsx";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
+import { useTranslation } from "react-i18next";
 
 /**
  * The properties for {@link SubmenuLayout}
@@ -36,6 +38,7 @@ export type SubmenuLayoutProps = {
  * A layout that defines the submenu with a button to get back to the parent menu
  */
 export default function SubmenuLayout(props: SubmenuLayoutProps) {
+    const [tg] = useTranslation();
     return (
         <div className={clsx("flex h-full w-full flex-col gap-4", props.className)}>
             <div
@@ -51,13 +54,23 @@ export default function SubmenuLayout(props: SubmenuLayoutProps) {
                         <Heading>{props.heading} </Heading>
                         <div className="flex">
                             {props.editButton && (
-                                <Button size={"icon"} onClick={() => props.editButton?.()} variant={"ghost"}>
-                                    <Edit />
-                                </Button>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button size={"icon"} onClick={() => props.editButton?.()} variant={"ghost"}>
+                                            <Edit />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>{tg("tooltip.edit")}</TooltipContent>
+                                </Tooltip>
                             )}
-                            <Button size={"icon"} onClick={() => props.navigate()} variant={"ghost"}>
-                                <X className={"size-6"} />
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button size={"icon"} onClick={() => props.navigate()} variant={"ghost"}>
+                                        <X className={"size-6"} />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{tg("tooltip.close")}</TooltipContent>
+                            </Tooltip>
                         </div>
                     </div>
                     {props.headingDescription && <Text>{props.headingDescription}</Text>}

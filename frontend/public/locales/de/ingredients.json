@@ -1,0 +1,18 @@
+{
+    "button": {
+        "search": "Zutaten f\u00fcr die Suche ausw\u00e4hlen",
+        "select": "Search Ingredients"
+    },
+    "command": {
+        "empty": "Nichts ausgew\u00e4hlt"
+    },
+    "heading": {
+        "all-ingredients": "Alle Zutaten",
+        "overview-title": "Suche Rezepte nach Zutaten",
+        "search-selected": "Ausgew\u00e4hlte Zutaten",
+        "select-ingredients": "Bitte w\u00e4hle Zutaten aus um nach Rezepte zu suchen"
+    },
+    "input": {
+        "filter": "Rezepte filtern"
+    }
+}

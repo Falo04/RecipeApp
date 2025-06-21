@@ -26,7 +26,7 @@ export type RecipeSearchProps = {};
  * Provides a recipe search component with suggestions.
  */
 export function RecipeSearch(_props: RecipeSearchProps) {
-    const [tg] = useTranslation();
+    const [t] = useTranslation("recipe");
     const navigate = useNavigate();
     const isMobile = useIsMobile();
 
@@ -65,7 +65,7 @@ export function RecipeSearch(_props: RecipeSearchProps) {
                     className={"lg:w-full"}
                 >
                     <Search />
-                    {!isMobile && tg("search.recipes")}
+                    {!isMobile && t("search.recipes")}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className={"p-2"}>
@@ -73,11 +73,11 @@ export function RecipeSearch(_props: RecipeSearchProps) {
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder={tg("search.recipes")}
+                        placeholder={t("search.recipes")}
                         className={"h-9"}
                     />
                     <CommandList>
-                        <CommandEmpty>{tg("search.recipes-empty")}</CommandEmpty>
+                        <CommandEmpty>{t("search.recipes-empty")}</CommandEmpty>
                         <CommandGroup>
                             {suggestions.map((recipe) => (
                                 <CommandItem

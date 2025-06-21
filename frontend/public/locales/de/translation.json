@@ -43,6 +43,7 @@
     },
     "search-recipe": "Rezept suchen",
     "sidebar": {
+        "ingredients": "Zutaten",
         "recipes": "Rezepte",
         "settings": "Einstellungen",
         "tags": "Tag"

@@ -17,5 +17,8 @@
     },
     "input": {
         "filter": "Filter Tags"
+    },
+    "tooltip": {
+        "delete": "Delete Tag"
     }
 }

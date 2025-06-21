@@ -25,6 +25,8 @@ import INGREDIENTS_CONTEXT from "@/context/ingredients.tsx";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
 import type { SimpleIngredient } from "@/api/model/ingredients.interface.ts";
+import { Subheading } from "@/components/ui/heading.tsx";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 
 /**
  * The properties for {@link IngredientsSearchOverview}
@@ -50,6 +52,13 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
         },
         validators: {
             onSubmitAsync: async ({ value }) => {
+                if (value.search.length === 0) {
+                    return {
+                        fields: {
+                            search: t("error.search-empty"),
+                        },
+                    };
+                }
                 let res = await Api.ingredients.getRecipes({
                     uuids: { list: value.search.flatMap((i) => (i.name !== "" ? i.uuid : [])) },
                 });
@@ -113,14 +122,19 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                className={"flex gap-2"}
+                className={"flex w-full gap-2"}
             >
                 <form.Field name={"search"}>
                     {(fieldApi) => (
-                        <div>
+                        <div className={"relative flex-col gap-2"}>
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
-                                    <Button variant={"default"} role="combobox" aria-expanded={open} className="w-fit">
+                                    <Button
+                                        variant={"default"}
+                                        role="combobox"
+                                        aria-expanded={open}
+                                        className={"w-fit"}
+                                    >
                                         <PlusIcon /> {t("button.search")}
                                     </Button>
                                 </PopoverTrigger>
@@ -129,7 +143,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                         <CommandInput placeholder={t("button.select")} className="h-9" />
                                         <CommandList>
                                             <CommandEmpty>{t("label.ingredients-empty")}</CommandEmpty>
-                                            <CommandGroup>
+                                            <CommandGroup heading={t("heading.search-selected")}>
                                                 {fieldApi.state.value.length !== 0 ? (
                                                     fieldApi.state.value.map((item, index) => (
                                                         <CommandItem
@@ -149,7 +163,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                                 )}
                                             </CommandGroup>
                                             <CommandSeparator />
-                                            <CommandGroup>
+                                            <CommandGroup heading={t("heading.all-ingredients")}>
                                                 {filteredIngredients.map((item) => (
                                                     <CommandItem
                                                         key={item.uuid}
@@ -169,14 +183,32 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                     </Command>
                                 </PopoverContent>
                             </Popover>
+                            {fieldApi.state.meta.errors.map((err) => (
+                                <p className="absolute text-sm text-nowrap text-red-500">{err}</p>
+                            ))}
                         </div>
                     )}
                 </form.Field>
-                <Button type={"submit"} variant={"outline"} size={"icon"}>
-                    <SearchIcon />
-                </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button className={"self-start"} type={"submit"} variant={"outline"} size={"icon"}>
+                            <SearchIcon />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{tg("tooltip.filter")}</p>
+                    </TooltipContent>
+                </Tooltip>
             </form>
-            <DataTable filterTag={t("input.filter")} columns={columns} data={recipes} />
+            {recipes.length === 0 ? (
+                <div className={"flex h-full w-full items-center justify-center"}>
+                    <Subheading className={"text-center"} level={4}>
+                        {t("heading.select-ingredients")}
+                    </Subheading>
+                </div>
+            ) : (
+                <DataTable filterTag={t("input.filter")} columns={columns} data={recipes} />
+            )}
         </HeadingLayout>
     );
 }

@@ -27,5 +27,9 @@
     },
     "input": {
         "filter": "Filter Recipes"
+    },
+    "search": {
+        "recipes": "Search recipe",
+        "recipes-empty": "No recipe found"
     }
 }

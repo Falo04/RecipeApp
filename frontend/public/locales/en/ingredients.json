@@ -6,10 +6,19 @@
     "command": {
         "empty": "Nothing selected"
     },
+    "error": {
+        "search-empty": "Please select ingredients to search for a recipe"
+    },
     "heading": {
-        "overview-title": "Search Recipes by Ingredients"
+        "all-ingredients": "All ingredients",
+        "overview-title": "Search Recipes by Ingredients",
+        "search-selected": "Selected Ingredients",
+        "select-ingredients": "Please select ingredients to search for recipes"
     },
     "input": {
+        "filter": "Filter Recipes"
+    },
+    "tooltip": {
         "filter": "Filter Recipes"
     }
 }

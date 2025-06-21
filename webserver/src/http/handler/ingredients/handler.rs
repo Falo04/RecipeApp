@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 use axum::extract::Query;
 use futures_util::TryStreamExt;
@@ -43,7 +44,7 @@ pub async fn get_recipes_by_ingredients(
             .collect(),
     );
 
-    let recipes_all: Vec<_> = rorm::query(
+    let mut recipes_all: Vec<_> = rorm::query(
         Database::global(),
         (
             RecipeIngredientModel.ingredients,
@@ -56,13 +57,19 @@ pub async fn get_recipes_by_ingredients(
     .try_collect()
     .await?;
 
+    let mut seen = HashSet::new();
+    recipes_all.retain(|recipe| {
+        let is_first = !seen.contains(&recipe.uuid);
+        seen.insert(recipe.uuid.clone());
+        is_first
+    });
+
     let ingredients_mapping: Vec<_> = rorm::query(Database::global(), RecipeIngredientModel)
         .condition(&condition)
         .all()
         .await?;
 
     let mut recipes = Vec::new();
-
     for recipe in recipes_all {
         let ingredients_uuids: Vec<_> = ingredients_mapping
             .iter()
