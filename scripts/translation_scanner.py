@@ -171,22 +171,22 @@ class TranslationHandler:
                         content = json.load(f)
 
                     for key in content:
-                        for value in content[key]:
-                            print(value)
-                            print(value)
-                            if type(value) is str:
-                                file_set.add((key, value))
-                            else:
-                                print(f"can't evaluate for this: {key}")
+                        if type(content[key]) is str:
+                            file_set.add((key, None))
+                        elif type(content[key]) is dict:
+                            for inner_key in content[key]:
+                                file_set.add((key, inner_key))
 
                     difference = file_set.difference(self.translations[file.stem])
                     for key, value in difference:
-                        print(key, value)
-                        del content[key][value]
+                        if value is None:
+                            del content[key]
+                        else:
+                            del content[key][value]
 
                     remove_key = set()
                     for key in content:
-                        if len(content[key]) == 0:
+                        if type(content[key]) is dict and len(content[key]) == 0:
                             remove_key.add(key)
 
                     for key in remove_key:
