@@ -7,7 +7,6 @@
         "update": "Update Recipe"
     },
     "error": {
-        "amount-not-zero": "Ingredients amount should not be zero",
         "ingre-amount": "Ingredients can not be empty or zero",
         "ingre-name": "Please provide a name",
         "ingre-unit": "Please provide a unit",
@@ -16,11 +15,9 @@
     },
     "heading": {
         "create-heading": "Create Recipe",
-        "detail-heading": "Recipe Details",
         "ingredients": "List of all Ingredients",
         "overview-description": "All recipes are listed here",
         "overview-title": "Recipe Overview",
-        "step": "Step: ",
         "steps": "Instruction:",
         "tags": "Tags:",
         "update-heading": "Update Recipe"

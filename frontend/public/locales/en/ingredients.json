@@ -18,7 +18,7 @@
     "input": {
         "filter": "Filter Recipes"
     },
-    "tooltip": {
-        "filter": "Filter Recipes"
+    "label": {
+        "ingredients-empty": "label.ingredients-empty"
     }
 }

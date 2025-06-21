@@ -6,6 +6,9 @@
     "command": {
         "empty": "Nichts ausgew\u00e4hlt"
     },
+    "error": {
+        "search-empty": "error.search-empty"
+    },
     "heading": {
         "all-ingredients": "Alle Zutaten",
         "overview-title": "Suche Rezepte nach Zutaten",
@@ -14,5 +17,8 @@
     },
     "input": {
         "filter": "Rezepte filtern"
+    },
+    "label": {
+        "ingredients-empty": "label.ingredients-empty"
     }
 }

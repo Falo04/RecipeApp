@@ -17,5 +17,9 @@
     },
     "input": {
         "filter": "Tag suchen"
+    },
+    "toast": {
+        "general-error": "toast.general-error",
+        "loading": "toast.loading"
     }
 }

@@ -1,7 +1,6 @@
 {
     "button": {
-        "close": "Close",
-        "login": "Log in"
+        "close": "Close"
     },
     "label": {
         "appearance": "Select Appearance",
@@ -11,23 +10,16 @@
         "description": "Description",
         "email": "Email",
         "en": "\ud83c\uddfa\ud83c\uddf8 English",
-        "ingredients-amount": "Amount",
-        "ingredients-name": "Name",
         "ingredients-title": "Ingredients:",
-        "ingredients-unit": "Unit",
         "language": "Select Language",
         "light": "Light Mode",
         "name": "Name",
         "password": "Password",
         "step-title": "Steps:",
-        "steps": "Step",
-        "tags": "Tags"
+        "steps": "Step"
     },
     "sidebar": {
-        "ingredients": "Ingredients",
-        "recipes": "Recipes",
-        "settings": "Settings",
-        "tags": "Tags"
+        "settings": "Settings"
     },
     "table": {
         "action": "Action",
@@ -46,6 +38,8 @@
     },
     "tooltip": {
         "close": "Close Menu",
-        "edit": "Edit"
+        "delete": "tooltip.delete",
+        "edit": "Edit",
+        "filter": "tooltip.filter"
     }
 }

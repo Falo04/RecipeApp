@@ -1,8 +1,12 @@
+import time
 import sys
 import os
 import re
 import json
 from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from colorama import Fore, Back, Style, init
 
 """
 This module provides a basic translation scanner to scan source files
@@ -119,7 +123,7 @@ class TranslationHandler:
         :param file_name: The name of the file to create
         :return:
         """
-        print("create translation file: ", file_name)
+        print(Fore.BLUE + "create namespace: ", file_name)
         for lang_dir in LOCAL_DIR.iterdir():
             file_path = Path(f"{lang_dir}/{file_name}.json")
             if not file_path.exists():
@@ -137,23 +141,32 @@ class TranslationHandler:
             file_path = lang_dir / f"{namespace}.json"
             if file_path.exists():
                 for pattern in patterns:
-                    if len(pattern) != 2:
-                        continue
-                    key = pattern[0]
-                    value = pattern[1]
                     with open(file_path, "r") as f:
-                        try:
-                            content = json.load(f)
-                        except json.JSONDecodeError:
-                            content = {}
+                        content = json.load(f)
 
-                    # Ensure the outer key exists
-                    if key not in content or not isinstance(content[key], dict):
-                        content[key] = {}
+                    if len(pattern) == 2:
+                        key = pattern[0]
+                        inner_key = pattern[1]
 
-                    # Add the new token
-                    if value not in content[key]:
-                        content[key][value] = f"{key}.{value}"
+                        # Ensure the outer key exists
+                        if key not in content or not isinstance(content[key], dict):
+                            content[key] = {}
+
+                        # Add the new token
+                        if inner_key not in content[key]:
+                            print(
+                                Fore.LIGHTGREEN_EX
+                                + f"{lang_dir.name}/{file_path.name} | add: {key}.{inner_key}"
+                            )
+                            content[key][inner_key] = f"{key}.{inner_key}"
+                    else:
+                        key = pattern[0]
+                        if key not in content or not isinstance(content[key], dict):
+                            print(
+                                Fore.LIGHTGREEN_EX
+                                + f"{lang_dir.name}/{file_path.name} | add: {key}"
+                            )
+                            content[key] = f"{key}"
 
                     with open(file_path, "w") as f:
                         json.dump(content, f, indent=4, sort_keys=True)
@@ -178,12 +191,22 @@ class TranslationHandler:
                                 file_set.add((key, inner_key))
 
                     difference = file_set.difference(self.translations[file.stem])
-                    for key, value in difference:
-                        if value is None:
+                    # remove unused translation
+                    for key, inner_key in difference:
+                        if inner_key is None:
+                            print(
+                                Fore.RED
+                                + f"{lang_dir.name}/{file.name} | remove: {key}"
+                            )
                             del content[key]
                         else:
-                            del content[key][value]
+                            print(
+                                Fore.RED
+                                + f"{lang_dir.name}/{file.name} | remove: {key}.{inner_key}"
+                            )
+                            del content[key][inner_key]
 
+                    # remove empty key dict
                     remove_key = set()
                     for key in content:
                         if type(content[key]) is dict and len(content[key]) == 0:
@@ -194,6 +217,47 @@ class TranslationHandler:
 
                     with open(file, "w") as f:
                         json.dump(content, f, indent=4, sort_keys=True)
+
+
+class SourceFileEventHandler(FileSystemEventHandler):
+    """Event handler for file system changes"""
+
+    def __init__(self, translation_handler):
+        self.translation_handler = translation_handler
+
+    def on_modified(self, event):
+        """Called when a file is modified"""
+        if not event.is_directory and self._is_source_file(event.src_path):
+            self.translation_handler.process_file(event.src_path)
+
+    def on_created(self, event):
+        """Called when a file is created"""
+        if not event.is_directory and self._is_source_file(event.src_path):
+            self.translation_handler.process_file(event.src_path)
+
+    def _is_source_file(self, path):
+        """Check if the file is a source file we should process"""
+        return any(path.endswith(ext) for ext in SCAN_EXTENSIONS)
+
+
+def watch_for_changes(translation_handler):
+    """Watch for file changes and update translation files"""
+
+    event_handler = SourceFileEventHandler(translation_handler)
+    observer = Observer()
+    observer.schedule(event_handler, str(SRC_DIR), recursive=True)
+    observer.start()
+
+    print(f"Watching for changes in {SRC_DIR}...")
+    print("Press Ctrl+C to stop")
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
 
 
 def scan_existing_files():
@@ -235,6 +299,23 @@ def sort_translation_files():
 
 
 def main():
+    help = "--help" or "-h" in sys.argv
+
+    if help:
+        print("""
+This module provides a basic translation scanner to scan source files
+and create translation files based on specified languages.
+
+It supports only two namespaces in one file, e.g:
+const [t] = useTranslation("namespace") -> local namespace
+const [tg] = useTranslation("namespace") -> global namespace
+        """)
+        print(Fore.CYAN + "Commands:")
+        print(Fore.LIGHTCYAN_EX + f"--watch: watch the {SRC_DIR} for file changes")
+        print(Fore.LIGHTCYAN_EX + "--remove-unused: removes all unused translation")
+        print()
+        return
+
     print("Starting translation scanner...")
     print(f"Scanning source directory: {SRC_DIR}")
     print(f"Creating translation files in: {LOCAL_DIR}")
@@ -248,12 +329,17 @@ def main():
 
     # remove unused translation
     remove_unused = "--remove-unused" in sys.argv
+    watch_mode = "--watch" in sys.argv
 
     if remove_unused:
         handler.remove_not_used_translations()
+
+    if watch_mode:
+        watch_for_changes(handler)
 
     print("Translation scanning completed.")
 
 
 if __name__ == "__main__":
+    init(autoreset=True)
     main()

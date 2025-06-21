@@ -7,7 +7,6 @@
         "update": "Rezept aktualisieren"
     },
     "error": {
-        "amount-not-zero": "Zutatenmenge darf nicht null sein",
         "ingre-amount": "Zutaten d\u00fcrfen nicht leer oder null sein",
         "ingre-name": "Bitte gib einen Namen an",
         "ingre-unit": "Bitte gib eine Einheit an",
@@ -16,16 +15,18 @@
     },
     "heading": {
         "create-heading": "Rezept erstellen",
-        "detail-heading": "Rezeptdetails",
         "ingredients": "Liste aller Zutaten",
         "overview-description": "Alle Rezepte sind hier aufgelistet",
         "overview-title": "Rezept \u00dcbersicht",
-        "step": "Schritt: ",
         "steps": "Anleitung:",
         "tags": "Tag:",
         "update-heading": "Rezept aktualisieren"
     },
     "input": {
         "filter": "Rezept suchen"
+    },
+    "search": {
+        "recipes": "search.recipes",
+        "recipes-empty": "search.recipes-empty"
     }
 }

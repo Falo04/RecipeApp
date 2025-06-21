@@ -1,13 +1,6 @@
 {
-    "breadcrumb": {
-        "create": "Erstellen",
-        "recipes": "Rezepte",
-        "tags": "Tags",
-        "update": "Aktualisieren"
-    },
     "button": {
-        "close": "Schlie\u00dfe",
-        "login": "Einloggen"
+        "close": "Schlie\u00dfe"
     },
     "label": {
         "appearance": "Aussehen w\u00e4hlen",
@@ -17,36 +10,16 @@
         "description": "Beschreibung",
         "email": "E-Mail",
         "en": "\ud83c\uddfa\ud83c\uddf8 Englisch",
-        "ingredients-amount": "Menge",
-        "ingredients-name": "Name",
         "ingredients-title": "Zutaten:",
-        "ingredients-unit": "Einheit",
         "language": "Sprache w\u00e4hlen",
         "light": "Heller Modus",
         "name": "Name",
         "password": "Passwort",
         "step-title": "Schritte:",
-        "steps": "Schritt",
-        "tags": "Tag"
+        "steps": "Schritt"
     },
-    "login": {
-        "description": "Einloggen",
-        "title": "Rezept-App"
-    },
-    "placeholder": {
-        "email": "test@test.com",
-        "password": "****"
-    },
-    "search": {
-        "recipes": "Rezept suchen",
-        "recipes-empty": "Kein Rezept gefunden"
-    },
-    "search-recipe": "Rezept suchen",
     "sidebar": {
-        "ingredients": "Zutaten",
-        "recipes": "Rezepte",
-        "settings": "Einstellungen",
-        "tags": "Tag"
+        "settings": "Einstellungen"
     },
     "table": {
         "action": "Aktion",
@@ -62,5 +35,11 @@
         "general-error": "Etwas ist schiefgelaufen...",
         "loading": "Lade...",
         "updated-success": "Erfolgreich aktualisiert"
+    },
+    "tooltip": {
+        "close": "tooltip.close",
+        "delete": "tooltip.delete",
+        "edit": "tooltip.edit",
+        "filter": "tooltip.filter"
     }
 }

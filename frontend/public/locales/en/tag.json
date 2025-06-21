@@ -18,7 +18,8 @@
     "input": {
         "filter": "Filter Tags"
     },
-    "tooltip": {
-        "delete": "Delete Tag"
+    "toast": {
+        "general-error": "toast.general-error",
+        "loading": "toast.loading"
     }
 }

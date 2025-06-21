@@ -1,0 +1,22 @@
+{
+    "button": {
+        "login": "button.login"
+    },
+    "error": {
+        "invalid-email": "error.invalid-email",
+        "password-too-short": "error.password-too-short"
+    },
+    "login": {
+        "description": "login.description",
+        "title": "login.title"
+    },
+    "placeholder": {
+        "email": "placeholder.email",
+        "password": "placeholder.password"
+    },
+    "toast": {
+        "login-failed": "toast.login-failed",
+        "login-loading": "toast.login-loading",
+        "login-success": "toast.login-success"
+    }
+}
