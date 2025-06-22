@@ -27,8 +27,12 @@ GLOBAL_NAMESPACE = "translation"
 ### Regex ###
 LOCAL_NAMESPACE_PATTERN = re.compile(r'useTranslation\("([^"]+)"\)')
 GLOBAL_NAMESPACE_PATTERN = re.compile(r"useTranslation\(\)")
-LOCAL_KEY_PATTERN = re.compile(r't\("([^.]+)[.]([^"]+)"(?:\s*,\s*\{[^}]*\})?')
-GLOBAL_KEY_PATTERN = re.compile(r'tg\("([^.]+)[.]([^"]+)"(?:\s*,\s*\{[^}]*\})?')
+LOCAL_KEY_PATTERN = re.compile(
+    r't\(\s*"([^."]+)\.([^\s",)]+)"(?:\s*,\s*\{[^}]*\})?\s*\)'
+)
+GLOBAL_KEY_PATTERN = re.compile(
+    r'tg\(\s*"([^."]+)\.([^\s",)]+)"(?:\s*,\s*\{[^}]*\})?\s*\)'
+)
 
 
 class TranslationHandler:
@@ -78,7 +82,7 @@ class TranslationHandler:
         :param file_path: The name of the file to process
         :return:
         """
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # check for global namespace
@@ -126,7 +130,7 @@ class TranslationHandler:
         for lang_dir in LOCAL_DIR.iterdir():
             file_path = Path(f"{lang_dir}/{file_name}.json")
             if not file_path.exists():
-                with open(file_path, "w") as f:
+                with open(file_path, "w", encoding="utf-8") as f:
                     json.dump({}, f, indent=4, sort_keys=True)
 
     def update_translation_file(self, namespace, patterns):
@@ -140,7 +144,7 @@ class TranslationHandler:
             file_path = lang_dir / f"{namespace}.json"
             if file_path.exists():
                 for pattern in patterns:
-                    with open(file_path, "r") as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = json.load(f)
 
                     if len(pattern) == 2:
@@ -171,7 +175,7 @@ class TranslationHandler:
                             )
                             content[key] = f"{key}"
 
-                    with open(file_path, "w") as f:
+                    with open(file_path, "w", encoding="utf-8") as f:
                         json.dump(content, f, indent=4, sort_keys=True)
 
     def remove_not_used_translations(self):
@@ -183,7 +187,7 @@ class TranslationHandler:
             if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
                 for file in lang_dir.iterdir():
                     file_set = set()
-                    with open(file, "r") as f:
+                    with open(file, "r", encoding="utf-8") as f:
                         content = json.load(f)
 
                     for key in content:
@@ -220,7 +224,7 @@ class TranslationHandler:
                     for key in remove_key:
                         del content[key]
 
-                    with open(file, "w") as f:
+                    with open(file, "w", encoding="utf-8") as f:
                         json.dump(content, f, indent=4, sort_keys=True)
 
 
@@ -310,10 +314,10 @@ def sort_translation_files():
     for lang_dir in LOCAL_DIR.iterdir():
         if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
             for file_path in lang_dir.iterdir():
-                with open(file_path, "r") as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     translations = json.load(f)
 
-                with open(file_path, "w") as f:
+                with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(translations, f, indent=4, sort_keys=True)
 
 
