@@ -91,12 +91,14 @@ class TranslationHandler:
             and GLOBAL_NAMESPACE not in self.namespaces
         ):
             self.create_translation_file(GLOBAL_NAMESPACE)
+            self.namespaces.add(GLOBAL_NAMESPACE)
 
         # check all local namespaces
         local_namespaces = LOCAL_NAMESPACE_PATTERN.findall(content)
         for namespace in local_namespaces:
             if namespace and namespace not in self.namespaces:
                 self.create_translation_file(namespace)
+                self.namespaces.add(namespace)
 
         for namespace in local_namespaces:
             if namespace:
@@ -126,10 +128,11 @@ class TranslationHandler:
         :param file_name: The name of the file to create
         :return:
         """
-        print(Fore.BLUE + "create namespace: ", file_name)
+        print(Fore.BLUE + f"create namespace: {file_name}")
         for lang_dir in LOCAL_DIR.iterdir():
             file_path = Path(f"{lang_dir}/{file_name}.json")
             if not file_path.exists():
+                print(Fore.LIGHTBLUE_EX + f"path: {lang_dir.stem}/{file_name}")
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump({}, f, indent=4, sort_keys=True)
 
@@ -183,6 +186,8 @@ class TranslationHandler:
         Removes all unused translations.
         :return:
         """
+        if not bool(self.translations):
+            return
         for lang_dir in LOCAL_DIR.iterdir():
             if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
                 for file in lang_dir.iterdir():
