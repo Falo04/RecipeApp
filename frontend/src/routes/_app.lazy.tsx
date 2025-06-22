@@ -7,38 +7,39 @@ import { Suspense } from "react";
 import AppSidebar from "@/components/layouts/app-sidebar.tsx";
 import Header from "@/components/layouts/header.tsx";
 import { IngredientProvider } from "@/context/ingredients.tsx";
+import { useTranslation } from "react-i18next";
 
 /**
  * The properties for {@link FoodMenu}
  */
 export type FoodMenuProps = {};
 
-export const app_meta_data = {
-    title: "Recipe App",
-    mainIcon: Soup,
-    navMain: [
-        {
-            title: "recipes",
-            url: "/app/recipes",
-            Icon: BookText,
-        },
-        {
-            title: "tags",
-            url: "/app/tag",
-            Icon: TagIcon,
-        },
-        {
-            title: "ingredients",
-            url: "/app/ingredients",
-            Icon: CarrotIcon,
-        },
-    ],
-};
-
 /**
  * The root layout for the application
  */
 export default function FoodMenu(_props: FoodMenuProps) {
+    const [tg] = useTranslation();
+    const app_meta_data = {
+        title: tg("sidebar.app-title"),
+        mainIcon: Soup,
+        navMain: [
+            {
+                title: tg("sidebar.recipes"),
+                url: "/app/recipes",
+                Icon: BookText,
+            },
+            {
+                title: tg("sidebar.tags"),
+                url: "/app/tag",
+                Icon: TagIcon,
+            },
+            {
+                title: tg("sidebar.ingredients"),
+                url: "/app/ingredients",
+                Icon: CarrotIcon,
+            },
+        ],
+    };
     return (
         <BaseLayout
             sidebar={

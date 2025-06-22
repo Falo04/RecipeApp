@@ -6,8 +6,12 @@
     "dialog": {
         "create-description": "Description for creating a tag",
         "create-title": "Create a tag",
-        "delete-description": "Delete tag, cannot be restored",
+        "delete-description": "Cannot be restored",
         "delete-title": "Delete Tag: "
+    },
+    "error": {
+        "name-required": "Name is required of tag",
+        "too-long": "Name is too long, it cannot be longer than 255 characters"
     },
     "heading": {
         "detail-description": "Here you see all recipes which are connected to tags",
@@ -18,8 +22,11 @@
     "input": {
         "filter": "Filter Tags"
     },
+    "placeholder": {
+        "empty": "No tags are found"
+    },
     "toast": {
-        "general-error": "toast.general-error",
-        "loading": "toast.loading"
+        "created-success": "Tag is successful created",
+        "deleted-success": "Tag is successful deleted"
     }
 }

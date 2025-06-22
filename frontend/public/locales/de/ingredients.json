@@ -7,7 +7,7 @@
         "empty": "Nichts ausgew\u00e4hlt"
     },
     "error": {
-        "search-empty": "error.search-empty"
+        "search-empty": "W\u00e4hle Zutaten aus, um Rezepte suchen zu k\u00f6nnen"
     },
     "heading": {
         "all-ingredients": "Alle Zutaten",
@@ -19,6 +19,6 @@
         "filter": "Rezepte filtern"
     },
     "label": {
-        "ingredients-empty": "label.ingredients-empty"
+        "ingredients-empty": "Keine Zutaten gefunden"
     }
 }

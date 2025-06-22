@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface.ts";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Text } from "@/components/ui/text.tsx";
+import { ErrorMessage, Text } from "@/components/ui/text.tsx";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
@@ -184,7 +184,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                 </PopoverContent>
                             </Popover>
                             {fieldApi.state.meta.errors.map((err) => (
-                                <p className="absolute text-sm text-nowrap text-red-500">{err}</p>
+                                <ErrorMessage>{err}</ErrorMessage>
                             ))}
                         </div>
                     )}
@@ -196,7 +196,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{tg("tooltip.filter")}</p>
+                        <p>{tg("tooltip.filter", { object: "filter" })}</p>
                     </TooltipContent>
                 </Tooltip>
             </form>

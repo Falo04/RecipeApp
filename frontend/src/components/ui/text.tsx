@@ -10,3 +10,7 @@ export function Text({ className, ...props }: React.ComponentPropsWithoutRef<"p"
         />
     );
 }
+
+export function ErrorMessage({ className, ...props }: React.ComponentPropsWithoutRef<"p">) {
+    return <p data-slot="text" {...props} className={clsx(className, "absolute text-sm text-nowrap text-red-500")} />;
+}

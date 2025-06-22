@@ -6,8 +6,12 @@
     "dialog": {
         "create-description": "Beschreibung zum Erstellen eines Tags",
         "create-title": "Ein Tag erstellen",
-        "delete-description": "Tag l\u00f6schen, kann nicht wiederhergestellt werden",
+        "delete-description": "Kann nicht wiederhergestellt werden",
         "delete-title": "Tag l\u00f6schen: "
+    },
+    "error": {
+        "name-required": "Name vom Tag ben\u00f6tigt.",
+        "too-long": "Name zu lang, kann maximal 255 Zeichen lang sein."
     },
     "heading": {
         "detail-description": "Hier siehst du alle Rezepte, die mit dem Tag verbunden sind",
@@ -18,8 +22,11 @@
     "input": {
         "filter": "Tag suchen"
     },
+    "placeholder": {
+        "empty": "Keine Zutaten gefunden"
+    },
     "toast": {
-        "general-error": "toast.general-error",
-        "loading": "toast.loading"
+        "created-success": "Tag erfolgreich erstellt",
+        "deleted-success": "Tag erfolgreich gel\u00f6scht"
     }
 }

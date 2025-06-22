@@ -23,7 +23,7 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
 
     const deleteTag = async () => {
         toast.promise(Api.tags.delete(props.tag.uuid), {
-            loading: t("toast.loading"),
+            loading: tg("toast.loading"),
             success: (result) => {
                 if (result.error) {
                     toast.error(result.error.message);
@@ -31,9 +31,9 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
                 }
 
                 props.onDeletion();
-                return tg("toast.deleted-success");
+                return t("toast.deleted-success");
             },
-            error: t("toast.general-error"),
+            error: tg("toast.general-error"),
         });
     };
 
@@ -52,11 +52,9 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
                 <DialogFooter>
                     <div className="flex w-full justify-between">
                         <Button variant="secondary" onClick={() => props.onClose()}>
-                            {" "}
-                            {tg("button.close")}{" "}
+                            {tg("button.close")}
                         </Button>
                         <Button variant="destructive" onClick={async () => await deleteTag()}>
-                            {" "}
                             {t("button.delete")}
                         </Button>
                     </div>

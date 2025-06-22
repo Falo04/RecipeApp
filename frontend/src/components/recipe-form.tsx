@@ -21,6 +21,7 @@ import type { VariantProps } from "class-variance-authority";
 import { Text } from "@/components/ui/text.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { AnimatePresence, motion } from "framer-motion";
+import { Subheading } from "@/components/ui/heading.tsx";
 
 /**
  * The properties for {@link RecipeForm}
@@ -83,7 +84,7 @@ export function RecipeForm(props: RecipeFormProps) {
                         }
 
                         props.navigate(props.formData!.uuid);
-                        return tg("toast.updated-success");
+                        return t("toast.updated-success");
                     },
                     error: () => tg("toast.general-error"),
                 });
@@ -106,7 +107,7 @@ export function RecipeForm(props: RecipeFormProps) {
 
                         if (result.data) {
                             props.navigate(result.data.uuid);
-                            return tg("toast.created-success");
+                            return t("toast.created-success");
                         }
                     },
                     error: () => tg("toast.general-error"),
@@ -131,7 +132,11 @@ export function RecipeForm(props: RecipeFormProps) {
                                 name="name"
                                 validators={{
                                     onChange: ({ value }) =>
-                                        !value ? "Name is required" : value.length > 255 ? "Too long" : undefined,
+                                        !value
+                                            ? t("error.name-required")
+                                            : value.length > 255
+                                              ? t("error.too-long")
+                                              : undefined,
                                 }}
                             >
                                 {(field) => (
@@ -141,11 +146,11 @@ export function RecipeForm(props: RecipeFormProps) {
                                             id="name"
                                             value={field.state.value}
                                             onChange={(e) => field.handleChange(e.target.value)}
-                                            placeholder="name"
+                                            placeholder={t("placeholder.name")}
                                         />
-                                        {field.state.meta.errors?.[0] && (
-                                            <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-                                        )}
+                                        {field.state.meta.errors.map((err) => (
+                                            <p className="text-sm text-red-500">{err}</p>
+                                        ))}
                                     </div>
                                 )}
                             </form.Field>
@@ -155,9 +160,9 @@ export function RecipeForm(props: RecipeFormProps) {
                                 validators={{
                                     onChange: ({ value }) =>
                                         !value
-                                            ? "Description is required"
+                                            ? t("error.description-required")
                                             : value.length > 255
-                                              ? "Too long"
+                                              ? t("error.too-long")
                                               : undefined,
                                 }}
                             >
@@ -168,12 +173,12 @@ export function RecipeForm(props: RecipeFormProps) {
                                             id="description"
                                             value={field.state.value}
                                             onChange={(e) => field.handleChange(e.target.value)}
-                                            placeholder="description"
+                                            placeholder={t("placeholder.description")}
                                             className="h-[100px] resize-none"
                                         />
-                                        {field.state.meta.errors?.[0] && (
-                                            <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-                                        )}
+                                        {field.state.meta.errors.map((err) => (
+                                            <p className="text-sm text-red-500">{err}</p>
+                                        ))}
                                     </div>
                                 )}
                             </form.Field>
@@ -193,9 +198,9 @@ export function RecipeForm(props: RecipeFormProps) {
                                             </PopoverTrigger>
                                             <PopoverContent side={"bottom"}>
                                                 <Command>
-                                                    <CommandInput placeholder="Search Tag..." className="h-9" />
+                                                    <CommandInput placeholder={t("placeholder.select-tags")} />
                                                     <CommandList>
-                                                        <CommandEmpty>No tag found.</CommandEmpty>
+                                                        <CommandEmpty>{t("placeholder.tags-empty")}</CommandEmpty>
                                                         <CommandGroup>
                                                             {tagContext.tags.items.map((item) => (
                                                                 <CommandItem
@@ -257,7 +262,7 @@ export function RecipeForm(props: RecipeFormProps) {
                             children={(ingredients) => (
                                 <div className={"flex flex-col gap-6"}>
                                     <div className={"flex justify-between"}>
-                                        <h2>{tg("label.ingredients-title")}</h2>
+                                        <Subheading level={2}>{t("heading.ingredients-title")}</Subheading>
                                         <Button
                                             type="button"
                                             onClick={() => {
@@ -297,7 +302,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                         setIngreNameError(undefined);
                                                     }}
                                                     value={ingreName}
-                                                    placeholder="Name"
+                                                    placeholder={t("placeholder.name")}
                                                 />
                                                 {ingreNameError && (
                                                     <p className="text-sm text-red-500">{ingreNameError}</p>
@@ -311,7 +316,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                         setIngreAmountError(undefined);
                                                     }}
                                                     value={ingreAmount}
-                                                    placeholder="Amount"
+                                                    placeholder={t("placeholder.amount")}
                                                 />
                                                 {ingreAmountError && (
                                                     <p className="text-sm text-red-500">{ingreAmountError}</p>
@@ -383,7 +388,7 @@ export function RecipeForm(props: RecipeFormProps) {
                     <motion.div key={"steps-recipes"} initial={initial} animate={animate} exit={exit}>
                         <div className={"flex flex-col gap-4"}>
                             <div className="flex justify-between">
-                                <h2>{tg("label.step-title")}</h2>
+                                <Subheading level={2}>{t("heading.step-title")}</Subheading>
                                 <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
                                     <PlusIcon />
                                 </Button>
@@ -416,14 +421,12 @@ export function RecipeForm(props: RecipeFormProps) {
                                                                     id={"step" + index}
                                                                     value={f.state.value}
                                                                     onChange={(e) => f.handleChange(e.target.value)}
-                                                                    placeholder="Step"
+                                                                    placeholder={t("placeholder.step")}
                                                                     className="h-[100px] resize-none"
                                                                 />
-                                                                {f.state.meta.errors?.[0] && (
-                                                                    <p className="text-sm text-red-500">
-                                                                        {f.state.meta.errors[0]}
-                                                                    </p>
-                                                                )}
+                                                                {f.state.meta.errors.map((err) => (
+                                                                    <p className="text-sm text-red-500">{err}</p>
+                                                                ))}
                                                             </div>
                                                         )}
                                                     </form.Field>

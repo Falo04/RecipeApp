@@ -76,9 +76,7 @@ export function RecipeDetail(_props: RecipeDetailProps) {
                         {data.steps.map((step) => (
                             <div key={step.uuid} className={"flex items-start gap-2"}>
                                 <Subheading>{step.index + 1}</Subheading>
-                                <div className="px-2">
-                                    <Text>{step.step}</Text>
-                                </div>
+                                <Text className={"px-2"}>{step.step}</Text>
                             </div>
                         ))}
                     </div>

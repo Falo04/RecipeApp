@@ -1,22 +1,21 @@
 {
     "button": {
-        "login": "button.login"
+        "login": "Anmelden"
     },
     "error": {
-        "invalid-email": "error.invalid-email",
-        "password-too-short": "error.password-too-short"
+        "invalid-email": "Invalide Email",
+        "password-too-short": "Das Passwort ist zu kurz"
     },
     "login": {
-        "description": "login.description",
-        "title": "login.title"
+        "description": "Gebe deine Anmelde Daten ein, um dich anmelden zu k\u00f6nnen",
+        "title": "Anmeldung"
     },
     "placeholder": {
-        "email": "placeholder.email",
-        "password": "placeholder.password"
+        "email": "test@test.com",
+        "password": "****"
     },
     "toast": {
-        "login-failed": "toast.login-failed",
-        "login-loading": "toast.login-loading",
-        "login-success": "toast.login-success"
+        "login-failed": "Anmeldeversuch gescheitert",
+        "login-success": "Erfolgreich angemeldet"
     }
 }

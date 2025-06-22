@@ -34,7 +34,6 @@ export function UpdateRecipe(_props: UpdateRecipeProps) {
             <RecipeForm
                 formData={data}
                 navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })}
-                onClose={() => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: recipeId } })}
             />
         </SubmenuLayout>
     );

@@ -45,7 +45,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                     if (result.data) {
                         tagContext.reset();
                         props.onClose();
-                        return tg("toast.created-success");
+                        return t("toast.created-success");
                     }
                 },
                 error: () => {
@@ -73,7 +73,11 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                         name="name"
                         validators={{
                             onChange: ({ value }) =>
-                                !value ? "Name is required" : value.length > 255 ? "Too long" : undefined,
+                                !value
+                                    ? t("error.name-required")
+                                    : value.length > 255
+                                      ? t("error.too-long")
+                                      : undefined,
                         }}
                         children={(field) => (
                             <div>
@@ -84,9 +88,9 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                                     onChange={(e) => field.handleChange(e.target.value)}
                                     placeholder="name"
                                 />
-                                {field.state.meta.errors?.[0] && (
-                                    <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-                                )}
+                                {field.state.meta.errors.map((err) => (
+                                    <p className="text-sm text-red-500">{err}</p>
+                                ))}
                             </div>
                         )}
                     />
@@ -101,7 +105,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                                 >
                                     <div>
                                         <SelectTrigger id={"create-tag"} className="w-full">
-                                            <SelectValue placeholder="Select a color" />
+                                            <SelectValue placeholder={t("placeholder.empty")} />
                                         </SelectTrigger>
                                     </div>
                                     <SelectContent>

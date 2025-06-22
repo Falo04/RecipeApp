@@ -10,16 +10,21 @@
         "description": "Beschreibung",
         "email": "E-Mail",
         "en": "\ud83c\uddfa\ud83c\uddf8 Englisch",
-        "ingredients-title": "Zutaten:",
         "language": "Sprache w\u00e4hlen",
         "light": "Heller Modus",
         "name": "Name",
         "password": "Passwort",
-        "step-title": "Schritte:",
         "steps": "Schritt"
     },
+    "placeholder": {
+        "empty": "Ist leer"
+    },
     "sidebar": {
-        "settings": "Einstellungen"
+        "app-title": "Rezepten App",
+        "ingredients": "Zutaten",
+        "recipes": "Rezepte",
+        "settings": "Einstellungen",
+        "tags": "Tags"
     },
     "table": {
         "action": "Aktion",
@@ -30,16 +35,14 @@
         "tags": "Tags"
     },
     "toast": {
-        "created-success": "Erfolgreich erstellt",
-        "deleted-success": "Erfolgreich gel\u00f6scht",
-        "general-error": "Etwas ist schiefgelaufen...",
-        "loading": "Lade...",
-        "updated-success": "Erfolgreich aktualisiert"
+        "general-error": "Etwas ist schiefgelaufen",
+        "loading": "Ladet",
+        "login-loading": ""
     },
     "tooltip": {
-        "close": "tooltip.close",
-        "delete": "tooltip.delete",
-        "edit": "tooltip.edit",
-        "filter": "tooltip.filter"
+        "close": "Schlie\u00dfe Men\u00fc",
+        "delete": "L\u00f6sche",
+        "edit": "Aktualisiere",
+        "filter": "Filter {{object}}"
     }
 }

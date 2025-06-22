@@ -7,17 +7,22 @@
         "update": "Rezept aktualisieren"
     },
     "error": {
+        "description-required": "Beschreibung fehlt",
         "ingre-amount": "Zutaten d\u00fcrfen nicht leer oder null sein",
         "ingre-name": "Bitte gib einen Namen an",
         "ingre-unit": "Bitte gib eine Einheit an",
+        "name-required": "Name vom Rezept fehlt",
         "step-length-255": "Schritt darf nicht l\u00e4nger als 255 Zeichen sein",
-        "step-length-zero": "Schritt darf nicht leer sein"
+        "step-length-zero": "Schritt darf nicht leer sein",
+        "too-long": "Eingabe ist zu lang, darf maximal 255 Zeichen lang sein"
     },
     "heading": {
         "create-heading": "Rezept erstellen",
         "ingredients": "Liste aller Zutaten",
+        "ingredients-title": "Gebe Zutaten ein",
         "overview-description": "Alle Rezepte sind hier aufgelistet",
         "overview-title": "Rezept \u00dcbersicht",
+        "step-title": "Gebe deine Anleitungen ein",
         "steps": "Anleitung:",
         "tags": "Tag:",
         "update-heading": "Rezept aktualisieren"
@@ -25,8 +30,20 @@
     "input": {
         "filter": "Rezept suchen"
     },
+    "placeholder": {
+        "amount": "Menge",
+        "description": "Beschreibung om Rezept",
+        "name": "Name vom Rezept",
+        "select-tags": "Wähle Tags aus",
+        "step": "Einzelner Schritt",
+        "tags-empty": "Keine Tags gefunden"
+    },
     "search": {
-        "recipes": "search.recipes",
-        "recipes-empty": "search.recipes-empty"
+        "recipes": "Suche Rezepte",
+        "recipes-empty": "Keine Rezepte gefunden"
+    },
+    "toast": {
+        "created-success": "Rezept erfolgreich erstellt",
+        "updated-success": "Rezept erfolgreich aktualisiert"
     }
 }

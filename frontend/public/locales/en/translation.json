@@ -10,16 +10,21 @@
         "description": "Description",
         "email": "Email",
         "en": "\ud83c\uddfa\ud83c\uddf8 English",
-        "ingredients-title": "Ingredients:",
         "language": "Select Language",
         "light": "Light Mode",
         "name": "Name",
         "password": "Password",
-        "step-title": "Steps:",
         "steps": "Step"
     },
+    "placeholder": {
+        "empty": "placeholder.empty"
+    },
     "sidebar": {
-        "settings": "Settings"
+        "app-title": "Recipe App",
+        "ingredients": "Ingredients",
+        "recipes": "Recipes",
+        "settings": "Settings",
+        "tags": "Tags"
     },
     "table": {
         "action": "Action",
@@ -30,16 +35,14 @@
         "tags": "Tags"
     },
     "toast": {
-        "created-success": "Succesfully created",
-        "deleted-success": "Succesfully deleted",
         "general-error": "Something failed...",
         "loading": "Loading...",
-        "updated-success": "Succesfully updated"
+        "login-loading": "toast.login-loading"
     },
     "tooltip": {
         "close": "Close Menu",
-        "delete": "tooltip.delete",
+        "delete": "Delete",
         "edit": "Edit",
-        "filter": "tooltip.filter"
+        "filter": "Filter {{object}}"
     }
 }

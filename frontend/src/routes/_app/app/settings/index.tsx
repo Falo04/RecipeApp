@@ -23,8 +23,7 @@ export function Settings(_props: SettingsProps) {
             appearance: localStorage.getItem("theme") ?? "dark",
         },
         onSubmit: ({ value }) => {
-            i18n.changeLanguage(value.language.toLowerCase());
-            console.log(value.appearance);
+            i18n.changeLanguage(value.language.toLowerCase()).then();
             if (value.appearance === "light") {
                 localStorage.setItem("theme", "light");
             } else {

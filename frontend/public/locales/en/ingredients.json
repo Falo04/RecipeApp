@@ -19,6 +19,6 @@
         "filter": "Filter Recipes"
     },
     "label": {
-        "ingredients-empty": "label.ingredients-empty"
+        "ingredients-empty": "Ingredients are empty"
     }
 }

@@ -35,7 +35,7 @@ export function Login(props: LoginProps) {
 
             // Show loading toast while request is being processed
             toast.promise(Api.jwt.login(payload), {
-                loading: t("toast.login-loading"), // The message shown while loading
+                loading: tg("toast.loading"), // The message shown while loading
                 success: (result) => {
                     if (result.error) {
                         toast.error(result.error.message);
@@ -87,9 +87,9 @@ export function Login(props: LoginProps) {
                                                 value={field.state.value}
                                                 onChange={(e) => field.handleChange(e.target.value)}
                                             />
-                                            {field.state.meta.errors?.[0] && (
-                                                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-                                            )}
+                                            {field.state.meta.errors.map((err) => (
+                                                <p className="text-sm text-red-500">{err}</p>
+                                            ))}
                                         </div>
                                     )}
                                 />
@@ -108,9 +108,9 @@ export function Login(props: LoginProps) {
                                                 value={field.state.value}
                                                 onChange={(e) => field.handleChange(e.target.value)}
                                             />
-                                            {field.state.meta.errors?.[0] && (
-                                                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-                                            )}
+                                            {field.state.meta.errors.map((err) => (
+                                                <p className="text-sm text-red-500">{err}</p>
+                                            ))}
                                         </div>
                                     )}
                                 />

@@ -1,22 +1,21 @@
 {
     "button": {
-        "login": "button.login"
+        "login": "Login"
     },
     "error": {
-        "invalid-email": "error.invalid-email",
-        "password-too-short": "error.password-too-short"
+        "invalid-email": "Invalid email",
+        "password-too-short": "Password is to short"
     },
     "login": {
-        "description": "login.description",
-        "title": "login.title"
+        "description": "Enter your login details to be able to log in",
+        "title": "Login"
     },
     "placeholder": {
-        "email": "placeholder.email",
-        "password": "placeholder.password"
+        "email": "test@test.com",
+        "password": "****"
     },
     "toast": {
-        "login-failed": "toast.login-failed",
-        "login-loading": "toast.login-loading",
-        "login-success": "toast.login-success"
+        "login-failed": "Login failed",
+        "login-success": "Login successful"
     }
 }
