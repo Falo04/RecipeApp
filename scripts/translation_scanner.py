@@ -15,6 +15,10 @@ and create translation files based on specified languages.
 It supports only two namespaces in one file, e.g:
 const [t] = useTranslation("namespace") -> local namespace
 const [tg] = useTranslation("namespace") -> global namespace
+
+Commands:
+    --watch: watch the {SRC_DIR} for file changes
+    --remove-unused: removes all unused translation
 """
 
 ### Local Variables ###
@@ -52,25 +56,25 @@ class TranslationHandler:
         """
         Adds all existing namespaces to this translation handler.
         If the namespaces differ in the language directory, the namespace will be created.
-        :return:
+        :return: None
         """
         if not LOCAL_DIR.exists():
             return
 
-        hashset_dict = dict()
+        namespace_dict_for_lang = dict()
 
         for lang_dir in LOCAL_DIR.iterdir():
             if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
-                hash_set = set()
+                lang_set = set()
                 for file in lang_dir.glob("*.json"):
-                    hash_set.add(file.stem)
-                hashset_dict.update({lang_dir.name: hash_set})
+                    lang_set.add(file.stem)
+                namespace_dict_for_lang.update({lang_dir.name: lang_set})
 
-        for hashset in hashset_dict.values():
-            self.namespaces = self.namespaces.union(hashset)
+        for lang_set in namespace_dict_for_lang.values():
+            self.namespaces = self.namespaces.union(lang_set)
 
-        for hashset in hashset_dict.values():
-            difference = self.namespaces.difference(hashset)
+        for lang_set in namespace_dict_for_lang.values():
+            difference = self.namespaces.difference(lang_set)
             for dif in difference:
                 self.create_translation_file(dif)
 
@@ -80,7 +84,7 @@ class TranslationHandler:
         If one or both namespaces are present in the file, it searches for all
         key patterns adds them to the namespace-specific translation file.
         :param file_path: The name of the file to process
-        :return:
+        :return: None
         """
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -116,7 +120,7 @@ class TranslationHandler:
         Adds all patterns of a namespace to the dictionary of the class.
         :param namespace: The namespace to add the patterns to.
         :param patterns: The patterns to add.
-        :return:
+        :return: None
         """
         if namespace not in self.translations:
             self.translations[namespace] = set()
@@ -126,7 +130,7 @@ class TranslationHandler:
     def create_translation_file(self, file_name):
         """
         :param file_name: The name of the file to create
-        :return:
+        :return: None
         """
         print(Fore.BLUE + f"create namespace: {file_name}")
         for lang_dir in LOCAL_DIR.iterdir():
@@ -141,7 +145,7 @@ class TranslationHandler:
         Loads the namespace-specific translation file and updates it.
         :param namespace: The namespace to update
         :param patterns: All patterns to add to translation files
-        :return:
+        :return: None
         """
         for lang_dir in LOCAL_DIR.iterdir():
             file_path = lang_dir / f"{namespace}.json"
@@ -169,6 +173,7 @@ class TranslationHandler:
                             content[key][inner_key] = f"{key}.{inner_key}"
                     else:
                         key = pattern[0]
+                        # Add the new token
                         if key not in content or not isinstance(content[key], dict):
                             print(
                                 Fore.LIGHTGREEN_EX
@@ -184,7 +189,7 @@ class TranslationHandler:
     def remove_not_used_translations(self):
         """
         Removes all unused translations.
-        :return:
+        :return: None
         """
         if not bool(self.translations):
             return
@@ -243,7 +248,7 @@ class SourceFileEventHandler(FileSystemEventHandler):
         """
         Called when a file is modified
         :param event:
-        :return:
+        :return: None
         """
         if not event.is_directory and self._is_source_file(event.src_path):
             self.translation_handler.process_file(event.src_path)
@@ -252,7 +257,7 @@ class SourceFileEventHandler(FileSystemEventHandler):
         """
         Called when a file is created
         :param event:
-        :return:
+        :return: None
         """
         if not event.is_directory and self._is_source_file(event.src_path):
             self.translation_handler.process_file(event.src_path)
@@ -261,7 +266,7 @@ class SourceFileEventHandler(FileSystemEventHandler):
         """
         Check if the file is a source file we should process
         :param path: path of the file
-        :return:
+        :return: Bool
         """
         return any(path.endswith(ext) for ext in SCAN_EXTENSIONS)
 
@@ -270,7 +275,7 @@ def watch_for_changes(translation_handler):
     """
     Watch for file changes and update translation files
     :param translation_handler:
-    :return:
+    :return: None
     """
 
     event_handler = SourceFileEventHandler(translation_handler)
@@ -327,7 +332,7 @@ def sort_translation_files():
 
 
 def main():
-    help = "--help" in sys.argv
+    help = any(arg in ("--help", "-h") for arg in sys.argv)
 
     if help:
         print("""
@@ -335,12 +340,17 @@ This module provides a basic translation scanner to scan source files
 and create translation files based on specified languages.
 
 It supports only two namespaces in one file, e.g:
-const [t] = useTranslation("namespace") -> local namespace
-const [tg] = useTranslation("namespace") -> global namespace
+    const [t] = useTranslation("namespace") -> local namespace
+    const [tg] = useTranslation() -> global namespace
         """)
         print(Fore.CYAN + "Commands:")
-        print(Fore.LIGHTCYAN_EX + f"--watch: watch the {SRC_DIR} for file changes")
-        print(Fore.LIGHTCYAN_EX + "--remove-unused: removes all unused translation")
+        print(
+            Fore.LIGHTCYAN_EX
+            + f'-w  --watch \t\t watch the "{SRC_DIR}" for file changes'
+        )
+        print(
+            Fore.LIGHTCYAN_EX + "-r  --remove-unused \t removes all unused translation"
+        )
         print()
         return
 
@@ -355,9 +365,9 @@ const [tg] = useTranslation("namespace") -> global namespace
     # Sort all translation files
     sort_translation_files()
 
-    # remove unused translation
-    remove_unused = "--remove-unused" in sys.argv
-    watch_mode = "--watch" in sys.argv
+    # flags
+    remove_unused = any(arg in ("--remove-unused", "-r") for arg in sys.argv)
+    watch_mode = any(arg in ("--watch", "-w") for arg in sys.argv)
 
     if remove_unused:
         handler.remove_not_used_translations()
