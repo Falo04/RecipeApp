@@ -16,9 +16,6 @@
         "password": "Password",
         "steps": "Step"
     },
-    "placeholder": {
-        "empty": "placeholder.empty"
-    },
     "sidebar": {
         "app-title": "Recipe App",
         "ingredients": "Ingredients",
@@ -36,8 +33,7 @@
     },
     "toast": {
         "general-error": "Something failed...",
-        "loading": "Loading...",
-        "login-loading": "toast.login-loading"
+        "loading": "Loading..."
     },
     "tooltip": {
         "close": "Close Menu",

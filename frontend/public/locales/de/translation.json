@@ -16,9 +16,6 @@
         "password": "Passwort",
         "steps": "Schritt"
     },
-    "placeholder": {
-        "empty": "Ist leer"
-    },
     "sidebar": {
         "app-title": "Rezepten App",
         "ingredients": "Zutaten",
@@ -36,8 +33,7 @@
     },
     "toast": {
         "general-error": "Etwas ist schiefgelaufen",
-        "loading": "Ladet",
-        "login-loading": ""
+        "loading": "Ladet"
     },
     "tooltip": {
         "close": "Schlie\u00dfe Men\u00fc",

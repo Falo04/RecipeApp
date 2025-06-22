@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from colorama import Fore, Back, Style, init
+from colorama import Fore, init
 
 """
 This module provides a basic translation scanner to scan source files
@@ -27,9 +27,8 @@ GLOBAL_NAMESPACE = "translation"
 ### Regex ###
 LOCAL_NAMESPACE_PATTERN = re.compile(r'useTranslation\("([^"]+)"\)')
 GLOBAL_NAMESPACE_PATTERN = re.compile(r"useTranslation\(\)")
-LOCAL_TRANSLATION = re.compile(r't\("([^"]+)"\)')
-LOCAL_KEY_PATTERN = re.compile(r't\("([^.]+)[.]([^"]+)"\)')
-GLOBAL_KEY_PATTERN = re.compile(r'tg\("([^.]+)[.]([^"]+)"\)')
+LOCAL_KEY_PATTERN = re.compile(r't\("([^.]+)[.]([^"]+)"(?:\s*,\s*\{[^}]*\})?')
+GLOBAL_KEY_PATTERN = re.compile(r'tg\("([^.]+)[.]([^"]+)"(?:\s*,\s*\{[^}]*\})?')
 
 
 class TranslationHandler:
@@ -156,7 +155,9 @@ class TranslationHandler:
                         if inner_key not in content[key]:
                             print(
                                 Fore.LIGHTGREEN_EX
-                                + f"{lang_dir.name}/{file_path.name} | add: {key}.{inner_key}"
+                                + f"{lang_dir.name}/{file_path.name}",
+                                "--",
+                                Fore.GREEN + f"add: {key}.{inner_key}",
                             )
                             content[key][inner_key] = f"{key}.{inner_key}"
                     else:
@@ -164,7 +165,9 @@ class TranslationHandler:
                         if key not in content or not isinstance(content[key], dict):
                             print(
                                 Fore.LIGHTGREEN_EX
-                                + f"{lang_dir.name}/{file_path.name} | add: {key}"
+                                + f"{lang_dir.name}/{file_path.name}",
+                                "--",
+                                Fore.GREEN + f"add: {key}",
                             )
                             content[key] = f"{key}"
 
@@ -195,14 +198,16 @@ class TranslationHandler:
                     for key, inner_key in difference:
                         if inner_key is None:
                             print(
-                                Fore.RED
-                                + f"{lang_dir.name}/{file.name} | remove: {key}"
+                                Fore.LIGHTRED_EX + f"{lang_dir.name}/{file.name}",
+                                "--",
+                                Fore.RED + f"remove: {key}",
                             )
                             del content[key]
                         else:
                             print(
-                                Fore.RED
-                                + f"{lang_dir.name}/{file.name} | remove: {key}.{inner_key}"
+                                Fore.LIGHTRED_EX + f"{lang_dir.name}/{file.name}",
+                                "--",
+                                Fore.RED + f"remove: {key}.{inner_key}",
                             )
                             del content[key][inner_key]
 
@@ -226,22 +231,38 @@ class SourceFileEventHandler(FileSystemEventHandler):
         self.translation_handler = translation_handler
 
     def on_modified(self, event):
-        """Called when a file is modified"""
+        """
+        Called when a file is modified
+        :param event:
+        :return:
+        """
         if not event.is_directory and self._is_source_file(event.src_path):
             self.translation_handler.process_file(event.src_path)
 
     def on_created(self, event):
-        """Called when a file is created"""
+        """
+        Called when a file is created
+        :param event:
+        :return:
+        """
         if not event.is_directory and self._is_source_file(event.src_path):
             self.translation_handler.process_file(event.src_path)
 
     def _is_source_file(self, path):
-        """Check if the file is a source file we should process"""
+        """
+        Check if the file is a source file we should process
+        :param path: path of the file
+        :return:
+        """
         return any(path.endswith(ext) for ext in SCAN_EXTENSIONS)
 
 
 def watch_for_changes(translation_handler):
-    """Watch for file changes and update translation files"""
+    """
+    Watch for file changes and update translation files
+    :param translation_handler:
+    :return:
+    """
 
     event_handler = SourceFileEventHandler(translation_handler)
     observer = Observer()
@@ -264,7 +285,6 @@ def scan_existing_files():
     """
     Scans the specified source directory for files matching specified extensions
     and processes each file using the TranslationHandler.
-
     :return: TranslationHandler object
     """
     handler = TranslationHandler()
@@ -281,7 +301,6 @@ def scan_existing_files():
 def sort_translation_files():
     """
     This function sorts translation files within a specified directory.
-
     :return: None
     """
     if not LOCAL_DIR.is_dir():
@@ -299,7 +318,7 @@ def sort_translation_files():
 
 
 def main():
-    help = "--help" or "-h" in sys.argv
+    help = "--help" in sys.argv
 
     if help:
         print("""

@@ -34,7 +34,7 @@
         "amount": "Menge",
         "description": "Beschreibung om Rezept",
         "name": "Name vom Rezept",
-        "select-tags": "Wähle Tags aus",
+        "select-tags": "W\u00e4hle Tags aus",
         "step": "Einzelner Schritt",
         "tags-empty": "Keine Tags gefunden"
     },
