@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from colorama import Back, Fore, init
+from colorama import Fore, init
 
 """
 This module provides a basic translation scanner to scan source files
@@ -61,7 +61,7 @@ class TranslationHandler:
         """
         if not LOCAL_DIR.exists():
             print(
-                Back.LIGHTRED_EX + "Error: ",
+                Fore.RED + "Error: ",
                 Fore.LIGHTRED_EX + f"{LOCAL_DIR} does not exists, please create it",
             )
             return
@@ -95,22 +95,23 @@ class TranslationHandler:
         :param file_path: The name of the file to process
         :return:
         """
+
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # check for global namespace
+            # check for global namespace
         if (
             TranslationHandler.GLOBAL_NAMESPACE_PATTERN.search(content)
             and GLOBAL_NAMESPACE not in self.namespaces
         ):
             self.create_translation_file(GLOBAL_NAMESPACE)
 
-        # check all local namespaces
+            # check all local namespaces
         local_namespaces = TranslationHandler.LOCAL_NAMESPACE_PATTERN.findall(content)
         for namespace in local_namespaces:
             if namespace == "":
                 print(
-                    Back.LIGHTRED_EX + "Error: ",
+                    Fore.RED + "Error: ",
                     Fore.LIGHTRED_EX
                     + "local namespace can not be empty, probaly meant to use the global namespace",
                     f"| file: {file_path}",
@@ -120,36 +121,39 @@ class TranslationHandler:
 
         # can only be one local namespace in file
         if len(local_namespaces) > 1:
-            print(
-                Back.LIGHTRED_EX + "Error: ",
-                Fore.LIGHTRED_EX
-                + f"Can only be one local nampspace: {local_namespaces}",
-                f"| file: {file_path}",
-            )
+            # if the same namespace, remove all other namespaces
+            if len(set(local_namespaces)) == 1:
+                local_namespaces = [local_namespaces[0]]
+            else:
+                print(
+                    Fore.RED + "Error: ",
+                    Fore.LIGHTRED_EX
+                    + f"Can only be one local nampspace: {local_namespaces}",
+                    f"| file: {file_path}",
+                )
+                return
 
         try:
             # check for local namespace translations
             patterns = TranslationHandler.LOCAL_KEY_PATTERN.findall(content)
             if patterns and len(local_namespaces) == 1:
                 self.update_translation_file(local_namespaces[0], patterns)
-                self.add_translations_of_namespace(local_namespaces[0], patterns)
             elif patterns:
                 print(
-                    Back.LIGHTRED_EX + "Error: ",
+                    Fore.RED + "Error: ",
                     Fore.LIGHTRED_EX
-                    + "Found local translation without local namespace",
+                    + "Found local translation without local namespace, probaly meant to use the global namespace [tg]",
                     f"| file: {file_path}",
                 )
         except Exception as e:
             print(
-                Back.LIGHTRED_EX + "Error: ",
+                Fore.RED + "Error: ",
                 Fore.LIGHTRED_EX + f"{e}",
                 f"| file: {file_path}",
             )
 
         global_patterns = TranslationHandler.GLOBAL_KEY_PATTERN.findall(content)
         if global_patterns and GLOBAL_NAMESPACE in self.namespaces:
-            self.add_translations_of_namespace(GLOBAL_NAMESPACE, global_patterns)
             self.update_translation_file(GLOBAL_NAMESPACE, global_patterns)
 
     def add_translations_of_namespace(self, namespace, patterns):
@@ -183,6 +187,7 @@ class TranslationHandler:
         :param patterns: All patterns to add to translation files
         :return:
         """
+        self.add_translations_of_namespace(namespace, patterns)
         for lang_dir in LOCAL_DIR.iterdir():
             file_path = lang_dir / f"{namespace}.json"
             if file_path.exists():
@@ -230,7 +235,13 @@ class TranslationHandler:
         for lang_dir in LOCAL_DIR.iterdir():
             if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
                 for file in lang_dir.iterdir():
-                    if not bool(self.translations[file.stem]):
+                    if file.stem not in self.translations:
+                        print(
+                            Fore.YELLOW + "Warn: ",
+                            Fore.LIGHTYELLOW_EX
+                            + "For this namespace no translations were found in the code space",
+                            f"| file: {file}",
+                        )
                         continue
 
                     file_set = set()
@@ -345,6 +356,7 @@ def scan_existing_files():
         for file in files:
             if any(file.endswith(ex) for ex in SCAN_EXTENSIONS):
                 file_path = os.path.join(root, file)
+
                 handler.process_file(file_path)
 
     return handler
