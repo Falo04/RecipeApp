@@ -61,7 +61,7 @@ class TranslationHandler:
         """
         if not LOCAL_DIR.exists():
             print(
-                Fore.RED + "Error: ",
+                Fore.RED + "Error:",
                 Fore.LIGHTRED_EX + f"{LOCAL_DIR} does not exists, please create it",
             )
             return
@@ -111,7 +111,7 @@ class TranslationHandler:
         for namespace in local_namespaces:
             if namespace == "":
                 print(
-                    Fore.RED + "Error: ",
+                    Fore.RED + "Error:",
                     Fore.LIGHTRED_EX
                     + "local namespace can not be empty, probaly meant to use the global namespace",
                     f"| file: {file_path}",
@@ -126,7 +126,7 @@ class TranslationHandler:
                 local_namespaces = [local_namespaces[0]]
             else:
                 print(
-                    Fore.RED + "Error: ",
+                    Fore.RED + "Error:",
                     Fore.LIGHTRED_EX
                     + f"Can only be one local nampspace: {local_namespaces}",
                     f"| file: {file_path}",
@@ -140,7 +140,7 @@ class TranslationHandler:
                 self.update_translation_file(local_namespaces[0], patterns)
             elif patterns:
                 print(
-                    Fore.RED + "Error: ",
+                    Fore.RED + "Error:",
                     Fore.LIGHTRED_EX
                     + "Found local translation without local namespace, probaly meant to use the global namespace [tg]",
                     f"| file: {file_path}",
@@ -237,7 +237,7 @@ class TranslationHandler:
                 for file in lang_dir.iterdir():
                     if file.stem not in self.translations:
                         print(
-                            Fore.YELLOW + "Warn: ",
+                            Fore.YELLOW + "Warn:",
                             Fore.LIGHTYELLOW_EX
                             + "For this namespace no translations were found in the code space",
                             f"| file: {file}",
