@@ -92,9 +92,9 @@ pub async fn sign_in_me(
     let parsed_hash = PasswordHash::new(user.password.as_ref())
         .map_err(|_err| ApiError::server_error("PasswordHash error"))?;
 
-    if !Argon2::default()
+    if Argon2::default()
         .verify_password(request.password.as_ref(), &parsed_hash)
-        .is_ok()
+        .is_err()
     {
         return Err(ApiError::bad_request("Wrong password"));
     }

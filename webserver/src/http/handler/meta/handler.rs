@@ -11,6 +11,6 @@ use crate::http::handler::meta::schema::MetaResponse;
 #[get("/")]
 pub async fn get_meta() -> ApiResult<ApiJson<MetaResponse>> {
     Ok(ApiJson(MetaResponse {
-        authentication_enabled: AUTHENTICATION_ENABLED.clone(),
+        authentication_enabled: *AUTHENTICATION_ENABLED,
     }))
 }

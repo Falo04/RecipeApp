@@ -59,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     if let Err(errors) = config::init() {
         for error in errors {
-            eprintln!("error: {}", error);
+            eprintln!("error: {error}");
         }
         return Err("Failed to load configuration".into());
     }
@@ -135,7 +135,7 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
         .init_modules()
         .await?
         .add_routes(server::initialize())
-        .start(SocketAddr::new(SERVER_ADDRESS.clone(), *SERVER_PORT))
+        .start(SocketAddr::new(*SERVER_ADDRESS, *SERVER_PORT))
         .await?;
 
     Ok(())

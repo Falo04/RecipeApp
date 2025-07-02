@@ -177,10 +177,7 @@ pub async fn get_recipe(
         uuid: recipe_uuid,
         name: recipe.name,
         description: recipe.description,
-        user: match user {
-            Some(user) => Some(SimpleUser::from(user)),
-            None => None,
-        },
+        user: user.map(SimpleUser::from),
         ingredients: recipe_ingredients,
         steps,
         tags,
@@ -221,10 +218,7 @@ pub async fn create_recipe(
             uuid: recipe_uuid,
             name: request.name,
             description: request.description,
-            user: match request.user {
-                Some(user) => Some(ForeignModelByField(user)),
-                None => None,
-            },
+            user: request.user.map(ForeignModelByField),
             created_at: OffsetDateTime::now_utc(),
         })
         .await?;

@@ -60,7 +60,7 @@ pub async fn get_recipes_by_ingredients(
     let mut seen = HashSet::new();
     recipes_all.retain(|recipe| {
         let is_first = !seen.contains(&recipe.uuid);
-        seen.insert(recipe.uuid.clone());
+        seen.insert(recipe.uuid);
         is_first
     });
 
@@ -144,7 +144,7 @@ pub async fn get_all_ingredients() -> ApiResult<ApiJson<List<SimpleIngredient>>>
         .all()
         .await?
         .into_iter()
-        .map(|ingr| SimpleIngredient::from(ingr))
+        .map(SimpleIngredient::from)
         .collect();
 
     Ok(ApiJson(List { list: items }))

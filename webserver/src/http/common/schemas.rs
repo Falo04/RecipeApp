@@ -30,7 +30,6 @@ pub struct List<T> {
 /// Represents the request structure for retrieving a paginated list of items.
 ///
 /// This struct defines the parameters for requesting a specific page of data.
-
 /// Default values are provided for `limit` and `offset` using the
 /// `default_limit` and `default_offset` functions respectively.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

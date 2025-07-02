@@ -21,7 +21,7 @@ pub fn initialize() -> GalvynRouter {
         .nest("/tags", tags::initialize())
         .nest("/ingredients", ingredients::initialize());
 
-    if AUTHENTICATION_ENABLED.clone() {
+    if *AUTHENTICATION_ENABLED {
         GalvynRouter::new().nest(
             "/v1",
             GalvynRouter::new()

@@ -8,7 +8,6 @@ use uuid::Uuid;
 use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
-use crate::models::ingredients::Units;
 
 /// Represents a simple recipe.
 ///
