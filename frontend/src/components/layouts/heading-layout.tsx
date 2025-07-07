@@ -1,7 +1,6 @@
 import React from "react";
 import { Heading } from "../ui/heading.tsx";
 import { clsx } from "clsx";
-import { Text } from "../ui/text.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 
 /**
@@ -10,9 +9,6 @@ import { Separator } from "@/components/ui/separator.tsx";
 export type HeadingLayoutProps = {
     /** The text for the heading */
     heading: string;
-
-    /** Optional description text under the heading */
-    headingDescription?: string;
 
     /** Additional children that will be displayed in the heading */
     headingChildren?: Array<React.ReactNode> | React.ReactNode;
@@ -40,7 +36,6 @@ export default function HeadingLayout(props: HeadingLayoutProps) {
             >
                 <div className={"flex flex-col gap-3"}>
                     <Heading>{props.heading}</Heading>
-                    {props.headingDescription && <Text>{props.headingDescription}</Text>}
                 </div>
                 {props.headingChildren !== undefined ? (
                     <div className={"flex justify-end gap-4"}>{props.headingChildren}</div>

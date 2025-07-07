@@ -8,6 +8,7 @@ import { RecipeSearch } from "../recipe-search.tsx";
 import { motion } from "framer-motion";
 
 export interface NavItem {
+    id: string;
     title: string;
     url: string;
     Icon: LucideIcon;
