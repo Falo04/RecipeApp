@@ -6,7 +6,10 @@ use galvyn::core::Module;
 use galvyn::delete;
 use galvyn::get;
 use galvyn::post;
+use galvyn::put;
 use galvyn::rorm::Database;
+use rorm::and;
+use tracing_subscriber::registry;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
@@ -127,6 +130,36 @@ pub async fn create_tag(
     tx.commit().await?;
 
     Ok(ApiJson(SingleUuid { uuid }))
+}
+
+#[put("/{uuid}")]
+pub async fn update_tag(
+    Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
+    ApiJson(request): ApiJson<CreateOrUpdateTag>,
+) -> ApiResult<()> {
+    let mut tx = Database::global().start_transaction().await?;
+
+    if rorm::query(&mut tx, Tag)
+        .condition(and![
+            Tag.name.equals(&*request.name),
+            Tag.uuid.not_equals(tag_uuid)
+        ])
+        .optional()
+        .await?
+        .is_some()
+    {
+        return Err(ApiError::bad_request("Name already exists"));
+    }
+
+    rorm::update(&mut tx, Tag)
+        .set(Tag.name, request.name)
+        .set(Tag.color, request.color)
+        .condition(Tag.uuid.equals(tag_uuid))
+        .await?;
+
+    tx.commit().await?;
+
+    Ok(())
 }
 
 /// Deletes a tag from the database based on its UUID.

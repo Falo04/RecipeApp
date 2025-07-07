@@ -70,7 +70,11 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => {
                                         return (
-                                            <TableHead key={header.id}>
+                                            <TableHead
+                                                key={header.id}
+                                                style={{ width: header.getSize() }}
+                                                className={"whitespace-nowrap"}
+                                            >
                                                 {header.isPlaceholder
                                                     ? null
                                                     : flexRender(header.column.columnDef.header, header.getContext())}
@@ -85,7 +89,11 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                                 table.getRowModel().rows.map((row) => (
                                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
+                                            <TableCell
+                                                key={cell.id}
+                                                style={{ width: cell.column.getSize() }}
+                                                className={"whitespace-nowrap"}
+                                            >
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         ))}

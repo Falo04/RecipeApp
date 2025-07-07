@@ -11,8 +11,7 @@ import React, { Suspense } from "react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TrashIcon } from "lucide-react";
-import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
+import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 
 /**
@@ -30,7 +29,6 @@ export function TagsOverview(_props: TagsOverviewProps) {
     const tagContext = React.useContext(TAGS_CONTEXT);
 
     const [openCreateTag, setOpenCreateTag] = React.useState(false);
-    const [openDeleteTag, setOpenDeleteTag] = React.useState<SimpleTag>();
 
     const columns: ColumnDef<SimpleTag>[] = useMemo(
         () => [
@@ -38,7 +36,7 @@ export function TagsOverview(_props: TagsOverviewProps) {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/tag/$tagId"} params={{ tagId: row.original.uuid }}>
+                    <Link to={"/app/tags/$tagId/info"} params={{ tagId: row.original.uuid }}>
                         <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
                             {" "}
                             <span>{row.original.name}</span>
@@ -59,19 +57,15 @@ export function TagsOverview(_props: TagsOverviewProps) {
                 accessorKey: "action",
                 header: () => <div className="flex justify-end">{tg("table.action")}</div>,
                 cell: ({ row }) => (
-                    <div className="flex justify-end">
+                    <div className={"flex justify-end pr-4"}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    onClick={() => setOpenDeleteTag(row.original)}
-                                    variant="ghost"
-                                    className="cursor-pointer"
-                                >
-                                    <TrashIcon />
-                                </Button>
+                                <Link to={"/app/tags/$tagId/info"} params={{ tagId: row.original.uuid }}>
+                                    <Info className={"size-4"} />
+                                </Link>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>{tg("tooltip.delete")}</p>
+                                <p>{tg("tooltip.info")}</p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -84,7 +78,6 @@ export function TagsOverview(_props: TagsOverviewProps) {
     return (
         <HeadingLayout
             heading={t("heading.overview-title")}
-            headingDescription={t("heading.overview-description")}
             headingChildren={<Button onClick={() => setOpenCreateTag(true)}>{t("button.create")}</Button>}
         >
             <DataTable filterTag={t("input.filter")} data={tagContext.tags.items} columns={columns} />
@@ -98,22 +91,10 @@ export function TagsOverview(_props: TagsOverviewProps) {
                     />
                 </Suspense>
             )}
-            {openDeleteTag && (
-                <Suspense>
-                    <DeleteTagDialog
-                        tag={openDeleteTag}
-                        onClose={() => setOpenDeleteTag(undefined)}
-                        onDeletion={() => {
-                            setOpenDeleteTag(undefined);
-                            tagContext.reset();
-                        }}
-                    />
-                </Suspense>
-            )}
         </HeadingLayout>
     );
 }
 
-export const Route = createFileRoute("/_app/app/tag/")({
+export const Route = createFileRoute("/_app/app/tags/")({
     component: TagsOverview,
 });

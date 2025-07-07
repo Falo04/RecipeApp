@@ -49,6 +49,12 @@ export const Api = {
             await callApi<Page<SimpleRecipe>>({ method: "GET", url: `/tags/${uuid}/recipes` }),
         create: async (payload: CreateOrUpdateTag): Promise<ApiResponse<SingleUuid>> =>
             await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
+        update: async (uuid: string, payload: CreateOrUpdateTag) =>
+            await callApi({
+                method: "PUT",
+                url: `/tags/${uuid}`,
+                data: payload,
+            }),
         delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/tags/${uuid}` }),
     },
     ingredients: {

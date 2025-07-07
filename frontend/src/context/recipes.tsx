@@ -1,33 +1,33 @@
 import { Api } from "@/api/api";
 import type { Page } from "@/api/model/global.interface";
-import type { SimpleTag } from "@/api/model/tag.interface";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
+import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 
 /**
- * Represents the context for managing and interacting with tags.
- * It contains the current list of tags and a function to reset the context.
+ * Represents the context for managing and interacting with recipes.
+ * It contains the current list of recipes and a function to reset the context.
  */
-export type TagsContext = {
-    tags: Page<SimpleTag>;
+export type RecipesContext = {
+    recipes: Page<SimpleRecipeWithTags>;
 
     reset: () => void;
 };
 
 /**
- * A React context provider for managing tag-related data.
+ * A React context provider for managing recipes-related data.
  * This context offers a centralized location to manage and access
- * tag data such as items, limit, offset, and total count.
+ * recipe data
  *
  * It also includes a reset function for managing state.
  */
-const TAGS_CONTEXT = React.createContext<TagsContext>({
-    tags: {
+const RECIPES_CONTEXT = React.createContext<RecipesContext>({
+    recipes: {
         items: [],
         limit: 999,
-        offset: 0,
         total: 0,
+        offset: 0,
     },
     reset: () => {},
 });
@@ -37,41 +37,41 @@ const TAGS_CONTEXT = React.createContext<TagsContext>({
  *
  * It provides a way to easily access and modify the display name of the context.
  */
-TAGS_CONTEXT.displayName = "TagsContext";
-export default TAGS_CONTEXT;
+RECIPES_CONTEXT.displayName = "RecipesContext";
+export default RECIPES_CONTEXT;
 
 /**
- * Props for the TagsProvider component.
+ * Props for the recipesContext component.
  *
- * This object defines the configuration options for the TagsProvider.
+ * This object defines the configuration options for the recipesPovider.
  * It allows you to pass in child components that will be rendered
  * within the provider.
  */
-type TagsProviderProps = {
+type RecipesProviderProps = {
     children: React.ReactNode | Array<React.ReactNode>;
 };
 
 /**
- * Provides a context with tags data.
+ * Provides a context with recipe data.
  *
- * @param {TagsProviderProps} props Props passed to the provider.
+ * @param {RecipesProviderProps} props Props passed to the provider.
  */
-export function TagsProvider(props: TagsProviderProps) {
-    const [tags, setTags] = React.useState<Page<SimpleTag> | "loading">("loading");
+export function RecipesProvider(props: RecipesProviderProps) {
+    const [recipes, setRecipes] = React.useState<Page<SimpleRecipeWithTags> | "loading">("loading");
     let fetching = false;
 
     const fetchTags = async () => {
         if (fetching) return;
         fetching = true;
 
-        const res = await Api.tags.getAll();
+        const res = await Api.recipe.getAll(999, 0);
         if (res.error) {
             toast.error(res.error.message);
             return;
         }
 
         if (res.data) {
-            setTags(res.data);
+            setRecipes(res.data);
         }
 
         fetching = false;
@@ -81,7 +81,7 @@ export function TagsProvider(props: TagsProviderProps) {
         fetchTags().then();
     }, []);
 
-    if (tags === "loading") {
+    if (recipes === "loading") {
         return (
             <div className={"flex h-screen items-center justify-center"}>
                 <Spinner />
@@ -90,13 +90,13 @@ export function TagsProvider(props: TagsProviderProps) {
     }
 
     return (
-        <TAGS_CONTEXT.Provider
+        <RECIPES_CONTEXT.Provider
             value={{
-                tags: tags,
+                recipes,
                 reset: fetchTags,
             }}
         >
             {props.children}
-        </TAGS_CONTEXT.Provider>
+        </RECIPES_CONTEXT.Provider>
     );
 }

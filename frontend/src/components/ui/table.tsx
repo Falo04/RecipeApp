@@ -1,8 +1,8 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import { useElementHeight } from "@/hooks/element-height.ts";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
     return (
@@ -13,29 +13,14 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
 }
 
 function TableStickyHeader({ className, ...props }: React.ComponentProps<"table">) {
-    const tableRef = useRef<HTMLDivElement>(null);
-
-    const [tableHeight, setTableHeight] = React.useState(0);
-
-    const getTableHeight = () => {
-        if (tableRef.current === null) {
-            return;
-        }
-        const newHeight = tableRef.current.getBoundingClientRect().height;
-        setTableHeight(newHeight);
-    };
-
-    useEffect(() => {
-        window.addEventListener("resize", getTableHeight);
-        getTableHeight();
-
-        return () => {
-            window.removeEventListener("resize", getTableHeight);
-        };
-    }, []);
+    const [tableRef, tableHeight] = useElementHeight<HTMLDivElement>();
 
     return (
-        <div data-slot="table-container" className={"block h-full w-full overflow-x-auto"} ref={tableRef}>
+        <div
+            data-slot="table-container"
+            className={"border-border block h-full w-full overflow-x-auto rounded-lg border py-2"}
+            ref={tableRef}
+        >
             <ScrollArea style={{ height: `${tableHeight}px` }}>
                 <table
                     data-slot="table"
@@ -89,7 +74,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
         <th
             data-slot="table-head"
             className={cn(
-                "text-muted-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+                "text-muted-foreground h-10 px-4 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
                 className,
             )}
             {...props}
@@ -102,7 +87,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
         <td
             data-slot="table-cell"
             className={cn(
-                "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+                "p-2 px-4 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
                 className,
             )}
             {...props}

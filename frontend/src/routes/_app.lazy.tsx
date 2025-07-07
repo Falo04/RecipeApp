@@ -5,9 +5,10 @@ import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
 import { BookText, CarrotIcon, Soup, TagIcon } from "lucide-react";
 import { Suspense } from "react";
 import AppSidebar from "@/components/layouts/app-sidebar.tsx";
-import Header from "@/components/layouts/header.tsx";
+import BreadcrumbMenuBar from "@/components/layouts/BreadcrumbMenuBar.tsx";
 import { IngredientProvider } from "@/context/ingredients.tsx";
 import { useTranslation } from "react-i18next";
+import { RecipesProvider } from "@/context/recipes.tsx";
 
 /**
  * The properties for {@link FoodMenu}
@@ -20,21 +21,24 @@ export type FoodMenuProps = {};
 export default function FoodMenu(_props: FoodMenuProps) {
     const [tg] = useTranslation();
     const app_meta_data = {
-        title: tg("sidebar.app-title"),
+        title: tg("menu.app-title"),
         mainIcon: Soup,
         navMain: [
             {
-                title: tg("sidebar.recipes"),
+                id: "recipes",
+                title: tg("menu.recipes"),
                 url: "/app/recipes",
                 Icon: BookText,
             },
             {
-                title: tg("sidebar.tags"),
-                url: "/app/tag",
+                id: "tags",
+                title: tg("menu.tags"),
+                url: "/app/tags",
                 Icon: TagIcon,
             },
             {
-                title: tg("sidebar.ingredients"),
+                id: "ingredients",
+                title: tg("menu.ingredients"),
                 url: "/app/ingredients",
                 Icon: CarrotIcon,
             },
@@ -50,7 +54,7 @@ export default function FoodMenu(_props: FoodMenuProps) {
                     navItems={app_meta_data.navMain}
                 />
             }
-            sideHeader={<Header appTitle={app_meta_data.title} icon={app_meta_data.mainIcon} />}
+            header={<BreadcrumbMenuBar navItems={app_meta_data.navMain} />}
             children={
                 <Suspense>
                     <Outlet />
@@ -63,11 +67,13 @@ export default function FoodMenu(_props: FoodMenuProps) {
 export const Route = createLazyFileRoute("/_app")({
     component: () => (
         <UserProvider>
-            <TagsProvider>
-                <IngredientProvider>
-                    <FoodMenu />
-                </IngredientProvider>
-            </TagsProvider>
+            <RecipesProvider>
+                <TagsProvider>
+                    <IngredientProvider>
+                        <FoodMenu />
+                    </IngredientProvider>
+                </TagsProvider>
+            </RecipesProvider>
         </UserProvider>
     ),
 });
