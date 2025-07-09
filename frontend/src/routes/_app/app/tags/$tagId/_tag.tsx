@@ -21,8 +21,8 @@ export default function SingleTagView(_props: SingleTagViewProps) {
             <SINGLE_TAG_CONTEXT.Consumer>
                 {(_ctx) => (
                     <TabMenu>
-                        <Tab to={"/app/tags/$tagId/info"} params={{ tagId }}>
-                            {tg("tab.info")}
+                        <Tab to={"/app/tags/$tagId/general"} params={{ tagId }}>
+                            {tg("tab.general")}
                         </Tab>
                         <Tab to={"/app/tags/$tagId/recipe"} params={{ tagId }}>
                             {tg("tab.recipe")}

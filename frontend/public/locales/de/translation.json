@@ -2,6 +2,9 @@
     "button": {
         "close": "Schlie\u00dfe"
     },
+    "error": {
+        "stepper-message": "Fehler, bitte gebe eine richtige Information an"
+    },
     "label": {
         "appearance": "Aussehen w\u00e4hlen",
         "color": "Farbe",
@@ -16,12 +19,20 @@
         "password": "Passwort",
         "steps": "Schritt"
     },
-    "sidebar": {
-        "app-title": "Rezepten App",
+    "menu": {
+        "app-title": "Rezept App",
+        "dashboard": "Dashboard",
         "ingredients": "Zutaten",
         "recipes": "Rezepte",
         "settings": "Einstellungen",
         "tags": "Tags"
+    },
+    "sr-only": {
+        "breadcrumb-menu": "Breadcrumb menu"
+    },
+    "tab": {
+        "general": "Generell",
+        "recipe": "Zugewiesene Rezepte"
     },
     "table": {
         "action": "Aktion",
@@ -36,9 +47,7 @@
         "loading": "Ladet"
     },
     "tooltip": {
-        "close": "Schlie\u00dfe Men\u00fc",
-        "delete": "L\u00f6sche",
-        "edit": "Aktualisiere",
-        "filter": "Filter {{object}}"
+        "filter": "Filter {{object}}",
+        "info": "Mehr Informationen"
     }
 }

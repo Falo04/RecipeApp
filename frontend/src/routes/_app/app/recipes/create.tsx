@@ -1,7 +1,8 @@
-import SubmenuLayout from "@/components/layouts/submenu-layout";
 import { RecipeForm } from "@/components/recipe-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { Heading } from "@/components/ui/heading.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 
 /**
  * The properties for {@link CreateRecipe}
@@ -17,9 +18,13 @@ export function CreateRecipe(_props: CreateRecipeProps) {
     const navigate = useNavigate();
 
     return (
-        <SubmenuLayout heading={t("heading.create-heading")} navigate={() => navigate({ to: "/app/recipes" })}>
+        <div className={"flex h-full w-full flex-col gap-6"}>
+            <div className={"flex w-full flex-col gap-2"}>
+                <Heading>{t("heading.create")}</Heading>
+                <Separator />
+            </div>
             <RecipeForm navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })} />
-        </SubmenuLayout>
+        </div>
     );
 }
 

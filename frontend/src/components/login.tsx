@@ -2,10 +2,9 @@ import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Api } from "@/api/api";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { FormLabel } from "./ui/form";
+import { Form, FormLabel, Input } from "./ui/form";
 import type { UserSignInRequest } from "@/api/model/jwt.interface";
 
 /**
@@ -65,13 +64,7 @@ export function Login(props: LoginProps) {
                             <CardDescription>{t("login.description")}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form
-                                className="space-y-8"
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    form.handleSubmit();
-                                }}
-                            >
+                            <Form onSubmit={form.handleSubmit}>
                                 <form.Field
                                     name="email"
                                     validators={{
@@ -115,7 +108,7 @@ export function Login(props: LoginProps) {
                                     )}
                                 />
                                 <Button type="submit">{t("button.login")}</Button>
-                            </form>
+                            </Form>
                         </CardContent>
                     </Card>
                 </div>

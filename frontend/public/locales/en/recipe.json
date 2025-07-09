@@ -17,15 +17,12 @@
         "too-long": "Input is too long, it cannot be longer than 255 characters"
     },
     "heading": {
-        "create-heading": "Create Recipe",
+        "create": "Create Recipe",
         "ingredients": "List of all Ingredients",
         "ingredients-title": "Input your Ingredients",
-        "overview-description": "All recipes are listed here",
         "overview-title": "Recipe Overview",
         "step-title": "Input your Steps",
-        "steps": "Instruction:",
-        "tags": "Tags:",
-        "update-heading": "Update Recipe"
+        "steps": "Instruction:"
     },
     "input": {
         "filter": "Filter Recipes"
@@ -41,6 +38,14 @@
     "search": {
         "recipes": "Search recipe",
         "recipes-empty": "No recipe found"
+    },
+    "stepper": {
+        "ingredients-description": "Provide ingredients for the recipe",
+        "ingredients-title": "Ingredients",
+        "meta-description": "Provide general information's",
+        "meta-title": "General Information's",
+        "steps-description": "Provide instructions for the recipe",
+        "steps-title": "Instruction"
     },
     "toast": {
         "created-success": "Recipe is successful created",

@@ -1,7 +1,8 @@
 {
     "button": {
         "create": "Tag erstellen",
-        "delete": "Tag l\u00f6schen"
+        "delete": "Tag l\u00f6schen",
+        "update": "Tag aktualisieren"
     },
     "dialog": {
         "create-description": "Beschreibung zum Erstellen eines Tags",
@@ -14,9 +15,6 @@
         "too-long": "Name zu lang, kann maximal 255 Zeichen lang sein."
     },
     "heading": {
-        "detail-description": "Hier siehst du alle Rezepte, die mit dem Tag verbunden sind",
-        "detail-title": "Tag Details",
-        "overview-description": "Alle Tags sind hier aufgelistet",
         "overview-title": "Tag \u00dcbersicht"
     },
     "input": {
@@ -27,6 +25,7 @@
     },
     "toast": {
         "created-success": "Tag erfolgreich erstellt",
-        "deleted-success": "Tag erfolgreich gel\u00f6scht"
+        "deleted-success": "Tag erfolgreich gel\u00f6scht",
+        "updated-success": "Tag erfolgreich aktualisiert"
     }
 }

@@ -9,7 +9,7 @@ import * as React from "react";
  * @const
  * @description This constant defines the screen width (in pixels) at which the layout adjusts for mobile devices.
  */
-const MOBILE_BREAKPOINT: number = 1024;
+const MOBILE_BREAKPOINT: number = 768;
 
 /**
  * Determines if the current screen is mobile.

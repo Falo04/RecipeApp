@@ -19,16 +19,20 @@ import { Route as AppAppSettingsIndexImport } from './routes/_app/app/settings/i
 import { Route as AppAppRecipesIndexImport } from './routes/_app/app/recipes/index'
 import { Route as AppAppIngredientsIndexImport } from './routes/_app/app/ingredients/index'
 import { Route as AppAppRecipesCreateImport } from './routes/_app/app/recipes/create'
-import { Route as AppAppRecipesRecipeIdIndexImport } from './routes/_app/app/recipes/$recipeId/index'
 import { Route as AppAppTagsTagIdTagImport } from './routes/_app/app/tags/$tagId/_tag'
-import { Route as AppAppRecipesRecipeIdUpdateImport } from './routes/_app/app/recipes/$recipeId/update'
+import { Route as AppAppRecipesRecipeIdRecipesImport } from './routes/_app/app/recipes/$recipeId/_recipes'
 import { Route as AppAppTagsTagIdTagRecipeImport } from './routes/_app/app/tags/$tagId/_tag/recipe'
-import { Route as AppAppTagsTagIdTagInfoImport } from './routes/_app/app/tags/$tagId/_tag/info'
+import { Route as AppAppTagsTagIdTagGeneralImport } from './routes/_app/app/tags/$tagId/_tag/general'
+import { Route as AppAppRecipesRecipeIdRecipesUpdateImport } from './routes/_app/app/recipes/$recipeId/_recipes/update'
+import { Route as AppAppRecipesRecipeIdRecipesGeneralImport } from './routes/_app/app/recipes/$recipeId/_recipes/general'
 
 // Create Virtual Routes
 
 const AppLazyImport = createFileRoute('/_app')()
 const AppAppTagsTagIdImport = createFileRoute('/_app/app/tags/$tagId')()
+const AppAppRecipesRecipeIdImport = createFileRoute(
+  '/_app/app/recipes/$recipeId',
+)()
 
 // Create/Update Routes
 
@@ -46,6 +50,12 @@ const IndexRoute = IndexImport.update({
 const AppAppTagsTagIdRoute = AppAppTagsTagIdImport.update({
   id: '/app/tags/$tagId',
   path: '/app/tags/$tagId',
+  getParentRoute: () => AppLazyRoute,
+} as any)
+
+const AppAppRecipesRecipeIdRoute = AppAppRecipesRecipeIdImport.update({
+  id: '/app/recipes/$recipeId',
+  path: '/app/recipes/$recipeId',
   getParentRoute: () => AppLazyRoute,
 } as any)
 
@@ -79,24 +89,15 @@ const AppAppRecipesCreateRoute = AppAppRecipesCreateImport.update({
   getParentRoute: () => AppLazyRoute,
 } as any)
 
-const AppAppRecipesRecipeIdIndexRoute = AppAppRecipesRecipeIdIndexImport.update(
-  {
-    id: '/app/recipes/$recipeId/',
-    path: '/app/recipes/$recipeId/',
-    getParentRoute: () => AppLazyRoute,
-  } as any,
-)
-
 const AppAppTagsTagIdTagRoute = AppAppTagsTagIdTagImport.update({
   id: '/_tag',
   getParentRoute: () => AppAppTagsTagIdRoute,
 } as any)
 
-const AppAppRecipesRecipeIdUpdateRoute =
-  AppAppRecipesRecipeIdUpdateImport.update({
-    id: '/app/recipes/$recipeId/update',
-    path: '/app/recipes/$recipeId/update',
-    getParentRoute: () => AppLazyRoute,
+const AppAppRecipesRecipeIdRecipesRoute =
+  AppAppRecipesRecipeIdRecipesImport.update({
+    id: '/_recipes',
+    getParentRoute: () => AppAppRecipesRecipeIdRoute,
   } as any)
 
 const AppAppTagsTagIdTagRecipeRoute = AppAppTagsTagIdTagRecipeImport.update({
@@ -105,11 +106,25 @@ const AppAppTagsTagIdTagRecipeRoute = AppAppTagsTagIdTagRecipeImport.update({
   getParentRoute: () => AppAppTagsTagIdTagRoute,
 } as any)
 
-const AppAppTagsTagIdTagInfoRoute = AppAppTagsTagIdTagInfoImport.update({
-  id: '/info',
-  path: '/info',
+const AppAppTagsTagIdTagGeneralRoute = AppAppTagsTagIdTagGeneralImport.update({
+  id: '/general',
+  path: '/general',
   getParentRoute: () => AppAppTagsTagIdTagRoute,
 } as any)
+
+const AppAppRecipesRecipeIdRecipesUpdateRoute =
+  AppAppRecipesRecipeIdRecipesUpdateImport.update({
+    id: '/update',
+    path: '/update',
+    getParentRoute: () => AppAppRecipesRecipeIdRecipesRoute,
+  } as any)
+
+const AppAppRecipesRecipeIdRecipesGeneralRoute =
+  AppAppRecipesRecipeIdRecipesGeneralImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => AppAppRecipesRecipeIdRecipesRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -164,12 +179,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAppTagsIndexImport
       parentRoute: typeof AppLazyImport
     }
-    '/_app/app/recipes/$recipeId/update': {
-      id: '/_app/app/recipes/$recipeId/update'
-      path: '/app/recipes/$recipeId/update'
-      fullPath: '/app/recipes/$recipeId/update'
-      preLoaderRoute: typeof AppAppRecipesRecipeIdUpdateImport
+    '/_app/app/recipes/$recipeId': {
+      id: '/_app/app/recipes/$recipeId'
+      path: '/app/recipes/$recipeId'
+      fullPath: '/app/recipes/$recipeId'
+      preLoaderRoute: typeof AppAppRecipesRecipeIdImport
       parentRoute: typeof AppLazyImport
+    }
+    '/_app/app/recipes/$recipeId/_recipes': {
+      id: '/_app/app/recipes/$recipeId/_recipes'
+      path: '/app/recipes/$recipeId'
+      fullPath: '/app/recipes/$recipeId'
+      preLoaderRoute: typeof AppAppRecipesRecipeIdRecipesImport
+      parentRoute: typeof AppAppRecipesRecipeIdRoute
     }
     '/_app/app/tags/$tagId': {
       id: '/_app/app/tags/$tagId'
@@ -185,18 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAppTagsTagIdTagImport
       parentRoute: typeof AppAppTagsTagIdRoute
     }
-    '/_app/app/recipes/$recipeId/': {
-      id: '/_app/app/recipes/$recipeId/'
-      path: '/app/recipes/$recipeId'
-      fullPath: '/app/recipes/$recipeId'
-      preLoaderRoute: typeof AppAppRecipesRecipeIdIndexImport
-      parentRoute: typeof AppLazyImport
+    '/_app/app/recipes/$recipeId/_recipes/general': {
+      id: '/_app/app/recipes/$recipeId/_recipes/general'
+      path: '/general'
+      fullPath: '/app/recipes/$recipeId/general'
+      preLoaderRoute: typeof AppAppRecipesRecipeIdRecipesGeneralImport
+      parentRoute: typeof AppAppRecipesRecipeIdRecipesImport
     }
-    '/_app/app/tags/$tagId/_tag/info': {
-      id: '/_app/app/tags/$tagId/_tag/info'
-      path: '/info'
-      fullPath: '/app/tags/$tagId/info'
-      preLoaderRoute: typeof AppAppTagsTagIdTagInfoImport
+    '/_app/app/recipes/$recipeId/_recipes/update': {
+      id: '/_app/app/recipes/$recipeId/_recipes/update'
+      path: '/update'
+      fullPath: '/app/recipes/$recipeId/update'
+      preLoaderRoute: typeof AppAppRecipesRecipeIdRecipesUpdateImport
+      parentRoute: typeof AppAppRecipesRecipeIdRecipesImport
+    }
+    '/_app/app/tags/$tagId/_tag/general': {
+      id: '/_app/app/tags/$tagId/_tag/general'
+      path: '/general'
+      fullPath: '/app/tags/$tagId/general'
+      preLoaderRoute: typeof AppAppTagsTagIdTagGeneralImport
       parentRoute: typeof AppAppTagsTagIdTagImport
     }
     '/_app/app/tags/$tagId/_tag/recipe': {
@@ -211,13 +240,45 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface AppAppRecipesRecipeIdRecipesRouteChildren {
+  AppAppRecipesRecipeIdRecipesGeneralRoute: typeof AppAppRecipesRecipeIdRecipesGeneralRoute
+  AppAppRecipesRecipeIdRecipesUpdateRoute: typeof AppAppRecipesRecipeIdRecipesUpdateRoute
+}
+
+const AppAppRecipesRecipeIdRecipesRouteChildren: AppAppRecipesRecipeIdRecipesRouteChildren =
+  {
+    AppAppRecipesRecipeIdRecipesGeneralRoute:
+      AppAppRecipesRecipeIdRecipesGeneralRoute,
+    AppAppRecipesRecipeIdRecipesUpdateRoute:
+      AppAppRecipesRecipeIdRecipesUpdateRoute,
+  }
+
+const AppAppRecipesRecipeIdRecipesRouteWithChildren =
+  AppAppRecipesRecipeIdRecipesRoute._addFileChildren(
+    AppAppRecipesRecipeIdRecipesRouteChildren,
+  )
+
+interface AppAppRecipesRecipeIdRouteChildren {
+  AppAppRecipesRecipeIdRecipesRoute: typeof AppAppRecipesRecipeIdRecipesRouteWithChildren
+}
+
+const AppAppRecipesRecipeIdRouteChildren: AppAppRecipesRecipeIdRouteChildren = {
+  AppAppRecipesRecipeIdRecipesRoute:
+    AppAppRecipesRecipeIdRecipesRouteWithChildren,
+}
+
+const AppAppRecipesRecipeIdRouteWithChildren =
+  AppAppRecipesRecipeIdRoute._addFileChildren(
+    AppAppRecipesRecipeIdRouteChildren,
+  )
+
 interface AppAppTagsTagIdTagRouteChildren {
-  AppAppTagsTagIdTagInfoRoute: typeof AppAppTagsTagIdTagInfoRoute
+  AppAppTagsTagIdTagGeneralRoute: typeof AppAppTagsTagIdTagGeneralRoute
   AppAppTagsTagIdTagRecipeRoute: typeof AppAppTagsTagIdTagRecipeRoute
 }
 
 const AppAppTagsTagIdTagRouteChildren: AppAppTagsTagIdTagRouteChildren = {
-  AppAppTagsTagIdTagInfoRoute: AppAppTagsTagIdTagInfoRoute,
+  AppAppTagsTagIdTagGeneralRoute: AppAppTagsTagIdTagGeneralRoute,
   AppAppTagsTagIdTagRecipeRoute: AppAppTagsTagIdTagRecipeRoute,
 }
 
@@ -242,9 +303,8 @@ interface AppLazyRouteChildren {
   AppAppRecipesIndexRoute: typeof AppAppRecipesIndexRoute
   AppAppSettingsIndexRoute: typeof AppAppSettingsIndexRoute
   AppAppTagsIndexRoute: typeof AppAppTagsIndexRoute
-  AppAppRecipesRecipeIdUpdateRoute: typeof AppAppRecipesRecipeIdUpdateRoute
+  AppAppRecipesRecipeIdRoute: typeof AppAppRecipesRecipeIdRouteWithChildren
   AppAppTagsTagIdRoute: typeof AppAppTagsTagIdRouteWithChildren
-  AppAppRecipesRecipeIdIndexRoute: typeof AppAppRecipesRecipeIdIndexRoute
 }
 
 const AppLazyRouteChildren: AppLazyRouteChildren = {
@@ -253,9 +313,8 @@ const AppLazyRouteChildren: AppLazyRouteChildren = {
   AppAppRecipesIndexRoute: AppAppRecipesIndexRoute,
   AppAppSettingsIndexRoute: AppAppSettingsIndexRoute,
   AppAppTagsIndexRoute: AppAppTagsIndexRoute,
-  AppAppRecipesRecipeIdUpdateRoute: AppAppRecipesRecipeIdUpdateRoute,
+  AppAppRecipesRecipeIdRoute: AppAppRecipesRecipeIdRouteWithChildren,
   AppAppTagsTagIdRoute: AppAppTagsTagIdRouteWithChildren,
-  AppAppRecipesRecipeIdIndexRoute: AppAppRecipesRecipeIdIndexRoute,
 }
 
 const AppLazyRouteWithChildren =
@@ -269,10 +328,11 @@ export interface FileRoutesByFullPath {
   '/app/recipes': typeof AppAppRecipesIndexRoute
   '/app/settings': typeof AppAppSettingsIndexRoute
   '/app/tags': typeof AppAppTagsIndexRoute
-  '/app/recipes/$recipeId/update': typeof AppAppRecipesRecipeIdUpdateRoute
+  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdRecipesRouteWithChildren
   '/app/tags/$tagId': typeof AppAppTagsTagIdTagRouteWithChildren
-  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdIndexRoute
-  '/app/tags/$tagId/info': typeof AppAppTagsTagIdTagInfoRoute
+  '/app/recipes/$recipeId/general': typeof AppAppRecipesRecipeIdRecipesGeneralRoute
+  '/app/recipes/$recipeId/update': typeof AppAppRecipesRecipeIdRecipesUpdateRoute
+  '/app/tags/$tagId/general': typeof AppAppTagsTagIdTagGeneralRoute
   '/app/tags/$tagId/recipe': typeof AppAppTagsTagIdTagRecipeRoute
 }
 
@@ -284,10 +344,11 @@ export interface FileRoutesByTo {
   '/app/recipes': typeof AppAppRecipesIndexRoute
   '/app/settings': typeof AppAppSettingsIndexRoute
   '/app/tags': typeof AppAppTagsIndexRoute
-  '/app/recipes/$recipeId/update': typeof AppAppRecipesRecipeIdUpdateRoute
+  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdRecipesRouteWithChildren
   '/app/tags/$tagId': typeof AppAppTagsTagIdTagRouteWithChildren
-  '/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdIndexRoute
-  '/app/tags/$tagId/info': typeof AppAppTagsTagIdTagInfoRoute
+  '/app/recipes/$recipeId/general': typeof AppAppRecipesRecipeIdRecipesGeneralRoute
+  '/app/recipes/$recipeId/update': typeof AppAppRecipesRecipeIdRecipesUpdateRoute
+  '/app/tags/$tagId/general': typeof AppAppTagsTagIdTagGeneralRoute
   '/app/tags/$tagId/recipe': typeof AppAppTagsTagIdTagRecipeRoute
 }
 
@@ -300,11 +361,13 @@ export interface FileRoutesById {
   '/_app/app/recipes/': typeof AppAppRecipesIndexRoute
   '/_app/app/settings/': typeof AppAppSettingsIndexRoute
   '/_app/app/tags/': typeof AppAppTagsIndexRoute
-  '/_app/app/recipes/$recipeId/update': typeof AppAppRecipesRecipeIdUpdateRoute
+  '/_app/app/recipes/$recipeId': typeof AppAppRecipesRecipeIdRouteWithChildren
+  '/_app/app/recipes/$recipeId/_recipes': typeof AppAppRecipesRecipeIdRecipesRouteWithChildren
   '/_app/app/tags/$tagId': typeof AppAppTagsTagIdRouteWithChildren
   '/_app/app/tags/$tagId/_tag': typeof AppAppTagsTagIdTagRouteWithChildren
-  '/_app/app/recipes/$recipeId/': typeof AppAppRecipesRecipeIdIndexRoute
-  '/_app/app/tags/$tagId/_tag/info': typeof AppAppTagsTagIdTagInfoRoute
+  '/_app/app/recipes/$recipeId/_recipes/general': typeof AppAppRecipesRecipeIdRecipesGeneralRoute
+  '/_app/app/recipes/$recipeId/_recipes/update': typeof AppAppRecipesRecipeIdRecipesUpdateRoute
+  '/_app/app/tags/$tagId/_tag/general': typeof AppAppTagsTagIdTagGeneralRoute
   '/_app/app/tags/$tagId/_tag/recipe': typeof AppAppTagsTagIdTagRecipeRoute
 }
 
@@ -318,10 +381,11 @@ export interface FileRouteTypes {
     | '/app/recipes'
     | '/app/settings'
     | '/app/tags'
-    | '/app/recipes/$recipeId/update'
-    | '/app/tags/$tagId'
     | '/app/recipes/$recipeId'
-    | '/app/tags/$tagId/info'
+    | '/app/tags/$tagId'
+    | '/app/recipes/$recipeId/general'
+    | '/app/recipes/$recipeId/update'
+    | '/app/tags/$tagId/general'
     | '/app/tags/$tagId/recipe'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -332,10 +396,11 @@ export interface FileRouteTypes {
     | '/app/recipes'
     | '/app/settings'
     | '/app/tags'
-    | '/app/recipes/$recipeId/update'
-    | '/app/tags/$tagId'
     | '/app/recipes/$recipeId'
-    | '/app/tags/$tagId/info'
+    | '/app/tags/$tagId'
+    | '/app/recipes/$recipeId/general'
+    | '/app/recipes/$recipeId/update'
+    | '/app/tags/$tagId/general'
     | '/app/tags/$tagId/recipe'
   id:
     | '__root__'
@@ -346,11 +411,13 @@ export interface FileRouteTypes {
     | '/_app/app/recipes/'
     | '/_app/app/settings/'
     | '/_app/app/tags/'
-    | '/_app/app/recipes/$recipeId/update'
+    | '/_app/app/recipes/$recipeId'
+    | '/_app/app/recipes/$recipeId/_recipes'
     | '/_app/app/tags/$tagId'
     | '/_app/app/tags/$tagId/_tag'
-    | '/_app/app/recipes/$recipeId/'
-    | '/_app/app/tags/$tagId/_tag/info'
+    | '/_app/app/recipes/$recipeId/_recipes/general'
+    | '/_app/app/recipes/$recipeId/_recipes/update'
+    | '/_app/app/tags/$tagId/_tag/general'
     | '/_app/app/tags/$tagId/_tag/recipe'
   fileRoutesById: FileRoutesById
 }
@@ -390,9 +457,8 @@ export const routeTree = rootRoute
         "/_app/app/recipes/",
         "/_app/app/settings/",
         "/_app/app/tags/",
-        "/_app/app/recipes/$recipeId/update",
-        "/_app/app/tags/$tagId",
-        "/_app/app/recipes/$recipeId/"
+        "/_app/app/recipes/$recipeId",
+        "/_app/app/tags/$tagId"
       ]
     },
     "/_app/app/recipes/create": {
@@ -415,9 +481,20 @@ export const routeTree = rootRoute
       "filePath": "_app/app/tags/index.tsx",
       "parent": "/_app"
     },
-    "/_app/app/recipes/$recipeId/update": {
-      "filePath": "_app/app/recipes/$recipeId/update.tsx",
-      "parent": "/_app"
+    "/_app/app/recipes/$recipeId": {
+      "filePath": "_app/app/recipes/$recipeId",
+      "parent": "/_app",
+      "children": [
+        "/_app/app/recipes/$recipeId/_recipes"
+      ]
+    },
+    "/_app/app/recipes/$recipeId/_recipes": {
+      "filePath": "_app/app/recipes/$recipeId/_recipes.tsx",
+      "parent": "/_app/app/recipes/$recipeId",
+      "children": [
+        "/_app/app/recipes/$recipeId/_recipes/general",
+        "/_app/app/recipes/$recipeId/_recipes/update"
+      ]
     },
     "/_app/app/tags/$tagId": {
       "filePath": "_app/app/tags/$tagId",
@@ -430,16 +507,20 @@ export const routeTree = rootRoute
       "filePath": "_app/app/tags/$tagId/_tag.tsx",
       "parent": "/_app/app/tags/$tagId",
       "children": [
-        "/_app/app/tags/$tagId/_tag/info",
+        "/_app/app/tags/$tagId/_tag/general",
         "/_app/app/tags/$tagId/_tag/recipe"
       ]
     },
-    "/_app/app/recipes/$recipeId/": {
-      "filePath": "_app/app/recipes/$recipeId/index.tsx",
-      "parent": "/_app"
+    "/_app/app/recipes/$recipeId/_recipes/general": {
+      "filePath": "_app/app/recipes/$recipeId/_recipes/general.tsx",
+      "parent": "/_app/app/recipes/$recipeId/_recipes"
     },
-    "/_app/app/tags/$tagId/_tag/info": {
-      "filePath": "_app/app/tags/$tagId/_tag/info.tsx",
+    "/_app/app/recipes/$recipeId/_recipes/update": {
+      "filePath": "_app/app/recipes/$recipeId/_recipes/update.tsx",
+      "parent": "/_app/app/recipes/$recipeId/_recipes"
+    },
+    "/_app/app/tags/$tagId/_tag/general": {
+      "filePath": "_app/app/tags/$tagId/_tag/general.tsx",
       "parent": "/_app/app/tags/$tagId/_tag"
     },
     "/_app/app/tags/$tagId/_tag/recipe": {

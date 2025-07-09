@@ -11,7 +11,7 @@ import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { DataTable } from "@/components/ui/data-table.tsx";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { CheckIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { CheckIcon, Info, PlusIcon, SearchIcon } from "lucide-react";
 import {
     Command,
     CommandEmpty,
@@ -99,7 +99,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                 cell: ({ row }) => (
                     <div className="flex flex-wrap gap-1">
                         {row.original.tags.map((tag) => (
-                            <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                            <Link to="/app/tags/$tagId/info" params={{ tagId: tag.uuid }} key={tag.uuid}>
                                 <Badge
                                     variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
                                     key={tag.uuid}
@@ -108,6 +108,24 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                 </Badge>
                             </Link>
                         ))}
+                    </div>
+                ),
+            },
+            {
+                accessorKey: "action",
+                header: () => <div className="flex justify-end">{tg("table.action")}</div>,
+                cell: ({ row }) => (
+                    <div className={"flex justify-end pr-4"}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
+                                    <Info className={"size-4"} />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tg("tooltip.info")}</p>
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 ),
             },

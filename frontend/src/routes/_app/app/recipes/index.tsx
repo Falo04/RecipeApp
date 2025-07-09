@@ -1,16 +1,17 @@
-import { Api } from "@/api/api";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table.tsx";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import { Text } from "@/components/ui/text.tsx";
+import RECIPES_CONTEXT from "@/context/recipes.tsx";
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 
 /**
  * The properties for {@link FoodOverview}
@@ -24,6 +25,7 @@ export function FoodOverview(_props: FoodOverviewProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
+    const data = React.useContext(RECIPES_CONTEXT);
     // const { offset, limit } = Route.useSearch();
 
     const columns: ColumnDef<SimpleRecipeWithTags>[] = useMemo(
@@ -31,20 +33,12 @@ export function FoodOverview(_props: FoodOverviewProps) {
             {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
-                cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <Text className="overflow-hidden text-ellipsis">{row.original.name}</Text>
-                    </Link>
-                ),
+                cell: ({ row }) => <Text className="overflow-hidden text-ellipsis">{row.original.name}</Text>,
             },
             {
                 accessorKey: "description",
                 header: () => <span>{tg("table.description")}</span>,
-                cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <Text className={"overflow-hidden text-ellipsis"}>{row.original.description}</Text>
-                    </Link>
-                ),
+                cell: ({ row }) => <Text className={"overflow-hidden text-ellipsis"}>{row.original.description}</Text>,
             },
             {
                 accessorKey: "tags",
@@ -52,7 +46,7 @@ export function FoodOverview(_props: FoodOverviewProps) {
                 cell: ({ row }) => (
                     <div className="flex flex-wrap gap-1">
                         {row.original.tags.map((tag) => (
-                            <Link to="/app/tag/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                            <Link to="/app/tags/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
                                 <Badge
                                     variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
                                     key={tag.uuid}
@@ -64,40 +58,42 @@ export function FoodOverview(_props: FoodOverviewProps) {
                     </div>
                 ),
             },
+            {
+                accessorKey: "action",
+                header: () => <div className="flex justify-end">{tg("table.action")}</div>,
+                cell: ({ row }) => (
+                    <div className={"flex justify-end pr-4"}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
+                                    <Info className={"size-4"} />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tg("tooltip.info")}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                ),
+            },
         ],
         [],
     );
 
-    const data = Route.useLoaderData();
-    if (!data) {
-        return;
-    }
-
     return (
         <HeadingLayout
             heading={t("heading.overview-title")}
-            headingDescription={t("heading.overview-description")}
             headingChildren={
                 <Link to={"/app/recipes/create"}>
                     <Button>{t("button.create")}</Button>
                 </Link>
             }
         >
-            <DataTable filterTag={t("input.filter")} columns={columns} data={data.items} />
+            <DataTable filterTag={t("input.filter")} columns={columns} data={data.recipes.items} />
         </HeadingLayout>
     );
 }
 
 export const Route = createFileRoute("/_app/app/recipes/")({
     component: FoodOverview,
-    loader: async () => {
-        const res = await Api.recipe.getAll(50, 0);
-
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        return res.data;
-    },
 });

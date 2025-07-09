@@ -2,6 +2,9 @@
     "button": {
         "close": "Close"
     },
+    "error": {
+        "stepper-message": "Error, please provide a correct information"
+    },
     "label": {
         "appearance": "Select Appearance",
         "color": "Color",
@@ -16,12 +19,20 @@
         "password": "Password",
         "steps": "Step"
     },
-    "sidebar": {
+    "menu": {
         "app-title": "Recipe App",
+        "dashboard": "Dashboard",
         "ingredients": "Ingredients",
         "recipes": "Recipes",
         "settings": "Settings",
         "tags": "Tags"
+    },
+    "sr-only": {
+        "breadcrumb-menu": "Breadcrumb menu"
+    },
+    "tab": {
+        "general": "General",
+        "recipe": "Assigned Recipes"
     },
     "table": {
         "action": "Action",
@@ -36,9 +47,7 @@
         "loading": "Loading..."
     },
     "tooltip": {
-        "close": "Close Menu",
-        "delete": "Delete",
-        "edit": "Edit",
-        "filter": "Filter {{object}}"
+        "filter": "Filter {{object}}",
+        "info": "More information's"
     }
 }

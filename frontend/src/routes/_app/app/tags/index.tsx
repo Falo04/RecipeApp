@@ -60,7 +60,7 @@ export function TagsOverview(_props: TagsOverviewProps) {
                     <div className={"flex justify-end pr-4"}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Link to={"/app/tags/$tagId/info"} params={{ tagId: row.original.uuid }}>
+                                <Link to={"/app/tags/$tagId/general"} params={{ tagId: row.original.uuid }}>
                                     <Info className={"size-4"} />
                                 </Link>
                             </TooltipTrigger>

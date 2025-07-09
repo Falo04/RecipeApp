@@ -63,7 +63,7 @@ export function RecipeSearch(_props: RecipeSearchProps) {
                     role={"combobox"}
                     aria-expanded={open}
                     size={"icon"}
-                    className={"lg:w-full"}
+                    className={"md:w-full"}
                 >
                     <Search />
                     {!isMobile && t("search.recipes")}

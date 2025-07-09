@@ -17,15 +17,12 @@
         "too-long": "Eingabe ist zu lang, darf maximal 255 Zeichen lang sein"
     },
     "heading": {
-        "create-heading": "Rezept erstellen",
+        "create": "Erstelle Rezept",
         "ingredients": "Liste aller Zutaten",
         "ingredients-title": "Gebe Zutaten ein",
-        "overview-description": "Alle Rezepte sind hier aufgelistet",
         "overview-title": "Rezept \u00dcbersicht",
         "step-title": "Gebe deine Anleitungen ein",
-        "steps": "Anleitung:",
-        "tags": "Tag:",
-        "update-heading": "Rezept aktualisieren"
+        "steps": "Anleitung:"
     },
     "input": {
         "filter": "Rezept suchen"
@@ -41,6 +38,14 @@
     "search": {
         "recipes": "Suche Rezepte",
         "recipes-empty": "Keine Rezepte gefunden"
+    },
+    "stepper": {
+        "ingredients-description": "Gebe zutaten an für das Rezept",
+        "ingredients-title": "Zutaten",
+        "meta-description": "Gebe allgemeine Information über das Rezept an",
+        "meta-title": "Allgemeine Information",
+        "steps-description": "Gebe einzelne Schritte für das Rezept an",
+        "steps-title": "Anleitung"
     },
     "toast": {
         "created-success": "Rezept erfolgreich erstellt",
