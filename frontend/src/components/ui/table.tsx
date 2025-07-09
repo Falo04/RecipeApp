@@ -21,7 +21,7 @@ function TableStickyHeader({ className, ...props }: React.ComponentProps<"table"
             className={"border-border block h-full w-full overflow-x-auto rounded-lg border py-2"}
             ref={tableRef}
         >
-            <ScrollArea style={{ height: `${tableHeight}px` }}>
+            <ScrollArea style={{ height: `${tableHeight - 25}px` }}>
                 <table
                     data-slot="table"
                     className={cn("w-full table-fixed caption-bottom text-sm", className)}
@@ -87,7 +87,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
         <td
             data-slot="table-cell"
             className={cn(
-                "p-2 px-4 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+                "p-3 px-4 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
                 className,
             )}
             {...props}

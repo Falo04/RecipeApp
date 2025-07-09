@@ -3,14 +3,16 @@ import React from "react";
 
 export function Text({ className, ...props }: React.ComponentPropsWithoutRef<"p">) {
     return (
-        <p
-            data-slot="text"
-            {...props}
-            className={clsx(className, "text-sm/6 text-zinc-500 sm:text-base/6 dark:text-zinc-400")}
-        />
+        <p data-slot="text" {...props} className={clsx(className, "text-muted-foreground text-sm/6 sm:text-base/6")} />
     );
 }
 
 export function ErrorMessage({ className, ...props }: React.ComponentPropsWithoutRef<"p">) {
-    return <p data-slot="text" {...props} className={clsx(className, "absolute text-sm text-nowrap text-red-500")} />;
+    return (
+        <p
+            data-slot="text"
+            {...props}
+            className={clsx(className, "text-destructive-foreground absolute text-sm text-nowrap")}
+        />
+    );
 }

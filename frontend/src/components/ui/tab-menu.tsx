@@ -9,7 +9,7 @@ export type TabMenuProps = {
 
 export function TabMenu(props: TabMenuProps) {
     return (
-        <div className={"gap4 flex h-full w-full flex-col gap-6"}>
+        <div className={"gap4 sticky top-0 flex h-full w-full flex-col gap-6"}>
             <nav className={"border-border flex gap-6 border-b"}>{props.children}</nav>
             <Outlet />
         </div>

@@ -11,10 +11,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./button.tsx";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableStickyHeader } from "./table.tsx";
 import { type ColumnFiltersState, getFilteredRowModel } from "@tanstack/table-core";
-import { Input } from "@/components/ui/input.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import React from "react";
+import { Input } from "@/components/ui/form.tsx";
 
 /**
  * The properties for {@link DataTable}
@@ -55,7 +55,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
     return (
         <div className={"flex h-full w-full flex-col justify-between gap-4"}>
             <div className={"flex h-full flex-col gap-2"}>
-                <div className={"flex items-center py-4"}>
+                <div className={"flex items-center"}>
                     <Input
                         placeholder={props.filterTag}
                         value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
