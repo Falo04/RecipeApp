@@ -39,7 +39,7 @@ export function UpdateRecipe(_props: UpdateRecipeProps) {
     );
 }
 
-export const Route = createFileRoute("/_app/app/recipes/$recipeId/update")({
+export const Route = createFileRoute("/_app/app/recipes/$recipeId/_recipes/update")({
     component: UpdateRecipe,
     loader: async ({ params }) => {
         const res = await Api.recipe.getById(params.recipeId);

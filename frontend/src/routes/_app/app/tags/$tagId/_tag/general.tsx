@@ -6,8 +6,7 @@ import { useForm } from "@tanstack/react-form";
 import { type CreateOrUpdateTag, type SimpleTag, TagColors } from "@/api/model/tag.interface.ts";
 import { toast } from "sonner";
 import { Api } from "@/api/api.tsx";
-import { FormLabel } from "@/components/ui/form.tsx";
-import { Input } from "@/components/ui/input.tsx";
+import { FormLabel, Input, Form } from "@/components/ui/form.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
@@ -64,13 +63,7 @@ export function TagDetail(_props: TagDetailProps) {
 
     return (
         <>
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    form.handleSubmit();
-                }}
-                className="max-w-lg space-y-8"
-            >
+            <Form onSubmit={form.handleSubmit}>
                 <form.Field
                     name="name"
                     validators={{
@@ -126,7 +119,7 @@ export function TagDetail(_props: TagDetailProps) {
                     </Button>
                     <Button type={"submit"}>{t("button.update")}</Button>
                 </div>
-            </form>
+            </Form>
             {openDeleteTag && (
                 <Suspense>
                     <DeleteTagDialog
@@ -143,6 +136,6 @@ export function TagDetail(_props: TagDetailProps) {
     );
 }
 
-export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/info")({
+export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/general")({
     component: TagDetail,
 });
