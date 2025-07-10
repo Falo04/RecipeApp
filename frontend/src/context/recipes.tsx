@@ -53,7 +53,6 @@ type RecipesProviderProps = {
 
 /**
  * Provides a context with recipe data.
- *
  * @param {RecipesProviderProps} props Props passed to the provider.
  */
 export function RecipesProvider(props: RecipesProviderProps) {

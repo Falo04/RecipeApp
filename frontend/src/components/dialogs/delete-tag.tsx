@@ -15,7 +15,7 @@ export type DeleteTagDialogProps = {
 };
 
 /**
- * The DeleteTagDialog
+ * Dialog to delete a tag
  */
 export function DeleteTagDialog(props: DeleteTagDialogProps) {
     const [t] = useTranslation("tag");

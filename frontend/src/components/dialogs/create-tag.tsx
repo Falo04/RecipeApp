@@ -13,10 +13,16 @@ import { Badge, badgeVariants } from "../ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import { ErrorMessage } from "@/components/ui/text.tsx";
 
+/**
+ * The properties for {@link CreateTagDialog}
+ */
 export type CreateTagDialogProps = {
     onClose: () => void;
 };
 
+/**
+ * Dialog for creating tags
+ */
 export function CreateTagDialog(props: CreateTagDialogProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
@@ -28,7 +34,6 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
             color: TagColors.Blue,
         },
         onSubmit: async (values) => {
-            console.log(values);
             const payload: CreateOrUpdateTag = {
                 name: values.value.name,
                 color: values.value.color,

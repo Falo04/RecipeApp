@@ -2,10 +2,6 @@ import { useEffect, useRef, useState } from "react";
 
 /**
  * Returns a hook that tracks the height of a specified HTML element.
- *
- * @returns A tuple containing:
- *   - A React ref object that allows manual reference to the HTML element.
- *   - The current height of the element in pixels.
  */
 export function useElementHeight<T extends HTMLElement>() {
     const elementRef = useRef<T>(null);

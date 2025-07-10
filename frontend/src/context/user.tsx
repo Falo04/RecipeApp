@@ -19,7 +19,7 @@ export type UserContext = {
     reset: () => void;
 };
 
-/** {@link React.Context} to access {@link FullUser user information} */
+/** {@link React.Context} to access {@link UserContext user information} */
 const USER_CONTEXT = React.createContext<UserContext>({
     user: undefined,
 
@@ -119,7 +119,9 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
         // Register as global singleton
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         if (USER_PROVIDER === null) USER_PROVIDER = this;
+        // eslint-disable-next-line no-console
         else if (USER_PROVIDER === this) console.error("UserProvider did mount twice");
+        // eslint-disable-next-line no-console
         else console.error("Two instances of UserProvider are used");
     }
 
@@ -129,14 +131,14 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
     componentWillUnmount() {
         // Deregister as global singleton
         if (USER_PROVIDER === this) USER_PROVIDER = null;
+        // eslint-disable-next-line no-console
         else if (USER_PROVIDER === null) console.error("UserProvider instance did unmount twice");
+        // eslint-disable-next-line no-console
         else console.error("Two instances of UserProvider are used");
     }
 
     /**
      * The render function
-     *
-     * @returns The JSX component
      */
     render() {
         switch (this.state.user) {

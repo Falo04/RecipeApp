@@ -70,11 +70,6 @@ export default function RecipeOverviewForTag() {
 
 export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/recipe")({
     component: RecipeOverviewForTag,
-    /**
-     *
-     * @param root0
-     * @param root0.params
-     */
     loader: async ({ params }) => {
         const res = await Api.tags.getRecipesByTag(params.tagId);
         if (res.error) {

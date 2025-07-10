@@ -16,6 +16,9 @@ import { ApiClient } from "./api-client";
 import type { MetaResponse } from "@/api/model/meta.interface.ts";
 import type { AllIngredientsRequest, SimpleIngredient } from "@/api/model/ingredients.interface.ts";
 
+/**
+ * Api wrapper containing various API endpoints.
+ */
 export const Api = {
     meta: {
         get: async (): Promise<ApiResponse<MetaResponse>> =>
@@ -72,6 +75,9 @@ export const Api = {
     },
 };
 
+/**
+ * Calls an API endpoint and returns the response data.
+ */
 export async function callApi<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
         const { data } = await ApiClient.request<T>(config);

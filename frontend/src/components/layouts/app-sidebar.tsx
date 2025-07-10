@@ -12,13 +12,22 @@ import {
 } from "@/components/ui/sidebar.tsx";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { type LucideIcon, SettingsIcon } from "lucide-react";
-import type { NavItem } from "@/components/layouts/navbar.tsx";
 import { Heading, Subheading } from "@/components/ui/heading.tsx";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import { RecipeSearch } from "@/components/recipe-search.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { Separator } from "@/components/ui/separator.tsx";
+
+/**
+ * Represents a single item within a navigation menu.
+ */
+export type NavItem = {
+    id: string;
+    title: string;
+    url: string;
+    Icon: LucideIcon;
+};
 
 /**
  * The properties for {@link AppSidebar}

@@ -42,8 +42,6 @@ export function TagDetail() {
                 color: values.value.color,
             };
 
-            console.log(values, payload);
-
             toast.promise(Api.tags.update(tag.uuid, payload), {
                 loading: tg("toast.loading"),
                 success: (result) => {

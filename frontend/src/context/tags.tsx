@@ -53,7 +53,6 @@ type TagsProviderProps = {
 
 /**
  * Provides a context with tags data.
- *
  * @param {TagsProviderProps} props Props passed to the provider.
  */
 export function TagsProvider(props: TagsProviderProps) {

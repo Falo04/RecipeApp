@@ -18,7 +18,7 @@ export type IngredientProvider = {
 /**
  * A React context provider for managing ingredients-related data.
  * This context offers a centralized location to manage and access
- * ingredients data
+ * ingredient data
  *
  * It also includes a reset function for managing state.
  */
@@ -47,8 +47,7 @@ type IngredientProviderProps = {
 };
 
 /**
- * Provides a context with ingredients data.
- *
+ * Provides a context with ingredient data.
  * @param {IngredientProviderProps} props Props passed to the provider.
  */
 export function IngredientProvider(props: IngredientProviderProps) {
