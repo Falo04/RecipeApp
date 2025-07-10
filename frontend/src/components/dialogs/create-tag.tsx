@@ -11,6 +11,7 @@ import TAGS_CONTEXT from "@/context/tags";
 import { useForm } from "@tanstack/react-form";
 import { Badge, badgeVariants } from "../ui/badge";
 import type { VariantProps } from "class-variance-authority";
+import { ErrorMessage } from "@/components/ui/text.tsx";
 
 export type CreateTagDialogProps = {
     onClose: () => void;
@@ -78,29 +79,29 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                                       ? t("error.too-long")
                                       : undefined,
                         }}
-                        children={(field) => (
-                            <div>
+                    >
+                        {(fieldApi) => (
+                            <>
                                 <FormLabel htmlFor="name">{tg("label.name")}</FormLabel>
                                 <Input
                                     id="name"
-                                    value={field.state.value}
-                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    value={fieldApi.state.value}
+                                    onChange={(e) => fieldApi.handleChange(e.target.value)}
                                     placeholder="name"
                                 />
-                                {field.state.meta.errors.map((err) => (
-                                    <p className="text-sm text-red-500">{err}</p>
+                                {fieldApi.state.meta.errors.map((err) => (
+                                    <ErrorMessage key={err}>{err}</ErrorMessage>
                                 ))}
-                            </div>
+                            </>
                         )}
-                    />
-                    <form.Field
-                        name="color"
-                        children={(field) => (
-                            <div>
+                    </form.Field>
+                    <form.Field name="color">
+                        {(fieldApi) => (
+                            <>
                                 <FormLabel htmlFor="create-tag">{tg("label.color")}</FormLabel>
                                 <Select
-                                    value={field.state.value}
-                                    onValueChange={(val) => field.setValue(val as TagColors)}
+                                    value={fieldApi.state.value}
+                                    onValueChange={(val) => fieldApi.setValue(val as TagColors)}
                                 >
                                     <div>
                                         <SelectTrigger id={"create-tag"} className="w-full">
@@ -123,9 +124,9 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                            </div>
+                            </>
                         )}
-                    />
+                    </form.Field>
                     <DialogFooter>
                         <div className="flex w-full justify-between">
                             <Button type="button" variant="secondary" onClick={() => props.onClose()}>

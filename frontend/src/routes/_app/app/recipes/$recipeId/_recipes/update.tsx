@@ -6,14 +6,12 @@ import React from "react";
 /**
  * The properties for {@link UpdateRecipe}
  */
-export type UpdateRecipeProps = {};
+export type UpdateRecipeProps = object;
 
 /**
  * Updates the recipe data.
- *
- * @param _props
  */
-export function UpdateRecipe(_props: UpdateRecipeProps) {
+export function UpdateRecipe() {
     const { recipe } = React.useContext(SINGLE_RECIPE_CONTEXT);
     const navigate = useNavigate();
 

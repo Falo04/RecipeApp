@@ -13,12 +13,12 @@ import { RecipesProvider } from "@/context/recipes.tsx";
 /**
  * The properties for {@link FoodMenu}
  */
-export type FoodMenuProps = {};
+export type FoodMenuProps = object;
 
 /**
  * The root layout for the application
  */
-export default function FoodMenu(_props: FoodMenuProps) {
+export default function FoodMenu() {
     const [tg] = useTranslation();
     const app_meta_data = {
         title: tg("menu.app-title"),
@@ -55,12 +55,11 @@ export default function FoodMenu(_props: FoodMenuProps) {
                 />
             }
             header={<BreadcrumbMenuBar navItems={app_meta_data.navMain} />}
-            children={
-                <Suspense>
-                    <Outlet />
-                </Suspense>
-            }
-        ></BaseLayout>
+        >
+            <Suspense>
+                <Outlet />
+            </Suspense>
+        </BaseLayout>
     );
 }
 

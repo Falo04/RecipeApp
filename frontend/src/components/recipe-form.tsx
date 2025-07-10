@@ -191,7 +191,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                 placeholder={t("placeholder.name")}
                                             />
                                             {field.state.meta.errors.map((err) => (
-                                                <ErrorMessage>{err}</ErrorMessage>
+                                                <ErrorMessage key={err}>{err}</ErrorMessage>
                                             ))}
                                         </div>
                                     )}
@@ -216,7 +216,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                 className="h-[100px] resize-none"
                                             />
                                             {field.state.meta.errors.map((err) => (
-                                                <ErrorMessage>{err}</ErrorMessage>
+                                                <ErrorMessage key={err}>{err}</ErrorMessage>
                                             ))}
                                         </div>
                                     )}
@@ -301,10 +301,8 @@ export function RecipeForm(props: RecipeFormProps) {
                             animate={animate}
                             exit={exit}
                         >
-                            <form.Field
-                                name="ingredients"
-                                mode="array"
-                                children={(ingredients) => (
+                            <form.Field name="ingredients" mode="array">
+                                {(fieldArrayApi) => (
                                     <div className={"flex h-full flex-col gap-6"}>
                                         <div className={"flex justify-between"}>
                                             <Subheading level={2}>{t("heading.ingredients-title")}</Subheading>
@@ -324,7 +322,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                         return;
                                                     }
                                                     if (ingreName && ingreAmount && ingreUnit) {
-                                                        ingredients.pushValue({
+                                                        fieldArrayApi.pushValue({
                                                             name: ingreName ?? "nothing",
                                                             amount: ingreAmount ?? 0,
                                                             unit: ingreUnit ?? Units.Teaspoon,
@@ -393,13 +391,13 @@ export function RecipeForm(props: RecipeFormProps) {
                                         <div className={"h-full"}>
                                             <IngredientsGrid
                                                 withScrolling={true}
-                                                ingredients={ingredients.state.value}
-                                                onDelete={(index) => ingredients.removeValue(index)}
+                                                ingredients={fieldArrayApi.state.value}
+                                                onDelete={(index) => fieldArrayApi.removeValue(index)}
                                             />
                                         </div>
                                     </div>
                                 )}
-                            />
+                            </form.Field>
                         </motion.div>
                     )}
                     {state === 2 && (
@@ -448,7 +446,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                                     className="h-[100px] resize-none"
                                                                 />
                                                                 {f.state.meta.errors.map((err) => (
-                                                                    <ErrorMessage>{err}</ErrorMessage>
+                                                                    <ErrorMessage key={err}>{err}</ErrorMessage>
                                                                 ))}
                                                             </div>
                                                         )}

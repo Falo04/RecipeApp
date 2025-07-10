@@ -13,14 +13,12 @@ import { Text } from "@/components/ui/text.tsx";
 /**
  * The properties for {@link RecipeOverviewForTag}
  */
-export type RecipeOverviewForTagProps = {};
+export type RecipeOverviewForTagProps = object;
 
 /**
- * Shows all recipes which are tagged to this tag
- *
- * @param _props
+ * Shows all recipes that are tagged to this tag
  */
-export default function RecipeOverviewForTag(_props: RecipeOverviewForTagProps) {
+export default function RecipeOverviewForTag() {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

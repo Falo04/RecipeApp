@@ -16,14 +16,12 @@ import { DataTable } from "@/components/ui/data-table.tsx";
 /**
  * The properties for {@link FoodOverview}
  */
-export type FoodOverviewProps = {};
+export type FoodOverviewProps = object;
 
 /**
  * Renders a food overview table.
- *
- * @param _props
  */
-export function FoodOverview(_props: FoodOverviewProps) {
+export function FoodOverview() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 

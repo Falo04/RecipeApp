@@ -18,14 +18,12 @@ import { Text } from "@/components/ui/text.tsx";
 /**
  * The properties for {@link TagsOverview}
  */
-export type TagsOverviewProps = {};
+export type TagsOverviewProps = object;
 
 /**
  * Renders a tag overview table.
- *
- * @param _props
  */
-export function TagsOverview(_props: TagsOverviewProps) {
+export function TagsOverview() {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
 

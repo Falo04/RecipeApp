@@ -7,14 +7,12 @@ import { Separator } from "@/components/ui/separator.tsx";
 /**
  * The properties for {@link CreateRecipe}
  */
-export type CreateRecipeProps = {};
+export type CreateRecipeProps = object;
 
 /**
  * Renders a recipe creation form within a submenu layout.
- *
- * @param _props
  */
-export function CreateRecipe(_props: CreateRecipeProps) {
+export function CreateRecipe() {
     const [t] = useTranslation("recipe");
 
     const navigate = useNavigate();

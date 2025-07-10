@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Form, FormLabel, Input } from "./ui/form";
 import type { UserSignInRequest } from "@/api/model/jwt.interface";
+import { ErrorMessage } from "@/components/ui/text.tsx";
 
 /**
  * The properties for {@link Login}
@@ -71,42 +72,44 @@ export function Login(props: LoginProps) {
                                         onChange: ({ value }) =>
                                             value.includes("@") ? undefined : t("error.invalid-email"),
                                     }}
-                                    children={(field) => (
+                                >
+                                    {(fieldApi) => (
                                         <div>
                                             <FormLabel htmlFor="email">{tg("label.email")}</FormLabel>
                                             <Input
                                                 id="email"
                                                 placeholder={t("placeholder.email")}
-                                                value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                value={fieldApi.state.value}
+                                                onChange={(e) => fieldApi.handleChange(e.target.value)}
                                             />
-                                            {field.state.meta.errors.map((err) => (
-                                                <p className="text-sm text-red-500">{err}</p>
+                                            {fieldApi.state.meta.errors.map((err) => (
+                                                <ErrorMessage key={err}>{err}</ErrorMessage>
                                             ))}
                                         </div>
                                     )}
-                                />
+                                </form.Field>
                                 <form.Field
                                     name="password"
                                     validators={{
                                         onChange: ({ value }) =>
                                             value.length >= 3 ? undefined : t("error.password-too-short"),
                                     }}
-                                    children={(field) => (
+                                >
+                                    {(fieldApi) => (
                                         <div>
                                             <FormLabel htmlFor="password">{tg("label.password")}</FormLabel>
                                             <Input
                                                 id="password"
                                                 placeholder={t("placeholder.password")}
-                                                value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                value={fieldApi.state.value}
+                                                onChange={(e) => fieldApi.handleChange(e.target.value)}
                                             />
-                                            {field.state.meta.errors.map((err) => (
-                                                <p className="text-sm text-red-500">{err}</p>
+                                            {fieldApi.state.meta.errors.map((err) => (
+                                                <ErrorMessage key={err}>{err}</ErrorMessage>
                                             ))}
                                         </div>
                                     )}
-                                />
+                                </form.Field>
                                 <Button type="submit">{t("button.login")}</Button>
                             </Form>
                         </CardContent>

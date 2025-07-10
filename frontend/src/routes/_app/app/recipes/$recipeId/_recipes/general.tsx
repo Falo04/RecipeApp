@@ -13,14 +13,12 @@ import IngredientsGrid from "@/components/ingredients-grid.tsx";
 /**
  * The properties for {@link RecipeDetail}
  */
-export type RecipeDetailProps = {};
+export type RecipeDetailProps = object;
 
 /**
  * Displays detailed information about a recipe.
- *
- * @param _props
  */
-export function RecipeDetail(_props: RecipeDetailProps) {
+export function RecipeDetail() {
     const [t] = useTranslation("recipe");
     const [ref, height] = useElementHeight<HTMLDivElement>();
 

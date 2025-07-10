@@ -6,14 +6,12 @@ import SINGLE_RECIPE_CONTEXT, { SingleRecipeProvider } from "@/context/recipe.ts
 /**
  * The properties for {@link SingleRecipeView}
  */
-export type SingleRecipeViewProps = {};
+export type SingleRecipeViewProps = object;
 
 /**
  * The Layout for a single recipe
- *
- * @param _props
  */
-export default function SingleRecipeView(_props: SingleRecipeViewProps) {
+export default function SingleRecipeView() {
     const [tg] = useTranslation();
 
     const { recipeId } = Route.useParams();
@@ -21,7 +19,7 @@ export default function SingleRecipeView(_props: SingleRecipeViewProps) {
     return (
         <SingleRecipeProvider uuid={recipeId}>
             <SINGLE_RECIPE_CONTEXT.Consumer>
-                {(_ctx) => (
+                {() => (
                     <TabMenu>
                         <Tab to={"/app/recipes/$recipeId/general"} params={{ recipeId }}>
                             {tg("tab.general")}

@@ -21,14 +21,12 @@ import { Spinner } from "@/components/ui/spinner.tsx";
 /**
  * The properties for {@link RecipeSearch}
  */
-export type RecipeSearchProps = {};
+export type RecipeSearchProps = object;
 
 /**
  * Provides a recipe search component with suggestions.
- *
- * @param _props
  */
-export function RecipeSearch(_props: RecipeSearchProps) {
+export function RecipeSearch() {
     const [t] = useTranslation("recipe");
     const navigate = useNavigate();
     const isMobile = useIsMobile();

@@ -11,13 +11,12 @@ import { toast } from "sonner";
 /**
  * The properties for {@link Settings}
  */
-export type SettingsProps = {};
+export type SettingsProps = object;
 
 /**
- *
- * @param _props
+ * Settings component
  */
-export function Settings(_props: SettingsProps) {
+export function Settings() {
     const [t] = useTranslation("settings");
     const [tg] = useTranslation();
 

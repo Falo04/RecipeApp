@@ -6,12 +6,12 @@ import { Tab, TabMenu } from "@/components/ui/tab-menu.tsx";
 /**
  * The properties for {@link SingleTagView}
  */
-export type SingleTagViewProps = {};
+export type SingleTagViewProps = object;
 
 /**
  * The Layout for a single tag
  */
-export default function SingleTagView(_props: SingleTagViewProps) {
+export default function SingleTagView() {
     const [tg] = useTranslation();
 
     const { tagId } = Route.useParams();
@@ -19,7 +19,7 @@ export default function SingleTagView(_props: SingleTagViewProps) {
     return (
         <SingleTagProvider uuid={tagId}>
             <SINGLE_TAG_CONTEXT.Consumer>
-                {(_ctx) => (
+                {() => (
                     <TabMenu>
                         <Tab to={"/app/tags/$tagId/general"} params={{ tagId }}>
                             {tg("tab.general")}

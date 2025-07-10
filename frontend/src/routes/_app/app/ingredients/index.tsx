@@ -31,12 +31,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 /**
  * The properties for {@link IngredientsSearchOverview}
  */
-export type IngredientsSearchOverviewProps = {};
+export type IngredientsSearchOverviewProps = object;
 
 /**
  * The overview for searching recipes by ingredients
  */
-export default function IngredientsSearchOverview(_props: IngredientsSearchOverviewProps) {
+export default function IngredientsSearchOverview() {
     const [t] = useTranslation("ingredients");
     const [tg] = useTranslation();
 
@@ -59,7 +59,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                         },
                     };
                 }
-                let res = await Api.ingredients.getRecipes({
+                const res = await Api.ingredients.getRecipes({
                     uuids: { list: value.search.flatMap((i) => (i.name !== "" ? i.uuid : [])) },
                 });
                 if (res.error) {
@@ -202,7 +202,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                                 </PopoverContent>
                             </Popover>
                             {fieldApi.state.meta.errors.map((err) => (
-                                <ErrorMessage>{err}</ErrorMessage>
+                                <ErrorMessage key={err}>{err}</ErrorMessage>
                             ))}
                         </div>
                     )}

@@ -24,7 +24,7 @@ import { Separator } from "@/components/ui/separator.tsx";
  * The properties for {@link AppSidebar}
  */
 export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    appTitle: String;
+    appTitle: string;
     Icon: LucideIcon;
     navItems: NavItem[];
 }

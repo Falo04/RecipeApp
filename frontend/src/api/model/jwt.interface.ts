@@ -1,8 +1,8 @@
 export interface UserSignInRequest {
-  email: string,
-  password: string;
+    email: string;
+    password: string;
 }
 
 export interface TokenDataResponse {
-  token: string,
+    token: string;
 }
