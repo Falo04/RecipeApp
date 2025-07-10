@@ -18,7 +18,7 @@ export function CreateRecipe(_props: CreateRecipeProps) {
     const navigate = useNavigate();
 
     return (
-        <div className={"flex h-full w-full flex-col gap-6"}>
+        <div className={"flex h-full w-full flex-col gap-2 lg:gap-6"}>
             <div className={"flex w-full flex-col gap-2"}>
                 <Heading>{t("heading.create")}</Heading>
                 <Separator />

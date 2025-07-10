@@ -4,7 +4,7 @@ import type { CreateRecipeRequest, FullRecipe, UpdateRecipeRequest } from "@/api
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel, Input } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { TableBody, TableCell, TableRow, TableScrollArea } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
 import USER_CONTEXT from "@/context/user";
@@ -27,10 +27,9 @@ import { CommandEmpty, CommandItem, Command, CommandGroup, CommandList, CommandI
 import { Badge, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import { ErrorMessage, Text } from "@/components/ui/text.tsx";
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Subheading } from "@/components/ui/heading.tsx";
-import { type StepperSteps, StepperHorizontal } from "@/components/ui/stepper.tsx";
+import { type StepperSteps, StepperHorizontal, StepperVertical } from "@/components/ui/stepper.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 /**
@@ -167,7 +166,8 @@ export function RecipeForm(props: RecipeFormProps) {
     ];
 
     return (
-        <div className="grid h-full grid-cols-1 gap-4 lg:h-fit lg:grid-cols-2">
+        <div className="flex h-full flex-col justify-center gap-4 lg:grid lg:h-fit lg:grid-cols-2">
+            {isMobile && <StepperVertical steps={steps} />}
             <Form onSubmit={form.handleSubmit} className={"flex h-full flex-col justify-between lg:justify-start"}>
                 <AnimatePresence initial={false} mode={"popLayout"}>
                     {state === 0 && (
@@ -294,12 +294,18 @@ export function RecipeForm(props: RecipeFormProps) {
                     )}
 
                     {state === 1 && (
-                        <motion.div key={"ingredients-recipes"} initial={initial} animate={animate} exit={exit}>
+                        <motion.div
+                            className={"h-full"}
+                            key={"ingredients-recipes"}
+                            initial={initial}
+                            animate={animate}
+                            exit={exit}
+                        >
                             <form.Field
                                 name="ingredients"
                                 mode="array"
                                 children={(ingredients) => (
-                                    <div className={"flex flex-col gap-6"}>
+                                    <div className={"flex h-full flex-col gap-6"}>
                                         <div className={"flex justify-between"}>
                                             <Subheading level={2}>{t("heading.ingredients-title")}</Subheading>
                                             <Button
@@ -334,7 +340,9 @@ export function RecipeForm(props: RecipeFormProps) {
                                         </div>
                                         <div className="flex justify-between">
                                             <div className={"grid grid-cols-2 gap-4 lg:grid-cols-3"}>
-                                                <div className={"col-span-2 flex flex-col gap-2 lg:col-span-1"}>
+                                                <div
+                                                    className={"col-span-2 flex flex-col gap-0 lg:col-span-1 lg:gap-2"}
+                                                >
                                                     <Input
                                                         onChange={(e) => {
                                                             setIngreName(e.target.value);
@@ -345,7 +353,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                     />
                                                     {ingreNameError && <ErrorMessage>{ingreNameError}</ErrorMessage>}
                                                 </div>
-                                                <div className={"flex flex-col gap-2"}>
+                                                <div className={"flex flex-col gap-0 lg:gap-2"}>
                                                     <Input
                                                         type="number"
                                                         onChange={(e) => {
@@ -382,104 +390,109 @@ export function RecipeForm(props: RecipeFormProps) {
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <ScrollArea className={"h-[40vh]"}>
-                                            <Table className={"border-t"}>
-                                                <TableBody>
-                                                    {ingredients.state.value.map((ingre, index) => (
-                                                        <TableRow
-                                                            key={index}
-                                                            className={"grid grid-cols-[1fr_1fr_1fr_auto] gap-2"}
-                                                        >
-                                                            <TableCell>
-                                                                <Text>{ingre.name}</Text>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Text>{ingre.amount}</Text>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Text>{ingre.unit}</Text>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    onClick={() => ingredients.removeValue(index)}
-                                                                >
-                                                                    <MinusIcon />
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </ScrollArea>
+                                        <TableScrollArea
+                                            scrollAreaHeight={10}
+                                            wrapperClassName={"border-none"}
+                                            className={"border-t"}
+                                        >
+                                            <TableBody>
+                                                {ingredients.state.value.map((ingre, index) => (
+                                                    <TableRow
+                                                        key={index}
+                                                        className={"grid grid-cols-[1fr_1fr_1fr_auto] gap-2"}
+                                                    >
+                                                        <TableCell>
+                                                            <Text>{ingre.name}</Text>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Text>{ingre.amount}</Text>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Text>{ingre.unit}</Text>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                onClick={() => ingredients.removeValue(index)}
+                                                            >
+                                                                <MinusIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </TableScrollArea>
                                     </div>
                                 )}
                             />
                         </motion.div>
                     )}
                     {state === 2 && (
-                        <motion.div key={"steps-recipes"} initial={initial} animate={animate} exit={exit}>
-                            <div className={"flex flex-col gap-4"}>
+                        <motion.div
+                            className={"h-full"}
+                            key={"steps-recipes"}
+                            initial={initial}
+                            animate={animate}
+                            exit={exit}
+                        >
+                            <div className={"flex h-full flex-col gap-4"}>
                                 <div className="flex justify-between">
                                     <Subheading level={2}>{t("heading.step-title")}</Subheading>
                                     <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
                                         <PlusIcon />
                                     </Button>
                                 </div>
-                                <ScrollArea className={"h-[55vh]"}>
-                                    <form.Field name="steps">
-                                        {(fieldArray) => (
-                                            <div className="flex flex-col gap-4">
-                                                {fieldArray.state.value.map((_, index) => (
-                                                    <div className={"relative"} key={index}>
-                                                        <form.Field
-                                                            name={`steps[${index}].step`}
-                                                            validators={{
-                                                                onSubmit: ({ value }) =>
-                                                                    value.length === 0
-                                                                        ? t("error.step-length-zero")
-                                                                        : undefined,
-                                                                onChange: ({ value }) =>
-                                                                    value.length > 255
-                                                                        ? t("error.step-length-255")
-                                                                        : undefined,
-                                                            }}
-                                                        >
-                                                            {(f) => (
-                                                                <div>
-                                                                    <FormLabel
-                                                                        htmlFor={"step" + index}
-                                                                    >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
-                                                                    <Textarea
-                                                                        id={"step" + index}
-                                                                        value={f.state.value}
-                                                                        onChange={(e) => f.handleChange(e.target.value)}
-                                                                        placeholder={t("placeholder.step")}
-                                                                        className="h-[100px] resize-none"
-                                                                    />
-                                                                    {f.state.meta.errors.map((err) => (
-                                                                        <ErrorMessage>{err}</ErrorMessage>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </form.Field>
+                                <form.Field name="steps">
+                                    {(fieldArray) => (
+                                        <div className="flex flex-col gap-4">
+                                            {fieldArray.state.value.map((_, index) => (
+                                                <div className={"relative"} key={index}>
+                                                    <form.Field
+                                                        name={`steps[${index}].step`}
+                                                        validators={{
+                                                            onSubmit: ({ value }) =>
+                                                                value.length === 0
+                                                                    ? t("error.step-length-zero")
+                                                                    : undefined,
+                                                            onChange: ({ value }) =>
+                                                                value.length > 255
+                                                                    ? t("error.step-length-255")
+                                                                    : undefined,
+                                                        }}
+                                                    >
+                                                        {(f) => (
+                                                            <div>
+                                                                <FormLabel
+                                                                    htmlFor={"step" + index}
+                                                                >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
+                                                                <Textarea
+                                                                    id={"step" + index}
+                                                                    value={f.state.value}
+                                                                    onChange={(e) => f.handleChange(e.target.value)}
+                                                                    placeholder={t("placeholder.step")}
+                                                                    className="h-[100px] resize-none"
+                                                                />
+                                                                {f.state.meta.errors.map((err) => (
+                                                                    <ErrorMessage>{err}</ErrorMessage>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </form.Field>
 
-                                                        <Button
-                                                            type="button"
-                                                            className="absolute top-6 right-1"
-                                                            variant="ghost"
-                                                            onClick={() => form.removeFieldValue("steps", index)}
-                                                        >
-                                                            <MinusIcon />
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </form.Field>
-                                </ScrollArea>
+                                                    <Button
+                                                        type="button"
+                                                        className="absolute top-6 right-1"
+                                                        variant="ghost"
+                                                        onClick={() => form.removeFieldValue("steps", index)}
+                                                    >
+                                                        <MinusIcon />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </form.Field>
                             </div>
                         </motion.div>
                     )}

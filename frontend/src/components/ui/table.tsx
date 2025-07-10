@@ -1,27 +1,47 @@
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { useElementHeight } from "@/hooks/element-height.ts";
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+    className,
+    wrapperClassName,
+    ...props
+}: React.ComponentProps<"table"> & {
+    wrapperClassName?: string;
+}) {
     return (
-        <div data-slot="table-container" className={"relative w-full overflow-x-auto"}>
-            <table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
+        <div
+            data-slot="table-container"
+            className={cn(wrapperClassName, "border-border relative w-full overflow-auto border py-2")}
+        >
+            <table
+                data-slot="table"
+                className={cn("w-full table-fixed caption-bottom text-sm", className)}
+                {...props}
+            />
         </div>
     );
 }
 
-function TableStickyHeader({ className, ...props }: React.ComponentProps<"table">) {
+function TableScrollArea({
+    className,
+    wrapperClassName,
+    scrollAreaHeight,
+    ...props
+}: React.ComponentProps<"table"> & {
+    scrollAreaHeight?: number;
+    wrapperClassName?: string;
+}) {
     const [tableRef, tableHeight] = useElementHeight<HTMLDivElement>();
 
     return (
         <div
             data-slot="table-container"
-            className={"border-border block h-full w-full overflow-x-auto rounded-lg border py-2"}
+            className={cn(wrapperClassName, "border-border relative h-full w-full rounded-lg border py-2")}
             ref={tableRef}
         >
-            <ScrollArea style={{ height: `${tableHeight - 25}px` }}>
+            <ScrollArea className={"w-full"} style={{ height: `${tableHeight - (scrollAreaHeight ?? 25)}px` }}>
                 <table
                     data-slot="table"
                     className={cn("w-full table-fixed caption-bottom text-sm", className)}
@@ -101,4 +121,4 @@ function TableCaption({ className, ...props }: React.ComponentProps<"caption">) 
     );
 }
 
-export { Table, TableStickyHeader, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+export { Table, TableScrollArea, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };

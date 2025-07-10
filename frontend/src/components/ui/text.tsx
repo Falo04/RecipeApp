@@ -9,10 +9,6 @@ export function Text({ className, ...props }: React.ComponentPropsWithoutRef<"p"
 
 export function ErrorMessage({ className, ...props }: React.ComponentPropsWithoutRef<"p">) {
     return (
-        <p
-            data-slot="text"
-            {...props}
-            className={clsx(className, "text-destructive-foreground absolute text-sm text-nowrap")}
-        />
+        <p data-slot="text" {...props} className={clsx(className, "text-destructive-foreground text-sm text-nowrap")} />
     );
 }

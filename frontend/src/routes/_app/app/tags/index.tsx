@@ -36,12 +36,9 @@ export function TagsOverview(_props: TagsOverviewProps) {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/tags/$tagId/info"} params={{ tagId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                            {" "}
-                            <span>{row.original.name}</span>
-                        </div>
-                    </Link>
+                    <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
+                        <span>{row.original.name}</span>
+                    </div>
                 ),
             },
             {

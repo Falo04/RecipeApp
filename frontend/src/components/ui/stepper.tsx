@@ -156,9 +156,9 @@ function StepperVertical(props: StepperProps) {
 
     return (
         <nav className={props.className}>
-            <ol className="flex justify-center overflow-hidden">
+            <ol className="flex h-10 justify-center overflow-hidden">
                 {props.steps.map((step, index) => (
-                    <li className={"relative mr-8 mb-2 lg:ms-6"} key={index}>
+                    <li className={"relative mr-8"} key={index}>
                         {/* connection */}
                         {index !== props.steps.length - 1 && (
                             <div

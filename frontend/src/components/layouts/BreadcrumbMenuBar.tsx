@@ -85,10 +85,18 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
                                         <Link to={navItem.url}>{navItem.title}</Link>
                                     </DropdownMenuItem>
                                 ))}
+                                <DropdownMenuItem>
+                                    <Link to={"/app/settings"}>{tg("menu.settings")}</Link>
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
+                    {path[0] === "settings" && (
+                        <BreadcrumbLink asChild>
+                            <Link to={"/app/settings"}>{tg("menu.settings")}</Link>
+                        </BreadcrumbLink>
+                    )}
                     {nav && (
                         <BreadcrumbLink asChild>
                             <Link to={nav.url}>{nav.title}</Link>
