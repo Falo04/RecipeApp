@@ -99,7 +99,7 @@ export default function IngredientsSearchOverview(_props: IngredientsSearchOverv
                 cell: ({ row }) => (
                     <div className="flex flex-wrap gap-1">
                         {row.original.tags.map((tag) => (
-                            <Link to="/app/tags/$tagId/info" params={{ tagId: tag.uuid }} key={tag.uuid}>
+                            <Link to="/app/tags/$tagId/general" params={{ tagId: tag.uuid }} key={tag.uuid}>
                                 <Badge
                                     variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
                                     key={tag.uuid}

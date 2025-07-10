@@ -10,6 +10,8 @@ export type SingleRecipeViewProps = {};
 
 /**
  * The Layout for a single recipe
+ *
+ * @param _props
  */
 export default function SingleRecipeView(_props: SingleRecipeViewProps) {
     const [tg] = useTranslation();

@@ -29,7 +29,7 @@ function Form(props: FormProps) {
                 e.preventDefault();
                 props.onSubmit();
             }}
-            className={cn(props.className, "max-w-lg space-y-8")}
+            className={cn(props.className, "w-full space-y-8 lg:max-w-lg")}
         >
             {props.children}
         </form>

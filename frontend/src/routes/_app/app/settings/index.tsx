@@ -13,6 +13,10 @@ import { toast } from "sonner";
  */
 export type SettingsProps = {};
 
+/**
+ *
+ * @param _props
+ */
 export function Settings(_props: SettingsProps) {
     const [t] = useTranslation("settings");
     const [tg] = useTranslation();
@@ -43,7 +47,7 @@ export function Settings(_props: SettingsProps) {
     });
 
     return (
-        <HeadingLayout heading={t("heading.title")} headingDescription={t("heading.description")}>
+        <HeadingLayout heading={t("heading.title")}>
             <form
                 onSubmit={(e) => {
                     e.preventDefault();

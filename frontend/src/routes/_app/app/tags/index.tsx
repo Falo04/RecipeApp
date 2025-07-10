@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
+import { Text } from "@/components/ui/text.tsx";
 
 /**
  * The properties for {@link TagsOverview}
@@ -21,6 +22,8 @@ export type TagsOverviewProps = {};
 
 /**
  * Renders a tag overview table.
+ *
+ * @param _props
  */
 export function TagsOverview(_props: TagsOverviewProps) {
     const [t] = useTranslation("tag");
@@ -36,9 +39,9 @@ export function TagsOverview(_props: TagsOverviewProps) {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[400px]">
-                        <span>{row.original.name}</span>
-                    </div>
+                    <Link to={"/app/tags/$tagId/general"} params={{ tagId: row.original.uuid }}>
+                        <Text className="hover:text-foreground overflow-hidden text-ellipsis">{row.original.name}</Text>
+                    </Link>
                 ),
             },
             {

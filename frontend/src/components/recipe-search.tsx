@@ -25,6 +25,8 @@ export type RecipeSearchProps = {};
 
 /**
  * Provides a recipe search component with suggestions.
+ *
+ * @param _props
  */
 export function RecipeSearch(_props: RecipeSearchProps) {
     const [t] = useTranslation("recipe");

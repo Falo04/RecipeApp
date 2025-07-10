@@ -11,6 +11,8 @@ export type CreateRecipeProps = {};
 
 /**
  * Renders a recipe creation form within a submenu layout.
+ *
+ * @param _props
  */
 export function CreateRecipe(_props: CreateRecipeProps) {
     const [t] = useTranslation("recipe");

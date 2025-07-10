@@ -1,7 +1,5 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { useElementHeight } from "@/hooks/element-height.ts";
 
 function Table({
     className,
@@ -13,41 +11,13 @@ function Table({
     return (
         <div
             data-slot="table-container"
-            className={cn(wrapperClassName, "border-border relative w-full overflow-auto border py-2")}
+            className={cn(wrapperClassName, "border-border relative w-full overflow-auto rounded-lg border")}
         >
             <table
                 data-slot="table"
                 className={cn("w-full table-fixed caption-bottom text-sm", className)}
                 {...props}
             />
-        </div>
-    );
-}
-
-function TableScrollArea({
-    className,
-    wrapperClassName,
-    scrollAreaHeight,
-    ...props
-}: React.ComponentProps<"table"> & {
-    scrollAreaHeight?: number;
-    wrapperClassName?: string;
-}) {
-    const [tableRef, tableHeight] = useElementHeight<HTMLDivElement>();
-
-    return (
-        <div
-            data-slot="table-container"
-            className={cn(wrapperClassName, "border-border relative h-full w-full rounded-lg border py-2")}
-            ref={tableRef}
-        >
-            <ScrollArea className={"w-full"} style={{ height: `${tableHeight - (scrollAreaHeight ?? 25)}px` }}>
-                <table
-                    data-slot="table"
-                    className={cn("w-full table-fixed caption-bottom text-sm", className)}
-                    {...props}
-                />
-            </ScrollArea>
         </div>
     );
 }
@@ -121,4 +91,4 @@ function TableCaption({ className, ...props }: React.ComponentProps<"caption">) 
     );
 }
 
-export { Table, TableScrollArea, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };

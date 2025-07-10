@@ -4,7 +4,6 @@ import type { CreateRecipeRequest, FullRecipe, UpdateRecipeRequest } from "@/api
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel, Input } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TableBody, TableCell, TableRow, TableScrollArea } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
 import USER_CONTEXT from "@/context/user";
@@ -26,11 +25,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CommandEmpty, CommandItem, Command, CommandGroup, CommandList, CommandInput } from "./ui/command";
 import { Badge, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import { ErrorMessage, Text } from "@/components/ui/text.tsx";
+import { ErrorMessage } from "@/components/ui/text.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Subheading } from "@/components/ui/heading.tsx";
 import { type StepperSteps, StepperHorizontal, StepperVertical } from "@/components/ui/stepper.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import IngredientsGrid from "@/components/ingredients-grid.tsx";
 
 /**
  * The properties for {@link RecipeForm}
@@ -166,9 +166,9 @@ export function RecipeForm(props: RecipeFormProps) {
     ];
 
     return (
-        <div className="flex h-full flex-col justify-center gap-4 lg:grid lg:h-fit lg:grid-cols-2">
+        <div className="flex h-full flex-col justify-center gap-4 md:grid md:max-h-[70vh] md:grid-cols-2">
             {isMobile && <StepperVertical steps={steps} />}
-            <Form onSubmit={form.handleSubmit} className={"flex h-full flex-col justify-between lg:justify-start"}>
+            <Form onSubmit={form.handleSubmit} className={"flex h-full flex-col justify-between"}>
                 <AnimatePresence initial={false} mode={"popLayout"}>
                     {state === 0 && (
                         <motion.div key={"meta-data-recipes"} initial={initial} animate={animate} exit={exit}>
@@ -390,39 +390,13 @@ export function RecipeForm(props: RecipeFormProps) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <TableScrollArea
-                                            scrollAreaHeight={10}
-                                            wrapperClassName={"border-none"}
-                                            className={"border-t"}
-                                        >
-                                            <TableBody>
-                                                {ingredients.state.value.map((ingre, index) => (
-                                                    <TableRow
-                                                        key={index}
-                                                        className={"grid grid-cols-[1fr_1fr_1fr_auto] gap-2"}
-                                                    >
-                                                        <TableCell>
-                                                            <Text>{ingre.name}</Text>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Text>{ingre.amount}</Text>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Text>{ingre.unit}</Text>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                onClick={() => ingredients.removeValue(index)}
-                                                            >
-                                                                <MinusIcon />
-                                                            </Button>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </TableScrollArea>
+                                        <div className={"h-full"}>
+                                            <IngredientsGrid
+                                                withScrolling={true}
+                                                ingredients={ingredients.state.value}
+                                                onDelete={(index) => ingredients.removeValue(index)}
+                                            />
+                                        </div>
                                     </div>
                                 )}
                             />
@@ -445,7 +419,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                 </div>
                                 <form.Field name="steps">
                                     {(fieldArray) => (
-                                        <div className="flex flex-col gap-4">
+                                        <div className="flex h-full max-h-[55vh] flex-col gap-4 overflow-y-auto">
                                             {fieldArray.state.value.map((_, index) => (
                                                 <div className={"relative"} key={index}>
                                                     <form.Field

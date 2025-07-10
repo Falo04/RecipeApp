@@ -9,13 +9,12 @@ import {
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { Button } from "./button.tsx";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableScrollArea, Table } from "./table.tsx";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "./table.tsx";
 import { type ColumnFiltersState, getFilteredRowModel } from "@tanstack/table-core";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import React from "react";
 import { Input } from "@/components/ui/form.tsx";
-import { useElementHeight } from "@/hooks/element-height.ts";
 
 /**
  * The properties for {@link DataTable}
@@ -40,7 +39,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
     const table = useReactTable({
         data: props.data,
         columns: props.columns,
-        initialState: { pagination: { pageSize: isMobile ? 5 : 50 } },
+        initialState: { pagination: { pageSize: isMobile ? 10 : 50 } },
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -55,7 +54,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
 
     return (
         <div className={"flex h-full w-full flex-col justify-between gap-4"}>
-            <div className={"flex h-full w-full flex-col gap-2"}>
+            <div className={"flex h-full w-full flex-col gap-4"}>
                 <div className={"flex items-center"}>
                     <Input
                         placeholder={props.filterTag}
@@ -64,7 +63,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                         className={"max-w-sm"}
                     />
                 </div>
-                <Table wrapperClassName={"overflow-clip"}>
+                <Table wrapperClassName={"overflow-clip max-h-[70vh] lg:max-h-[73vh]"}>
                     <TableHeader className={"sticky top-0"}>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>

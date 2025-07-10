@@ -10,6 +10,8 @@ export type UpdateRecipeProps = {};
 
 /**
  * Updates the recipe data.
+ *
+ * @param _props
  */
 export function UpdateRecipe(_props: UpdateRecipeProps) {
     const { recipe } = React.useContext(SINGLE_RECIPE_CONTEXT);

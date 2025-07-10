@@ -21,6 +21,8 @@ export type TagDetailProps = {};
 
 /**
  * View for seeing all information for a single tag
+ *
+ * @param _props
  */
 export function TagDetail(_props: TagDetailProps) {
     const [t] = useTranslation("tag");

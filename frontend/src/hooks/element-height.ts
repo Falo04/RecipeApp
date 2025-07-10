@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 /**
  * Returns a hook that tracks the height of a specified HTML element.
  *
- * @returns {[React.RefObject<HTMLElement>, number]} A tuple containing:
+ * @returns A tuple containing:
  *   - A React ref object that allows manual reference to the HTML element.
  *   - The current height of the element in pixels.
  */
@@ -15,7 +15,7 @@ export function useElementHeight<T extends HTMLElement>() {
         if (!elementRef.current) return;
 
         const observer = new ResizeObserver((entries) => {
-            for (let entry of entries) {
+            for (const entry of entries) {
                 if (entry.target === elementRef.current) {
                     setHeight(entry.contentRect.height);
                 }

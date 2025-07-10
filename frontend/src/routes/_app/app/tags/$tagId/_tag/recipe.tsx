@@ -6,6 +6,9 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { SimpleRecipe } from "@/api/model/recipe.interface.ts";
 import { useMemo } from "react";
 import { DataTable } from "@/components/ui/data-table.tsx";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
+import { Info } from "lucide-react";
+import { Text } from "@/components/ui/text.tsx";
 
 /**
  * The properties for {@link RecipeOverviewForTag}
@@ -14,6 +17,8 @@ export type RecipeOverviewForTagProps = {};
 
 /**
  * Shows all recipes which are tagged to this tag
+ *
+ * @param _props
  */
 export default function RecipeOverviewForTag(_props: RecipeOverviewForTagProps) {
     const [t] = useTranslation("tag");
@@ -30,22 +35,32 @@ export default function RecipeOverviewForTag(_props: RecipeOverviewForTagProps) 
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[80ch]">
-                            <span>{row.original.name}</span>
-                        </div>
+                    <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
+                        <Text className="hover:text-foreground overflow-hidden text-ellipsis">{row.original.name}</Text>
                     </Link>
                 ),
             },
             {
                 accessorKey: "description",
                 header: () => <span>{tg("table.description")}</span>,
+                cell: ({ row }) => <Text className={"overflow-hidden text-ellipsis"}>{row.original.description}</Text>,
+            },
+            {
+                accessorKey: "action",
+                header: () => <div className="flex justify-end">{tg("table.action")}</div>,
                 cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
-                        <div className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[40ch]">
-                            <span>{row.original.description}</span>
-                        </div>
-                    </Link>
+                    <div className={"flex justify-end pr-4"}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
+                                    <Info className={"size-4"} />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tg("tooltip.info")}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
                 ),
             },
         ],
@@ -57,6 +72,11 @@ export default function RecipeOverviewForTag(_props: RecipeOverviewForTagProps) 
 
 export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/recipe")({
     component: RecipeOverviewForTag,
+    /**
+     *
+     * @param root0
+     * @param root0.params
+     */
     loader: async ({ params }) => {
         const res = await Api.tags.getRecipesByTag(params.tagId);
         if (res.error) {
