@@ -10,7 +10,6 @@ import {
     BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { useTranslation } from "react-i18next";
-import type { NavItem } from "./navbar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,6 +20,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import RECIPES_CONTEXT from "@/context/recipes.tsx";
 import React from "react";
 import TAGS_CONTEXT from "@/context/tags.tsx";
+import type { NavItem } from "@/components/layouts/app-sidebar.tsx";
 
 /**
  * The properties for {@link BreadcrumbMenuBar}
