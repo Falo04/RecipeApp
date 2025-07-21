@@ -19,7 +19,7 @@ RUN --mount=type=bind,source=webserver/,target=webserver/ \
     <<EOF
 set -e
 cargo build --release --locked
-cp ./target/debug/webserver /bin/server
+cp ./target/release/webserver /bin/server
 EOF
 
 FROM debian:bookworm-slim AS final
