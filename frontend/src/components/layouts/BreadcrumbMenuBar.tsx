@@ -1,4 +1,4 @@
-import { SidebarTrigger } from "@/components/ui/sidebar.tsx";
+import { type SidebarNavItem, SidebarTrigger } from "@/components/ui/sidebar.tsx";
 import { RecipeSearch } from "@/components/recipe-search.tsx";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -20,13 +20,12 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import RECIPES_CONTEXT from "@/context/recipes.tsx";
 import React from "react";
 import TAGS_CONTEXT from "@/context/tags.tsx";
-import type { NavItem } from "@/components/layouts/app-sidebar.tsx";
 
 /**
  * The properties for {@link BreadcrumbMenuBar}
  */
 export type SiteHeaderProps = {
-    navItems: NavItem[];
+    navItems: SidebarNavItem[];
 };
 
 /**
@@ -80,9 +79,9 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
                                 <span className={"sr-only"}>{tg("sr-only.breadcrumb-menu")}</span>{" "}
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align={"start"}>
-                                {props.navItems.map((navItem: NavItem) => (
-                                    <DropdownMenuItem key={navItem.title}>
-                                        <Link to={navItem.url}>{navItem.title}</Link>
+                                {props.navItems.map((items) => (
+                                    <DropdownMenuItem key={items.title}>
+                                        <Link to={items.url}>{items.title}</Link>
                                     </DropdownMenuItem>
                                 ))}
                                 <DropdownMenuItem>

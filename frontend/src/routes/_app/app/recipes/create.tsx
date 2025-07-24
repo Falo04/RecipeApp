@@ -23,7 +23,9 @@ export function CreateRecipe() {
                 <Heading>{t("heading.create")}</Heading>
                 <Separator />
             </div>
-            <RecipeForm navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })} />
+            <RecipeForm
+                navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId/general", params: { recipeId: uuid } })}
+            />
         </div>
     );
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
+import { type LucideIcon, PanelLeftIcon } from "lucide-react";
 
 import { useIsMobileSidebar } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useRouterState, Link, type LinkProps } from "@tanstack/react-router";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -27,6 +28,16 @@ type SidebarContextProps = {
     setOpenMobile: (open: boolean) => void;
     isMobile: boolean;
     toggleSidebar: () => void;
+};
+
+/**
+ * Represents a single item within a navigation menu.
+ */
+export type SidebarNavItem = {
+    id: string;
+    title: string;
+    url: LinkProps["href"];
+    Icon: LucideIcon;
 };
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null);
@@ -424,7 +435,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
         <ul
             data-slot="sidebar-menu"
             data-sidebar="menu"
-            className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+            className={cn("flex w-full min-w-0 flex-col gap-2", className)}
             {...props}
         />
     );
@@ -650,6 +661,21 @@ function SidebarMenuSubButton({
     );
 }
 
+function SidebarItem({ children, href }: { className?: string; children?: React.ReactNode; href: LinkProps["href"] }) {
+    const { setOpenMobile } = useSidebar();
+    const pathName = useRouterState().location.pathname;
+
+    return (
+        <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathName.includes(href ?? "")}>
+                <Link to={href} onClick={() => setOpenMobile(false)}>
+                    {children}
+                </Link>
+            </SidebarMenuButton>
+        </SidebarMenuItem>
+    );
+}
+
 export {
     Sidebar,
     SidebarContent,
@@ -664,7 +690,6 @@ export {
     SidebarMenu,
     SidebarMenuAction,
     SidebarMenuBadge,
-    SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSkeleton,
     SidebarMenuSub,
@@ -675,4 +700,5 @@ export {
     SidebarSeparator,
     SidebarTrigger,
     useSidebar,
+    SidebarItem,
 };

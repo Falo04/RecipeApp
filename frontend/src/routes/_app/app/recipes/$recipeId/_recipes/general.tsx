@@ -25,7 +25,7 @@ export function RecipeDetail() {
     const { recipe } = React.useContext(SINGLE_RECIPE_CONTEXT);
 
     return (
-        <div className={"mx-auto h-full max-w-2xl overflow-hidden"} ref={ref}>
+        <div className={"h-full max-w-2xl overflow-hidden"} ref={ref}>
             <ScrollArea style={{ height: `${height - 10}px` }}>
                 <div className={"flex h-full flex-col justify-center gap-8 lg:gap-8"}>
                     {/* Some testing with images

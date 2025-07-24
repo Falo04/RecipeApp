@@ -24,6 +24,9 @@ export default function SingleRecipeView() {
                         <Tab to={"/app/recipes/$recipeId/general"} params={{ recipeId }}>
                             {tg("tab.general")}
                         </Tab>
+                        <Tab to={"/app/recipes/$recipeId/update"} params={{ recipeId }}>
+                            {tg("tab.update")}
+                        </Tab>
                     </TabMenu>
                 )}
             </SINGLE_RECIPE_CONTEXT.Consumer>
