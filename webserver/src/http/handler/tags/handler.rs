@@ -9,7 +9,6 @@ use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
 use rorm::and;
-use tracing_subscriber::registry;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;

@@ -1,10 +1,12 @@
 //! Represents all recipe responses and requests.
+
 use rorm::fields::types::MaxStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::http::common::schemas::GetPageRequest;
 use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
@@ -132,4 +134,17 @@ pub struct RecipeSearchResponse {
     pub uuid: Uuid,
     /// The name of the recipe.
     pub name: MaxStr<255>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct GetAllRecipesRequest {
+    /// Page request
+    #[serde(flatten)]
+    pub page: GetPageRequest,
+
+    /// Search for recipe name
+    pub filter_name: Option<String>,
+
+    /// Filters for a specific tag
+    pub filter_tag: Option<Uuid>,
 }

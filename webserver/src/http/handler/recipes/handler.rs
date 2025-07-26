@@ -13,6 +13,7 @@ use galvyn::get;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
+use rorm::and;
 use rorm::conditions;
 use rorm::conditions::DynamicCollection;
 use rorm::model::Identifiable;
@@ -21,9 +22,9 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::schema::CreateOrUpdateRecipe;
+use super::schema::GetAllRecipesRequest;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
@@ -52,14 +53,35 @@ use crate::models::users::User;
 /// # Arguments
 ///
 /// * `Query<GetPageRequest>` - object containing pagination parameters
-#[get("/")]
+#[post("/all")]
 pub async fn get_all_recipes(
-    pagination: Query<GetPageRequest>,
+    ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
+    let GetAllRecipesRequest {
+        page,
+        filter_name,
+        filter_tag,
+    } = pagination;
+
+    let condition = and![
+        filter_name.map(|name| conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(Recipe.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!(
+                "%{}%",
+                name.replace('_', "\\_")
+                    .replace('%', "\\%")
+                    .replace('\\', "\\\\")
+            )))
+        }),
+        filter_tag.map(|tag_uuid| Recipe.tags.tag.equals(tag_uuid)),
+    ];
+
     let items: Vec<_> = rorm::query(Database::global(), Recipe)
+        .condition(condition)
         .order_asc(Recipe.name)
-        .limit(pagination.limit)
-        .offset(pagination.offset)
+        .limit(page.limit)
+        .offset(page.offset)
         .stream()
         .try_collect()
         .await?;
@@ -104,8 +126,8 @@ pub async fn get_all_recipes(
 
     Ok(ApiJson(Page {
         items,
-        limit: pagination.limit,
-        offset: pagination.offset,
+        limit: page.limit,
+        offset: page.offset,
         total,
     }))
 }
