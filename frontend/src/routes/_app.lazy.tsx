@@ -7,20 +7,18 @@ import { Suspense } from "react";
 import BreadcrumbMenuBar from "@/components/layouts/BreadcrumbMenuBar.tsx";
 import { IngredientProvider } from "@/context/ingredients.tsx";
 import { useTranslation } from "react-i18next";
-import { RecipesProvider } from "@/context/recipes.tsx";
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarItem,
     SidebarMenu,
     SidebarMenuItem,
     type SidebarNavItem,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Heading, Subheading } from "@/components/ui/heading";
 
 /**
@@ -68,6 +66,7 @@ export function FoodMenu() {
                     </SidebarHeader>
                     <SidebarContent>
                         <SidebarGroup>
+                            <SidebarGroupLabel>{tg("menu.tool-label")}</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
                                     {navMain.map(({ id, title, url, Icon }) => (
@@ -79,16 +78,18 @@ export function FoodMenu() {
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
+                        <SidebarGroup>
+                            <SidebarGroupLabel>{tg("menu.personal-label")}</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    <SidebarItem href={"/app/settings"}>
+                                        <SettingsIcon className={"size-4"} />
+                                        <Subheading>{tg("menu.settings")}</Subheading>
+                                    </SidebarItem>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
                     </SidebarContent>
-                    <SidebarFooter>
-                        <Separator />
-                        <SidebarMenu>
-                            <SidebarItem href={"/app/settings"}>
-                                <SettingsIcon className={"size-4"} />
-                                <Subheading>{tg("menu.settings")}</Subheading>
-                            </SidebarItem>
-                        </SidebarMenu>
-                    </SidebarFooter>
                 </Sidebar>
             }
             header={<BreadcrumbMenuBar navItems={navMain} />}
@@ -103,13 +104,11 @@ export function FoodMenu() {
 export const Route = createLazyFileRoute("/_app")({
     component: () => (
         <UserProvider>
-            <RecipesProvider>
-                <TagsProvider>
-                    <IngredientProvider>
-                        <FoodMenu />
-                    </IngredientProvider>
-                </TagsProvider>
-            </RecipesProvider>
+            <TagsProvider>
+                <IngredientProvider>
+                    <FoodMenu />
+                </IngredientProvider>
+            </TagsProvider>
         </UserProvider>
     ),
 });

@@ -70,6 +70,6 @@ export function RecipeDetail() {
     );
 }
 
-export const Route = createFileRoute("/_app/app/recipes/$recipeId/_recipes/general")({
+export const Route = createFileRoute("/_app/app/recipes/$recipeId/_recipes/")({
     component: RecipeDetail,
 });

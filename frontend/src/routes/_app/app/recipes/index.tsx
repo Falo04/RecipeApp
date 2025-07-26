@@ -1,22 +1,34 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface";
-import React, { useMemo } from "react";
-import { BadgeButton, badgeVariants } from "@/components/ui/badge.tsx";
-import type { VariantProps } from "class-variance-authority";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
+import React from "react";
+import TAGS_CONTEXT from "@/context/tags.tsx";
 import { Text } from "@/components/ui/text.tsx";
-import RECIPES_CONTEXT from "@/context/recipes.tsx";
-import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
-import { DataTable } from "@/components/ui/data-table.tsx";
+import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
+import type { VariantProps } from "class-variance-authority";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.tsx";
+import { CopyIcon, MoreHorizontalIcon, PenBoxIcon, Settings2Icon, Trash2Icon } from "lucide-react";
+import { useForm } from "@tanstack/react-form";
+import { Api } from "@/api/api.tsx";
+import { toast } from "sonner";
+import { Form, FormLabel, Input } from "@/components/ui/form.tsx";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
+import TablePagination from "@/components/ui/table-pagination.tsx";
 
 /**
  * The properties for {@link FoodOverview}
  */
 export type FoodOverviewProps = object;
+
+const LIMIT = 50;
 
 /**
  * Renders a food overview table.
@@ -25,79 +37,222 @@ export function FoodOverview() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
-    const data = React.useContext(RECIPES_CONTEXT);
-    // const { offset, limit } = Route.useSearch();
+    const navigate = useNavigate();
 
-    const columns: ColumnDef<SimpleRecipeWithTags>[] = useMemo(
-        () => [
-            {
-                accessorKey: "name",
-                header: () => <span>{tg("table.name")}</span>,
-                cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
-                        <Text className="hover:text-foreground overflow-hidden text-ellipsis">{row.original.name}</Text>
-                    </Link>
-                ),
-            },
-            {
-                accessorKey: "description",
-                header: () => <span>{tg("table.description")}</span>,
-                cell: ({ row }) => <Text className={"overflow-hidden text-ellipsis"}>{row.original.description}</Text>,
-            },
-            {
-                accessorKey: "tags",
-                header: () => <span>{tg("table.tags")}</span>,
-                cell: ({ row }) => (
-                    <div className="flex flex-wrap gap-1">
-                        {row.original.tags.map((tag) => (
-                            <Link to="/app/tags/$tagId" params={{ tagId: tag.uuid }} key={tag.uuid}>
-                                <BadgeButton
-                                    variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
-                                    key={tag.uuid}
-                                >
-                                    {tag.name}
-                                </BadgeButton>
-                            </Link>
-                        ))}
-                    </div>
-                ),
-            },
-            {
-                accessorKey: "action",
-                header: () => <div className="flex justify-end">{tg("table.action")}</div>,
-                cell: ({ row }) => (
-                    <div className={"flex justify-end pr-4"}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
-                                    <Info className={"size-4"} />
-                                </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{tg("tooltip.info")}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                ),
-            },
-        ],
-        [],
-    );
+    const { search, page, filter_tag } = Route.useSearch();
+    const data = Route.useLoaderData();
+    if (!data) {
+        return;
+    }
+
+    const tags = React.useContext(TAGS_CONTEXT);
+
+    const form = useForm({
+        defaultValues: {
+            search: search,
+        },
+    });
 
     return (
         <HeadingLayout
             heading={t("heading.overview-title")}
+            description={t("heading.overview-description")}
             headingChildren={
                 <Link to={"/app/recipes/create"}>
                     <Button>{t("button.create")}</Button>
                 </Link>
             }
         >
-            <DataTable filterTag={t("input.filter")} columns={columns} data={data.recipes.items} />
+            <div className={"flex items-end justify-between gap-4"}>
+                <div className={"flex items-end gap-4"}>
+                    <Form onSubmit={form.handleSubmit}>
+                        <form.Field
+                            name={"search"}
+                            validators={{
+                                onChangeAsync: async ({ fieldApi }) => {
+                                    await navigate({
+                                        to: `/app/recipes`,
+                                        search: {
+                                            page: 1,
+                                            search: fieldApi.state.value,
+                                            filter_tag,
+                                        },
+                                    });
+                                },
+                            }}
+                        >
+                            {(fieldApi) => (
+                                <div>
+                                    <FormLabel htmlFor={"search"}>{t("label.filter")}</FormLabel>
+                                    <Input
+                                        value={fieldApi.state.value}
+                                        onChange={(e) => fieldApi.handleChange(e.target.value)}
+                                        placeholder={t("label.placeholder")}
+                                        className={"w-72"}
+                                    />
+                                </div>
+                            )}
+                        </form.Field>
+                    </Form>
+                    <Select>
+                        <SelectTrigger>
+                            <SelectValue placeholder={t("filter.tag")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value={"show-all"}>{t("filter.show-all-tag")}</SelectItem>
+                                {tags.tags.items.map((tag) => (
+                                    <SelectItem key={tag.uuid} value={tag.uuid}>
+                                        <Badge
+                                            variant={
+                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
+                                            }
+                                            key={tag.uuid}
+                                        >
+                                            {tag.name}
+                                        </Badge>
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={"outline"}>
+                            <Settings2Icon className={"me-1.5 size-4 opacity-80"} />
+                            {t("filter.view")}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenu>
+                            <DropdownMenuItem>
+                                <Button variant={"ghost"}>{t("filter.grid")}</Button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Button variant={"ghost"}>{t("filter.table")}</Button>
+                            </DropdownMenuItem>
+                        </DropdownMenu>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            <Table>
+                <TableHeader className={"sticky top-0"}>
+                    <TableRow>
+                        <TableHead>{tg("table.name")}</TableHead>
+                        <TableHead>{tg("table.description")}</TableHead>
+                        <TableHead>{tg("table.tags")}</TableHead>
+                        <TableHead className={"w-0"}>
+                            <span className={"sr-only"}>{tg("accessibility.actions")}</span>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {data.items.map((recipe) => (
+                        <TableRow
+                            key={recipe.uuid}
+                            onClick={() =>
+                                navigate({
+                                    to: "/app/recipes/$recipeId",
+                                    params: { recipeId: recipe.uuid },
+                                })
+                            }
+                        >
+                            <TableCell>
+                                <Text>{recipe.name}</Text>
+                            </TableCell>
+                            <TableCell>
+                                <Text>{recipe.description}</Text>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex flex-wrap gap-1">
+                                    {recipe.tags.map((tag) => (
+                                        <Badge
+                                            variant={
+                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
+                                            }
+                                            key={tag.uuid}
+                                        >
+                                            {tag.name}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <div className={"-ms-3 flex items-center justify-end"}>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant={"ghost"} size={"icon"}>
+                                                <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                                                <MoreHorizontalIcon className={"w-5"} />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align={"end"}>
+                                            <DropdownMenuItem onSelect={() => {}}>
+                                                <PenBoxIcon className={"me-2.5 size-4"} />
+                                                {t("button.edit")}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => {}}>
+                                                <CopyIcon className={"me-2.5 size-4"} />
+                                                {t("button.copy")}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => {}}>
+                                                <Trash2Icon className={"me-2.5 size-4"} />
+                                                {t("button.delete")}
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+            <TablePagination
+                currentPage={page}
+                maxPages={data.total === 0 ? 1 : Math.ceil(data.total / LIMIT)}
+                href={"/app/recipes"}
+                getSearchParams={(newPage: number) => ({ page: newPage })}
+            />
         </HeadingLayout>
     );
 }
 
+type RecipeOverviewSearchProps = {
+    /** The current page number we're on */
+    page: number;
+    /** The search term that should be used */
+    search: string;
+    /** The tag to filter*/
+    filter_tag: string;
+};
+
 export const Route = createFileRoute("/_app/app/recipes/")({
     component: FoodOverview,
+    validateSearch: (search: Record<string, unknown>): RecipeOverviewSearchProps => {
+        const page = Number(search?.page ?? 1);
+
+        return {
+            page: page <= 0 ? 1 : page,
+            search: (search.search as string) || "",
+            filter_tag: (search.tags as string) || "",
+        };
+    },
+    loaderDeps: ({ search: { page, search, filter_tag } }) => ({ page, search, filter_tag }),
+    loader: async ({ deps }) => {
+        const res = await Api.recipe.getAll(
+            LIMIT,
+            (deps.page - 1) * LIMIT,
+            deps.search,
+            deps.filter_tag === "show-all" ? undefined : deps.filter_tag,
+        );
+
+        if (res.error) {
+            toast.error(res.error.message);
+            return;
+        }
+
+        return res.data;
+    },
 });
