@@ -1,37 +1,45 @@
 {
+    "accessibility": {
+        "actions": "Aktionen",
+        "open-menu": "Men\u00fc \u00f6ffnen"
+    },
     "button": {
-        "close": "Schlie\u00dfe"
+        "close": "Schlie\u00dfen"
     },
     "error": {
-        "stepper-message": "Fehler, bitte gebe eine richtige Information an"
+        "stepper-message": "Fehler, bitte korrekte Informationen angeben"
     },
     "label": {
-        "appearance": "Aussehen w\u00e4hlen",
+        "appearance": "Darstellung ausw\u00e4hlen",
         "color": "Farbe",
         "dark": "Dunkler Modus",
         "de": "\ud83c\udde9\ud83c\uddea Deutsch",
         "description": "Beschreibung",
         "email": "E-Mail",
         "en": "\ud83c\uddfa\ud83c\uddf8 Englisch",
-        "language": "Sprache w\u00e4hlen",
+        "language": "Sprache ausw\u00e4hlen",
         "light": "Heller Modus",
         "name": "Name",
+        "next": "N\u00e4chste Seite",
         "password": "Passwort",
+        "prev": "Vorherige Seite",
         "steps": "Schritt"
     },
     "menu": {
-        "app-title": "Rezept App",
-        "dashboard": "Dashboard",
+        "app-title": "Rezept-App",
+        "dashboard": "\u00dcbersicht",
         "ingredients": "Zutaten",
+        "personal-label": "Pers\u00f6nlich",
         "recipes": "Rezepte",
         "settings": "Einstellungen",
-        "tags": "Tags"
+        "tags": "Tags",
+        "tool-label": "Tabellen"
     },
     "sr-only": {
-        "breadcrumb-menu": "Breadcrumb menu"
+        "breadcrumb-menu": "Navigationsmen\u00fc"
     },
     "tab": {
-        "general": "Generell",
+        "general": "Allgemein",
         "recipe": "Zugewiesene Rezepte"
     },
     "table": {
@@ -43,11 +51,11 @@
         "tags": "Tags"
     },
     "toast": {
-        "general-error": "Etwas ist schiefgelaufen",
-        "loading": "Ladet"
+        "general-error": "Etwas ist schiefgelaufen...",
+        "loading": "Lade..."
     },
     "tooltip": {
-        "filter": "Filter {{object}}",
-        "info": "Mehr Informationen"
+        "filter": "{{object}} filtern",
+        "info": "Weitere Informationen"
     }
 }

@@ -1,34 +1,42 @@
 {
+    "accessibility": {
+        "actions": "Actions",
+        "open-menu": "Open menu"
+    },
     "button": {
         "close": "Close"
     },
     "error": {
-        "stepper-message": "Error, please provide a correct information"
+        "stepper-message": "Error, please provide correct information"
     },
     "label": {
         "appearance": "Select Appearance",
         "color": "Color",
         "dark": "Dark Mode",
-        "de": "\ud83c\udde9\ud83c\uddea Deutsch",
+        "de": "\ud83c\udde9\ud83c\uddea German",
         "description": "Description",
         "email": "Email",
         "en": "\ud83c\uddfa\ud83c\uddf8 English",
         "language": "Select Language",
         "light": "Light Mode",
         "name": "Name",
+        "next": "Next Page",
         "password": "Password",
+        "prev": "Previous Page",
         "steps": "Step"
     },
     "menu": {
         "app-title": "Recipe App",
         "dashboard": "Dashboard",
         "ingredients": "Ingredients",
+        "personal-label": "Personal",
         "recipes": "Recipes",
         "settings": "Settings",
-        "tags": "Tags"
+        "tags": "Tags",
+        "tool-label": "Tables"
     },
     "sr-only": {
-        "breadcrumb-menu": "Breadcrumb menu"
+        "breadcrumb-menu": "Breadcrumb Menu"
     },
     "tab": {
         "general": "General",
@@ -43,11 +51,11 @@
         "tags": "Tags"
     },
     "toast": {
-        "general-error": "Something failed...",
+        "general-error": "Something went wrong...",
         "loading": "Loading..."
     },
     "tooltip": {
         "filter": "Filter {{object}}",
-        "info": "More information's"
+        "info": "More information"
     }
 }

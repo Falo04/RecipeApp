@@ -1,24 +1,25 @@
 {
     "button": {
-        "search": "Zutaten f\u00fcr die Suche ausw\u00e4hlen",
-        "select": "Search Ingredients"
+        "search": "Zutaten ausw\u00e4hlen, um zu suchen",
+        "select": "Zutaten suchen"
     },
     "command": {
         "empty": "Nichts ausgew\u00e4hlt"
     },
     "error": {
-        "search-empty": "W\u00e4hle Zutaten aus, um Rezepte suchen zu k\u00f6nnen"
+        "search-empty": "Bitte w\u00e4hle Zutaten aus, um nach Rezepten zu suchen"
     },
     "heading": {
         "all-ingredients": "Alle Zutaten",
-        "overview-title": "Suche Rezepte nach Zutaten",
+        "overview-description": "W\u00e4hle Zutaten aus, um alle Rezepte zu finden, in denen sie enthalten sind.",
+        "overview-title": "Rezepte nach Zutaten suchen",
         "search-selected": "Ausgew\u00e4hlte Zutaten",
-        "select-ingredients": "Bitte w\u00e4hle Zutaten aus um nach Rezepte zu suchen"
+        "select-ingredients": "Bitte w\u00e4hle Zutaten aus, um nach Rezepten zu suchen"
     },
     "input": {
         "filter": "Rezepte filtern"
     },
     "label": {
-        "ingredients-empty": "Keine Zutaten gefunden"
+        "ingredients-empty": "Keine Zutaten vorhanden"
     }
 }

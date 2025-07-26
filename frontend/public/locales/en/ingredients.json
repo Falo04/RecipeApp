@@ -1,16 +1,17 @@
 {
     "button": {
-        "search": "Select Ingredients to search for",
+        "search": "Select ingredients to search",
         "select": "Search Ingredients"
     },
     "command": {
         "empty": "Nothing selected"
     },
     "error": {
-        "search-empty": "Please select ingredients to search for a recipe"
+        "search-empty": "Please select ingredients to search for recipes"
     },
     "heading": {
-        "all-ingredients": "All ingredients",
+        "all-ingredients": "All Ingredients",
+        "overview-description": "Select ingredients to find all recipes that include them.",
         "overview-title": "Search Recipes by Ingredients",
         "search-selected": "Selected Ingredients",
         "select-ingredients": "Please select ingredients to search for recipes"
@@ -19,6 +20,6 @@
         "filter": "Filter Recipes"
     },
     "label": {
-        "ingredients-empty": "Ingredients are empty"
+        "ingredients-empty": "No ingredients available"
     }
 }

@@ -347,7 +347,7 @@ export function RecipeForm(props: RecipeFormProps) {
                                                             setIngreNameError(undefined);
                                                         }}
                                                         value={ingreName}
-                                                        placeholder={t("placeholder.name")}
+                                                        placeholder={t("placeholder.name-ingredients")}
                                                     />
                                                     {ingreNameError && <ErrorMessage>{ingreNameError}</ErrorMessage>}
                                                 </div>

@@ -2,54 +2,66 @@
     "button": {
         "add-tags": "Add Tags",
         "back": "Back",
+        "copy": "Copy",
         "create": "Create Recipe",
         "create-short": "Add",
+        "delete": "Delete",
+        "edit": "Edit",
         "next": "Next",
         "update": "Update Recipe"
     },
     "error": {
-        "description-required": "Description is required of Recipe",
-        "ingre-amount": "Ingredients can not be empty or zero",
+        "description-required": "A description is required for the recipe",
+        "ingre-amount": "Ingredient amount cannot be empty or zero",
         "ingre-name": "Please provide a name",
         "ingre-unit": "Please provide a unit",
-        "name-required": "Name is required of Recipe",
+        "name-required": "A name is required for the recipe",
         "step-length-255": "Step cannot be longer than 255 characters",
         "step-length-zero": "Step cannot be empty",
-        "too-long": "Input is too long, it cannot be longer than 255 characters"
+        "too-long": "Input is too long, it must be 255 characters or fewer"
+    },
+    "filter": {
+        "grid": "Grid View",
+        "show-all-tag": "Show All Tags",
+        "table": "Table View",
+        "tag": "Tag",
+        "view": "View"
     },
     "heading": {
         "create": "Create Recipe",
-        "ingredients": "List of all Ingredients",
-        "ingredients-title": "Input your Ingredients",
+        "ingredients": "List of All Ingredients",
+        "ingredients-title": "Enter Your Ingredients",
+        "overview-description": "General information about the recipe",
         "overview-title": "Recipe Overview",
-        "step-title": "Input your Steps",
-        "steps": "Instruction:"
+        "step-title": "Enter Your Steps",
+        "steps": "Instructions:"
     },
-    "input": {
-        "filter": "Filter Recipes"
+    "label": {
+        "placeholder": "Enter a value"
     },
     "placeholder": {
         "amount": "Amount",
-        "description": "Description of Recipe",
-        "name": "Name of Recipe",
-        "select-tags": "Select tags",
+        "description": "Description of the Recipe",
+        "name": "Name of the Recipe",
+        "name-ingredients": "Ingredients name",
+        "select-tags": "Select Tags",
         "step": "Step",
-        "tags-empty": "Not tags are found"
+        "tags-empty": "No tags found"
     },
     "search": {
-        "recipes": "Search recipe",
-        "recipes-empty": "No recipe found"
+        "recipes": "Search Recipes",
+        "recipes-empty": "No recipes found"
     },
     "stepper": {
-        "ingredients-description": "Provide ingredients for the recipe",
+        "ingredients-description": "Add ingredients for the recipe",
         "ingredients-title": "Ingredients",
-        "meta-description": "Provide general information's",
-        "meta-title": "General Information's",
-        "steps-description": "Provide instructions for the recipe",
-        "steps-title": "Instruction"
+        "meta-description": "Provide general information",
+        "meta-title": "General Information",
+        "steps-description": "Add instructions for the recipe",
+        "steps-title": "Instructions"
     },
     "toast": {
-        "created-success": "Recipe is successful created",
-        "updated-success": "Recipe is successful updated"
+        "created-success": "Recipe was created successfully",
+        "updated-success": "Recipe was updated successfully"
     }
 }
