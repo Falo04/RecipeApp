@@ -12,10 +12,24 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
-import { CopyIcon, MoreHorizontalIcon, PenBoxIcon, PlusIcon, Settings2Icon, Trash2Icon } from "lucide-react";
+import {
+    CopyIcon,
+    GridIcon,
+    LayoutGridIcon,
+    LayoutListIcon,
+    MoreHorizontalIcon,
+    PenBoxIcon,
+    PlusIcon,
+    Settings2Icon,
+    TableIcon,
+    Trash2Icon,
+} from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
@@ -154,12 +168,18 @@ export function FoodOverview() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenu>
-                            <DropdownMenuItem>
-                                <Button variant={"ghost"}>{t("filter.grid")}</Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Button variant={"ghost"}>{t("filter.table")}</Button>
-                            </DropdownMenuItem>
+                            <DropdownMenuLabel>{t("filter.layout")}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={"table"}>
+                                <DropdownMenuRadioItem value={"table"}>
+                                    <LayoutListIcon className={"size-4"} />
+                                    <Button variant={"ghost"}>{t("filter.table")}</Button>
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value={"grid"}>
+                                    <LayoutGridIcon className={"size-4"} />
+                                    <Button variant={"ghost"}>{t("filter.grid")}</Button>
+                                </DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
                         </DropdownMenu>
                     </DropdownMenuContent>
                 </DropdownMenu>

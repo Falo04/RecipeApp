@@ -120,22 +120,6 @@ pub struct CreateOrUpdateRecipe {
     pub steps: Vec<Step>,
 }
 
-/// Represents a request for searching recipes.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct RecipeSearchRequest {
-    /// The name of the recipe to search for (string, maximum length 255).
-    pub name: MaxStr<255>,
-}
-
-/// Represents the response received after searching for recipes.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct RecipeSearchResponse {
-    /// The UUID for the recipe.
-    pub uuid: Uuid,
-    /// The name of the recipe.
-    pub name: MaxStr<255>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetAllRecipesRequest {
     /// Page request

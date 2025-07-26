@@ -1,4 +1,3 @@
-use super::schema::RecipeSearchResponse;
 use super::schema::SimpleRecipe;
 use super::schema::Step;
 use crate::models::recipes::Recipe;
@@ -11,16 +10,6 @@ impl From<Recipe> for SimpleRecipe {
             uuid: value.uuid,
             name: value.name,
             description: value.description,
-        }
-    }
-}
-
-impl From<Recipe> for RecipeSearchResponse {
-    /// Creates a new `RecipeSearchResponse` instance from a given `Recipe` instance.
-    fn from(value: Recipe) -> Self {
-        Self {
-            uuid: value.uuid,
-            name: value.name,
         }
     }
 }

@@ -21,9 +21,10 @@
         "too-long": "Input is too long, it must be 255 characters or fewer"
     },
     "filter": {
-        "grid": "Grid View",
+        "grid": "Grid",
+        "layout": "Layout",
         "show-all-tag": "Show All Tags",
-        "table": "Table View",
+        "table": "Table",
         "tag": "Tag",
         "view": "View"
     },

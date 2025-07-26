@@ -13,5 +13,4 @@ pub fn initialize() -> GalvynRouter {
         .handler(recipes::handler::create_recipe)
         .handler(recipes::handler::update_recipe)
         .handler(recipes::handler::delete_recipe)
-        .handler(recipes::handler::search_recipes)
 }

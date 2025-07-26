@@ -25,13 +25,10 @@ use super::schema::CreateOrUpdateRecipe;
 use super::schema::GetAllRecipesRequest;
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::recipes::schema::FullRecipe;
-use crate::http::handler::recipes::schema::RecipeSearchRequest;
-use crate::http::handler::recipes::schema::RecipeSearchResponse;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Step;
 use crate::http::handler::tags::schema::SimpleTag;
@@ -317,31 +314,4 @@ pub async fn delete_recipe(
 
     tx.commit().await?;
     Ok(())
-}
-
-/// Handles recipe search requests.
-///
-/// This function takes a search query and retrieves recipes from the database
-/// that match the query.
-///
-/// # Arguments
-///
-/// * `RecipeSearchRequest` - object containing the search term
-#[get("/search")]
-pub async fn search_recipes(
-    search: Query<RecipeSearchRequest>,
-) -> ApiResult<ApiJson<List<RecipeSearchResponse>>> {
-    let items: Vec<_> = rorm::query(Database::global(), Recipe)
-        .condition(conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(Recipe.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!("%{}%", search.name))),
-        })
-        .order_asc(Recipe.name)
-        .stream()
-        .map(|result| result.map(RecipeSearchResponse::from))
-        .try_collect()
-        .await?;
-
-    Ok(ApiJson(List { list: items }))
 }

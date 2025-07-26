@@ -22,6 +22,7 @@
     },
     "filter": {
         "grid": "Rasteransicht",
+        "layout": "Ansicht",
         "show-all-tag": "Alle Tags anzeigen",
         "table": "Tabellenansicht",
         "tag": "Tag",

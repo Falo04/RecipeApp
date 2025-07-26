@@ -43,8 +43,6 @@ export const Api = {
         update: async (uuid: string, payload: UpdateRecipeRequest): Promise<ApiResponse<SingleUuid>> =>
             await callApi({ method: "PUT", url: `/recipes/${uuid}`, data: payload }),
         delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipe/${uuid}` }),
-        search: async (search: RecipeSearchRequest): Promise<ApiResponse<List<RecipeSearchResponse>>> =>
-            await callApi({ method: "GET", url: `/recipes/search?name=${search.name}` }),
     },
     tags: {
         getAll: async (): Promise<ApiResponse<Page<SimpleTag>>> =>
