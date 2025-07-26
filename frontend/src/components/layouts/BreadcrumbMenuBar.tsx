@@ -1,5 +1,4 @@
 import { type SidebarNavItem, SidebarTrigger } from "@/components/ui/sidebar.tsx";
-import { RecipeSearch } from "@/components/recipe-search.tsx";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
     Breadcrumb,
@@ -116,14 +115,7 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
                         ))}
                 </BreadcrumbList>
             </Breadcrumb>
-            <div className={"flex gap-2"}>
-                {isMobile && (
-                    <>
-                        <RecipeSearch />
-                        <SidebarTrigger />
-                    </>
-                )}
-            </div>
+            {isMobile && <SidebarTrigger />}
         </div>
     );
 }

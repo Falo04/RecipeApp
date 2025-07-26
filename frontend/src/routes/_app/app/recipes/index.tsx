@@ -20,14 +20,12 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import {
     CopyIcon,
-    GridIcon,
     LayoutGridIcon,
     LayoutListIcon,
     MoreHorizontalIcon,
     PenBoxIcon,
     PlusIcon,
     Settings2Icon,
-    TableIcon,
     Trash2Icon,
 } from "lucide-react";
 import { useForm } from "@tanstack/react-form";

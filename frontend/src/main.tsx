@@ -1,6 +1,6 @@
-import { StrictMode, useEffect } from "react";
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter, useNavigate } from "@tanstack/react-router";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -17,13 +17,6 @@ const router = createRouter({
     defaultPreload: "intent",
     scrollRestoration: true,
     defaultStructuralSharing: true,
-    defaultNotFoundComponent: () => {
-        const navigate = useNavigate();
-        useEffect(() => {
-            navigate({ to: "/app/recipes" });
-        }, [navigate]);
-        return null;
-    },
 });
 
 // Register the router instance for type safety

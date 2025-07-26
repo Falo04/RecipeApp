@@ -4,8 +4,6 @@ import type {
     CreateRecipeRequest,
     FullRecipe,
     GetAllRecipesRequest,
-    RecipeSearchRequest,
-    RecipeSearchResponse,
     SimpleRecipe,
     SimpleRecipeWithTags,
     UpdateRecipeRequest,
