@@ -3,6 +3,7 @@
         "add-tags": "Add Tags",
         "back": "Back",
         "create": "Create Recipe",
+        "create-short": "Add",
         "next": "Next",
         "update": "Update Recipe"
     },

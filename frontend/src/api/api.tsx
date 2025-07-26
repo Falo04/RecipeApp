@@ -3,6 +3,7 @@ import type { SimpleUser } from "./model/user.interface";
 import type {
     CreateRecipeRequest,
     FullRecipe,
+    GetAllRecipesRequest,
     RecipeSearchRequest,
     RecipeSearchResponse,
     SimpleRecipe,
@@ -33,8 +34,8 @@ export const Api = {
             await callApi<SimpleUser>({ method: "GET", url: "/users/me" }),
     },
     recipe: {
-        getAll: async (limit: number, offset: number): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> =>
-            await callApi<Page<SimpleRecipeWithTags>>({ method: "GET", url: "/recipes", params: { limit, offset } }),
+        getAll: async (request: GetAllRecipesRequest): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> =>
+            await callApi<Page<SimpleRecipeWithTags>>({ method: "POST", url: "/recipes/all", data: request }),
         getById: async (uuid: string): Promise<ApiResponse<FullRecipe>> =>
             await callApi<FullRecipe>({ method: "GET", url: `/recipes/${uuid}` }),
         create: async (payload: CreateRecipeRequest): Promise<ApiResponse<SingleUuid>> =>

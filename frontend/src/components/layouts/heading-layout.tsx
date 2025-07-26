@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 
 /**
  * The properties for {@link HeadingLayout}
@@ -28,11 +28,15 @@ export default function HeadingLayout(props: HeadingLayoutProps) {
     return (
         <Card className={props.className}>
             <CardHeader>
-                <CardTitle className={"text-2xl"}>{props.heading}</CardTitle>
-                <CardDescription>{props.description}</CardDescription>
-                {props.headingChildren !== undefined ? (
-                    <CardAction className={"flex justify-end gap-4"}>{props.headingChildren}</CardAction>
-                ) : undefined}
+                <div className={"flex flex-row justify-between gap-2"}>
+                    <div className={"flex flex-col items-start"}>
+                        <CardTitle className={"text-2xl"}>{props.heading}</CardTitle>
+                        <CardDescription>{props.description}</CardDescription>
+                    </div>
+                    {props.headingChildren !== undefined ? (
+                        <div className={"flex justify-end gap-4"}>{props.headingChildren}</div>
+                    ) : undefined}
+                </div>
             </CardHeader>
             <CardContent className={"flex w-full flex-col gap-4"}>{props.children}</CardContent>
         </Card>

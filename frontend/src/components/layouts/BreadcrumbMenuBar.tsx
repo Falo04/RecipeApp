@@ -17,9 +17,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { Link, useRouterState } from "@tanstack/react-router";
-import RECIPES_CONTEXT from "@/context/recipes.tsx";
 import React from "react";
-import TAGS_CONTEXT from "@/context/tags.tsx";
+import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
+import SINGLE_TAG_CONTEXT from "@/context/tag.tsx";
 
 /**
  * The properties for {@link BreadcrumbMenuBar}
@@ -35,8 +35,8 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
     const [tg] = useTranslation();
     const isMobile = useIsMobile();
 
-    const recipesContext = React.useContext(RECIPES_CONTEXT);
-    const tagsContext = React.useContext(TAGS_CONTEXT);
+    const recipeContext = React.useContext(SINGLE_RECIPE_CONTEXT);
+    const tagContext = React.useContext(SINGLE_TAG_CONTEXT);
 
     const pathName = useRouterState().location.pathname;
     const path = pathName.split("/").slice(2);
@@ -45,13 +45,13 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
         if (path.length > 0 && path[0] !== "dashboard") {
             switch (path[0]) {
                 case "recipes":
-                    return recipesContext.recipes.items.find((r) => r.uuid === path[1])?.name || path[1];
+                    return recipeContext.recipe.name;
                 case "tags":
-                    return tagsContext.tags.items.find((t) => t.uuid === path[1])?.name || path[1];
+                    return tagContext.tag.name;
             }
         }
         return undefined;
-    }, [path, recipesContext.recipes.items, tagsContext.tags.items]);
+    }, [path, recipeContext.recipe.name, tagContext.tag.name]);
 
     const nav = React.useMemo(
         () => (path[0] && path[0] !== "dashboard" ? props.navItems.find((n) => n.id === path[0]) || null : null),

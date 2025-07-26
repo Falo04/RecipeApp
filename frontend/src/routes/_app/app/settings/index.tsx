@@ -46,7 +46,7 @@ export function Settings() {
     });
 
     return (
-        <HeadingLayout heading={t("heading.title")}>
+        <HeadingLayout heading={t("heading.title")} description={t("heading.description")}>
             <form
                 onSubmit={(e) => {
                     e.preventDefault();

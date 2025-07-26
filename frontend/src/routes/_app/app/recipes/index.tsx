@@ -15,13 +15,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
-import { CopyIcon, MoreHorizontalIcon, PenBoxIcon, Settings2Icon, Trash2Icon } from "lucide-react";
+import { CopyIcon, MoreHorizontalIcon, PenBoxIcon, PlusIcon, Settings2Icon, Trash2Icon } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
-import { Form, FormLabel, Input } from "@/components/ui/form.tsx";
+import { Form, Input } from "@/components/ui/form.tsx";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import TablePagination from "@/components/ui/table-pagination.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 /**
  * The properties for {@link FoodOverview}
@@ -38,6 +39,7 @@ export function FoodOverview() {
     const [tg] = useTranslation();
 
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const { search, page, filter_tag } = Route.useSearch();
     const data = Route.useLoaderData();
@@ -59,12 +61,20 @@ export function FoodOverview() {
             description={t("heading.overview-description")}
             headingChildren={
                 <Link to={"/app/recipes/create"}>
-                    <Button>{t("button.create")}</Button>
+                    <Button>
+                        {isMobile ? (
+                            <div className={"flex items-center gap-1"}>
+                                <PlusIcon size={"size-4"} /> {t("button.create-short")}
+                            </div>
+                        ) : (
+                            t("button.create")
+                        )}
+                    </Button>
                 </Link>
             }
         >
-            <div className={"flex items-end justify-between gap-4"}>
-                <div className={"flex items-end gap-4"}>
+            <div className={"flex items-start justify-between gap-4 lg:items-end"}>
+                <div className={"flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-4"}>
                     <Form onSubmit={form.handleSubmit}>
                         <form.Field
                             name={"search"}
@@ -79,43 +89,61 @@ export function FoodOverview() {
                                         },
                                     });
                                 },
+                                onChangeAsyncDebounceMs: 500,
                             }}
                         >
                             {(fieldApi) => (
                                 <div>
-                                    <FormLabel htmlFor={"search"}>{t("label.filter")}</FormLabel>
                                     <Input
                                         value={fieldApi.state.value}
                                         onChange={(e) => fieldApi.handleChange(e.target.value)}
                                         placeholder={t("label.placeholder")}
-                                        className={"w-72"}
+                                        className={"w-44 lg:w-72"}
                                     />
                                 </div>
                             )}
                         </form.Field>
                     </Form>
-                    <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder={t("filter.tag")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value={"show-all"}>{t("filter.show-all-tag")}</SelectItem>
-                                {tags.tags.items.map((tag) => (
-                                    <SelectItem key={tag.uuid} value={tag.uuid}>
-                                        <Badge
-                                            variant={
-                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
-                                            }
-                                            key={tag.uuid}
-                                        >
-                                            {tag.name}
-                                        </Badge>
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    {!isMobile && (
+                        <Select
+                            value={filter_tag}
+                            onValueChange={async (x) => {
+                                console.log(x);
+                                await navigate({
+                                    to: "/app/recipes",
+                                    search: {
+                                        page: 1,
+                                        filter_tag: x,
+                                        search,
+                                    },
+                                });
+                                console.log(x);
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={t("filter.tag")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value={"show-all"}>{t("filter.show-all-tag")}</SelectItem>
+                                    {tags.tags.items.map((tag) => (
+                                        <SelectItem key={tag.uuid} value={tag.uuid}>
+                                            <Badge
+                                                variant={
+                                                    tag.color.toLowerCase() as VariantProps<
+                                                        typeof badgeVariants
+                                                    >["variant"]
+                                                }
+                                                key={tag.uuid}
+                                            >
+                                                {tag.name}
+                                            </Badge>
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    )}
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -236,17 +264,17 @@ export const Route = createFileRoute("/_app/app/recipes/")({
         return {
             page: page <= 0 ? 1 : page,
             search: (search.search as string) || "",
-            filter_tag: (search.tags as string) || "",
+            filter_tag: (search.filter_tag as string) || "show-all",
         };
     },
     loaderDeps: ({ search: { page, search, filter_tag } }) => ({ page, search, filter_tag }),
     loader: async ({ deps }) => {
-        const res = await Api.recipe.getAll(
-            LIMIT,
-            (deps.page - 1) * LIMIT,
-            deps.search,
-            deps.filter_tag === "show-all" ? undefined : deps.filter_tag,
-        );
+        const res = await Api.recipe.getAll({
+            limit: LIMIT,
+            offset: (deps.page - 1) * LIMIT,
+            filter_name: deps.search,
+            filter_tag: deps.filter_tag === "show-all" ? undefined : deps.filter_tag,
+        });
 
         if (res.error) {
             toast.error(res.error.message);

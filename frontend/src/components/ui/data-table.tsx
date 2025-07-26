@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import React from "react";
 import { Input } from "@/components/ui/form.tsx";
+import { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
 
 /**
  * The properties for {@link DataTable}
@@ -53,8 +54,8 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
     });
 
     return (
-        <div className={"flex h-full w-full flex-col justify-between gap-4"}>
-            <div className={"flex h-full w-full flex-col gap-4"}>
+        <Card className={"flex h-full w-full flex-col justify-between gap-4"}>
+            <CardContent className={"flex h-full w-full flex-col gap-4"}>
                 <div className={"flex items-center"}>
                     <Input
                         placeholder={props.filterTag}
@@ -107,8 +108,8 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className={"flex items-center justify-between"}>
+            </CardContent>
+            <CardFooter className={"flex items-center justify-between"}>
                 <Select
                     onValueChange={(e) => {
                         table.setPageSize(Number(e));
@@ -144,7 +145,7 @@ export function DataTable<TData extends { uuid: string }, TValue>(props: DataTab
                         Next
                     </Button>
                 </div>
-            </div>
-        </div>
+            </CardFooter>
+        </Card>
     );
 }

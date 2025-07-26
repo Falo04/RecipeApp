@@ -57,3 +57,10 @@ export interface RecipeSearchResponse {
     uuid: string;
     name: string;
 }
+
+export interface GetAllRecipesRequest {
+    limit: number;
+    offset: number;
+    filter_name: string;
+    filter_tag: string | undefined;
+}

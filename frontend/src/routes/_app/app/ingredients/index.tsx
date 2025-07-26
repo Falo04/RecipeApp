@@ -134,7 +134,7 @@ export default function IngredientsSearchOverview() {
     );
 
     return (
-        <HeadingLayout heading={t("heading.overview-title")}>
+        <HeadingLayout heading={t("heading.overview-title")} description={t("heading.overview-description")}>
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
