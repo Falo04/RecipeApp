@@ -53,7 +53,7 @@ export function EditTagDialog(props: EditTagDialogProps) {
 
     return (
         <Dialog open={true} onOpenChange={props.onClose}>
-            <DialogContent size={"sm"}>
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t("dialog.update-title")}</DialogTitle>
                     <DialogDescription>{t("dialog.update-description")}</DialogDescription>

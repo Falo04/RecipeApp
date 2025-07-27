@@ -1,5 +1,5 @@
 import { Api } from "@/api/api";
-import { TagColors, type CreateOrUpdateTag } from "@/api/model/tag.interface";
+import { TagColors } from "@/api/model/tag.interface";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -31,35 +31,26 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
             name: "",
             color: TagColors.Blue,
         },
-        onSubmit: async (values) => {
-            const payload: CreateOrUpdateTag = {
-                name: values.value.name,
-                color: values.value.color,
-            };
+        validators: {
+            onChangeAsync: async ({ value }) => {
+                const res = await Api.tags.create({ name: value.name, color: value.color });
 
-            toast.promise(Api.tags.create(payload), {
-                loading: tg("toast.loading"),
-                success: (result) => {
-                    if (result.error) {
-                        toast.error(result.error.message);
-                        return;
-                    }
+                if (res.error) {
+                    toast.error(res.error.message);
+                    return;
+                }
 
-                    if (result.data) {
-                        props.onClose();
-                        return t("toast.created-success");
-                    }
-                },
-                error: () => {
-                    return tg("toast.general-error");
-                },
-            });
+                toast.success("toast.created-success");
+            },
+        },
+        onSubmit: () => {
+            props.onClose();
         },
     });
 
     return (
         <Dialog open={true} onOpenChange={props.onClose}>
-            <DialogContent size={"sm"}>
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t("dialog.create-title")}</DialogTitle>
                     <DialogDescription>{t("dialog.create-description")}</DialogDescription>

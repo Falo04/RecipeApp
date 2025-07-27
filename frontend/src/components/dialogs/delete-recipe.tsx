@@ -22,24 +22,20 @@ export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
     const [tg] = useTranslation();
 
     const deleteTag = async () => {
-        toast.promise(Api.recipe.delete(props.recipe_uuid), {
-            loading: tg("toast.loading"),
-            success: (result) => {
-                if (result.error) {
-                    toast.error(result.error.message);
-                    return;
-                }
+        const res = await Api.recipe.delete(props.recipe_uuid);
+        if (res.error) {
+            toast.error(res.error.message);
+            return;
+        }
 
-                props.onClose();
-                return t("toast.deleted-success");
-            },
-            error: tg("toast.general-error"),
-        });
+        toast.success(t("toast.deleted-success"));
+        props.onClose();
+        return;
     };
 
     return (
         <Dialog open={true} onOpenChange={props.onClose}>
-            <DialogContent size={"sm"}>
+            <DialogContent>
                 <DialogHeader className="items-start">
                     <DialogTitle>{t("dialog.delete-title")} </DialogTitle>
                     <DialogDescription className="flex w-full flex-col items-start gap-2">
