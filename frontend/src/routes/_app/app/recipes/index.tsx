@@ -193,7 +193,7 @@ export function FoodOverview() {
                             </TableCell>
                             <TableCell>
                                 <div className={"-ms-3 flex items-center justify-end"}>
-                                    <DropdownMenu>
+                                    <DropdownMenu modal={false}>
                                         <DropdownMenuTrigger asChild data-nolink>
                                             <Button variant={"ghost"} size={"icon"}>
                                                 <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
