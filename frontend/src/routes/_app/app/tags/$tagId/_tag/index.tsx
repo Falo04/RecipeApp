@@ -33,7 +33,7 @@ export default function RecipeOverviewForTag() {
                 accessorKey: "name",
                 header: () => <span>{tg("table.name")}</span>,
                 cell: ({ row }) => (
-                    <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
+                    <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
                         <Text className="hover:text-foreground overflow-hidden text-ellipsis">{row.original.name}</Text>
                     </Link>
                 ),
@@ -50,7 +50,7 @@ export default function RecipeOverviewForTag() {
                     <div className={"flex justify-end pr-4"}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Link to={"/app/recipes/$recipeId/general"} params={{ recipeId: row.original.uuid }}>
+                                <Link to={"/app/recipes/$recipeId"} params={{ recipeId: row.original.uuid }}>
                                     <Info className={"size-4"} />
                                 </Link>
                             </TooltipTrigger>

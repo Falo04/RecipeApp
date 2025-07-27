@@ -31,8 +31,6 @@ export default function TablePagination(props: TablePaginationProps) {
     const [tg] = useTranslation();
     const { currentPage, maxPages } = props;
 
-    console.log(currentPage, maxPages);
-
     return (
         <Pagination>
             <PaginationPrevious

@@ -8,7 +8,7 @@ import type {
     SimpleRecipeWithTags,
     UpdateRecipeRequest,
 } from "./model/recipe.interface";
-import type { CreateOrUpdateTag, SimpleTag } from "./model/tag.interface";
+import type { CreateOrUpdateTag, GetAllTagRequest, SimpleTag } from "./model/tag.interface";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, List, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
@@ -40,11 +40,11 @@ export const Api = {
             await callApi<SingleUuid>({ method: "POST", url: "/recipes", data: payload }),
         update: async (uuid: string, payload: UpdateRecipeRequest): Promise<ApiResponse<SingleUuid>> =>
             await callApi({ method: "PUT", url: `/recipes/${uuid}`, data: payload }),
-        delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipe/${uuid}` }),
+        delete: async (uuid: string) => await callApi({ method: "DELETE", url: `/recipes/${uuid}` }),
     },
     tags: {
-        getAll: async (): Promise<ApiResponse<Page<SimpleTag>>> =>
-            await callApi<Page<SimpleTag>>({ method: "GET", url: "/tags" }),
+        getAll: async (request: GetAllTagRequest): Promise<ApiResponse<Page<SimpleTag>>> =>
+            await callApi<Page<SimpleTag>>({ method: "POST", url: "/tags/all", data: request }),
         getRecipesByTag: async (uuid: string): Promise<ApiResponse<Page<SimpleRecipe>>> =>
             await callApi<Page<SimpleRecipe>>({ method: "GET", url: `/tags/${uuid}/recipes` }),
         create: async (payload: CreateOrUpdateTag): Promise<ApiResponse<SingleUuid>> =>

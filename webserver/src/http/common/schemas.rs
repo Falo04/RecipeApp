@@ -35,28 +35,10 @@ pub struct List<T> {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetPageRequest {
     /// The maximum number of items to return in this page.
-    #[serde(default = "default_limit")]
     pub limit: u64,
 
     /// The starting index of the items to return in this page.
-    #[serde(default = "default_offset")]
     pub offset: u64,
-}
-
-/// Returns a default limit value of 999.
-///
-/// This function provides a sensible default value for a limit,
-/// often used in scenarios where a specific value isn't known or
-/// relevant.
-fn default_limit() -> u64 {
-    999
-}
-
-/// Returns a default offset value.
-///
-/// This function simply returns 0 as the default offset.
-fn default_offset() -> u64 {
-    0
 }
 
 /// Represents a paginated list of items.

@@ -128,7 +128,4 @@ pub struct GetAllRecipesRequest {
 
     /// Search for recipe name
     pub filter_name: Option<String>,
-
-    /// Filters for a specific tag
-    pub filter_tag: Option<Uuid>,
 }

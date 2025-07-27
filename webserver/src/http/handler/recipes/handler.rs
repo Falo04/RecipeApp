@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use std::ops::Deref;
 
 use axum::extract::Path;
-use axum::extract::Query;
 use futures_util::StreamExt;
 use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
@@ -54,25 +53,18 @@ use crate::models::users::User;
 pub async fn get_all_recipes(
     ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
-    let GetAllRecipesRequest {
-        page,
-        filter_name,
-        filter_tag,
-    } = pagination;
+    let GetAllRecipesRequest { page, filter_name } = pagination;
 
-    let condition = and![
-        filter_name.map(|name| conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(Recipe.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!(
-                "%{}%",
-                name.replace('_', "\\_")
-                    .replace('%', "\\%")
-                    .replace('\\', "\\\\")
-            )))
-        }),
-        filter_tag.map(|tag_uuid| Recipe.tags.tag.equals(tag_uuid)),
-    ];
+    let condition = and![filter_name.map(|name| conditions::Binary {
+        operator: conditions::BinaryOperator::Like,
+        fst_arg: conditions::Column(Recipe.name),
+        snd_arg: conditions::Value::String(Cow::Owned(format!(
+            "%{}%",
+            name.replace('_', "\\_")
+                .replace('%', "\\%")
+                .replace('\\', "\\\\")
+        )))
+    }),];
 
     let items: Vec<_> = rorm::query(Database::global(), Recipe)
         .condition(condition)

@@ -62,5 +62,4 @@ export interface GetAllRecipesRequest {
     limit: number;
     offset: number;
     filter_name: string;
-    filter_tag: string | undefined;
 }

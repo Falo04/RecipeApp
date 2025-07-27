@@ -29,3 +29,9 @@ export enum TagColors {
     Rose = "Rose",
     Zinc = "Zinc",
 }
+
+export interface GetAllTagRequest {
+    limit: number;
+    offset: number;
+    filter_name: string;
+}

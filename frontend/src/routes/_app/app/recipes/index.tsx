@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
-import React from "react";
-import TAGS_CONTEXT from "@/context/tags.tsx";
 import { Text } from "@/components/ui/text.tsx";
-import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
+import { BadgeButton, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import {
     DropdownMenu,
@@ -32,9 +30,10 @@ import { useForm } from "@tanstack/react-form";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
 import { Form, Input } from "@/components/ui/form.tsx";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import TablePagination from "@/components/ui/table-pagination.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import React, { Suspense } from "react";
+import { DeleteRecipeDialog } from "@/components/dialogs/delete-recipe.tsx";
 
 /**
  * The properties for {@link FoodOverview}
@@ -50,16 +49,16 @@ export function FoodOverview() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
 
+    const [openDelete, setOpenDelete] = React.useState<string | undefined>();
+
     const navigate = useNavigate();
     const isMobile = useIsMobile();
 
-    const { search, page, filter_tag } = Route.useSearch();
+    const { search, page } = Route.useSearch();
     const data = Route.useLoaderData();
     if (!data) {
         return;
     }
-
-    const tags = React.useContext(TAGS_CONTEXT);
 
     const form = useForm({
         defaultValues: {
@@ -86,77 +85,35 @@ export function FoodOverview() {
             }
         >
             <div className={"flex items-start justify-between gap-4 lg:items-end"}>
-                <div className={"flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-4"}>
-                    <Form onSubmit={form.handleSubmit}>
-                        <form.Field
-                            name={"search"}
-                            validators={{
-                                onChangeAsync: async ({ fieldApi }) => {
-                                    await navigate({
-                                        to: `/app/recipes`,
-                                        search: {
-                                            page: 1,
-                                            search: fieldApi.state.value,
-                                            filter_tag,
-                                        },
-                                    });
-                                },
-                                onChangeAsyncDebounceMs: 500,
-                            }}
-                        >
-                            {(fieldApi) => (
-                                <div>
-                                    <Input
-                                        value={fieldApi.state.value}
-                                        onChange={(e) => fieldApi.handleChange(e.target.value)}
-                                        placeholder={t("label.placeholder")}
-                                        className={"w-44 lg:w-72"}
-                                    />
-                                </div>
-                            )}
-                        </form.Field>
-                    </Form>
-                    {!isMobile && (
-                        <Select
-                            value={filter_tag}
-                            onValueChange={async (x) => {
-                                console.log(x);
+                <Form onSubmit={form.handleSubmit}>
+                    <form.Field
+                        name={"search"}
+                        validators={{
+                            onChangeAsync: async ({ fieldApi }) => {
                                 await navigate({
-                                    to: "/app/recipes",
+                                    to: `/app/recipes`,
                                     search: {
                                         page: 1,
-                                        filter_tag: x,
-                                        search,
+                                        search: fieldApi.state.value,
                                     },
                                 });
-                                console.log(x);
-                            }}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder={t("filter.tag")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value={"show-all"}>{t("filter.show-all-tag")}</SelectItem>
-                                    {tags.tags.items.map((tag) => (
-                                        <SelectItem key={tag.uuid} value={tag.uuid}>
-                                            <Badge
-                                                variant={
-                                                    tag.color.toLowerCase() as VariantProps<
-                                                        typeof badgeVariants
-                                                    >["variant"]
-                                                }
-                                                key={tag.uuid}
-                                            >
-                                                {tag.name}
-                                            </Badge>
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    )}
-                </div>
+                            },
+                            onChangeAsyncDebounceMs: 500,
+                        }}
+                    >
+                        {(fieldApi) => (
+                            <div>
+                                <Input
+                                    value={fieldApi.state.value}
+                                    onChange={(e) => fieldApi.handleChange(e.target.value)}
+                                    placeholder={t("label.placeholder")}
+                                    className={"w-44 lg:w-72"}
+                                />
+                            </div>
+                        )}
+                    </form.Field>
+                </Form>
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant={"outline"}>
@@ -197,12 +154,15 @@ export function FoodOverview() {
                     {data.items.map((recipe) => (
                         <TableRow
                             key={recipe.uuid}
-                            onClick={() =>
-                                navigate({
-                                    to: "/app/recipes/$recipeId",
-                                    params: { recipeId: recipe.uuid },
-                                })
-                            }
+                            onClick={async (e) => {
+                                const target = e.target as HTMLElement;
+                                if (!target.closest("[data-nolink]") && e.currentTarget.contains(target)) {
+                                    await navigate({
+                                        to: "/app/recipes/$recipeId",
+                                        params: { recipeId: recipe.uuid },
+                                    });
+                                }
+                            }}
                         >
                             <TableCell>
                                 <Text>{recipe.name}</Text>
@@ -213,28 +173,42 @@ export function FoodOverview() {
                             <TableCell>
                                 <div className="flex flex-wrap gap-1">
                                     {recipe.tags.map((tag) => (
-                                        <Badge
+                                        <BadgeButton
+                                            key={tag.uuid}
+                                            data-nolink
                                             variant={
                                                 tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
                                             }
-                                            key={tag.uuid}
+                                            onClick={async () => {
+                                                await navigate({
+                                                    to: "/app/tags/$tagId",
+                                                    params: { tagId: tag.uuid },
+                                                });
+                                            }}
                                         >
                                             {tag.name}
-                                        </Badge>
+                                        </BadgeButton>
                                     ))}
                                 </div>
                             </TableCell>
                             <TableCell>
                                 <div className={"-ms-3 flex items-center justify-end"}>
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
+                                        <DropdownMenuTrigger asChild data-nolink>
                                             <Button variant={"ghost"} size={"icon"}>
                                                 <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
                                                 <MoreHorizontalIcon className={"w-5"} />
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align={"end"}>
-                                            <DropdownMenuItem onSelect={() => {}}>
+                                            <DropdownMenuItem
+                                                onSelect={async () => {
+                                                    await navigate({
+                                                        to: "/app/recipes/$recipeId/update",
+                                                        params: { recipeId: recipe.uuid },
+                                                    });
+                                                }}
+                                            >
                                                 <PenBoxIcon className={"me-2.5 size-4"} />
                                                 {t("button.edit")}
                                             </DropdownMenuItem>
@@ -243,7 +217,7 @@ export function FoodOverview() {
                                                 {t("button.copy")}
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => {}}>
+                                            <DropdownMenuItem onSelect={() => setOpenDelete(recipe.uuid)}>
                                                 <Trash2Icon className={"me-2.5 size-4"} />
                                                 {t("button.delete")}
                                             </DropdownMenuItem>
@@ -261,6 +235,12 @@ export function FoodOverview() {
                 href={"/app/recipes"}
                 getSearchParams={(newPage: number) => ({ page: newPage })}
             />
+
+            {openDelete && (
+                <Suspense>
+                    <DeleteRecipeDialog recipe_uuid={openDelete} onClose={() => setOpenDelete(undefined)} />
+                </Suspense>
+            )}
         </HeadingLayout>
     );
 }
@@ -270,8 +250,6 @@ type RecipeOverviewSearchProps = {
     page: number;
     /** The search term that should be used */
     search: string;
-    /** The tag to filter*/
-    filter_tag: string;
 };
 
 export const Route = createFileRoute("/_app/app/recipes/")({
@@ -282,16 +260,14 @@ export const Route = createFileRoute("/_app/app/recipes/")({
         return {
             page: page <= 0 ? 1 : page,
             search: (search.search as string) || "",
-            filter_tag: (search.filter_tag as string) || "show-all",
         };
     },
-    loaderDeps: ({ search: { page, search, filter_tag } }) => ({ page, search, filter_tag }),
+    loaderDeps: ({ search: { page, search } }) => ({ page, search }),
     loader: async ({ deps }) => {
         const res = await Api.recipe.getAll({
             limit: LIMIT,
             offset: (deps.page - 1) * LIMIT,
             filter_name: deps.search,
-            filter_tag: deps.filter_tag === "show-all" ? undefined : deps.filter_tag,
         });
 
         if (res.error) {
