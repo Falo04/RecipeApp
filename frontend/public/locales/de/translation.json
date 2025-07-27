@@ -38,10 +38,6 @@
     "sr-only": {
         "breadcrumb-menu": "Navigationsmen\u00fc"
     },
-    "tab": {
-        "general": "Allgemein",
-        "recipe": "Zugewiesene Rezepte"
-    },
     "table": {
         "action": "Aktion",
         "color": "Farbe",

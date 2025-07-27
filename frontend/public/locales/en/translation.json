@@ -38,10 +38,6 @@
     "sr-only": {
         "breadcrumb-menu": "Breadcrumb Menu"
     },
-    "tab": {
-        "general": "General",
-        "recipe": "Assigned Recipes"
-    },
     "table": {
         "action": "Action",
         "color": "Color",

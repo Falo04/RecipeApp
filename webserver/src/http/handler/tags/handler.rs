@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use axum::extract::Path;
 use axum::extract::Query;
 use futures_lite::StreamExt;
@@ -9,6 +11,7 @@ use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
 use rorm::and;
+use rorm::conditions;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
@@ -16,8 +19,10 @@ use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
+use crate::http::handler::recipes::schema::GetAllRecipesRequest;
 use crate::http::handler::recipes::schema::SimpleRecipe;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
+use crate::http::handler::tags::schema::GetAllTagsRequest;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::recipes::Recipe;
 use crate::models::tags::RecipeTag;
@@ -32,14 +37,28 @@ use crate::models::tags::Tag;
 /// # Arguments
 ///
 /// * `Query<GetPageRequest>` - object containing the pagination parameters
-#[get("/")]
+#[post("/all")]
 pub async fn get_all_tags(
-    pagination: Query<GetPageRequest>,
+    ApiJson(pagination): ApiJson<GetAllTagsRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleTag>>> {
+    let GetAllTagsRequest { page, filter_name } = pagination;
+
+    let condition = and![filter_name.map(|name| conditions::Binary {
+        operator: conditions::BinaryOperator::Like,
+        fst_arg: conditions::Column(Tag.name),
+        snd_arg: conditions::Value::String(Cow::Owned(format!(
+            "%{}%",
+            name.replace('_', "\\_")
+                .replace('%', "\\%")
+                .replace('\\', "\\\\")
+        )))
+    })];
+
     let items: Vec<_> = rorm::query(Database::global(), Tag)
+        .condition(condition)
         .order_asc(Tag.name)
-        .limit(pagination.limit)
-        .offset(pagination.offset)
+        .limit(page.limit)
+        .offset(page.offset)
         .stream()
         .map(|result| result.map(SimpleTag::from))
         .try_collect()
@@ -51,8 +70,8 @@ pub async fn get_all_tags(
 
     Ok(ApiJson(Page {
         items,
-        limit: pagination.limit,
-        offset: pagination.offset,
+        limit: page.limit,
+        offset: page.offset,
         total,
     }))
 }
@@ -66,16 +85,32 @@ pub async fn get_all_tags(
 ///
 /// * `Path<SingleUuid>` - The UUID of the tag to filter recipes by.
 /// * `Query<GetPageRequest>` - The pagination request.
-#[get("/{uuid}/recipes")]
+#[post("/{uuid}/recipes")]
 pub async fn get_recipes_by_tag(
     Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
-    pagination: Query<GetPageRequest>,
+    ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipe>>> {
+    let GetAllRecipesRequest { page, filter_name } = pagination;
+
+    let condition = and![
+        filter_name.map(|name| conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(RecipeTag.recipe.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!(
+                "%{}%",
+                name.replace('_', "\\_")
+                    .replace('%', "\\%")
+                    .replace('\\', "\\\\")
+            ))),
+        }),
+        Some(RecipeTag.tag.equals(tag_uuid)),
+    ];
+
     let items: Vec<_> = rorm::query(Database::global(), RecipeTag.recipe.query_as(Recipe))
-        .condition(RecipeTag.tag.equals(tag_uuid))
+        .condition(condition)
         .order_asc(RecipeTag.recipe.name)
-        .limit(pagination.limit)
-        .offset(pagination.offset)
+        .limit(page.limit)
+        .offset(page.offset)
         .stream()
         .map(|result| result.map(SimpleRecipe::from))
         .try_collect()
@@ -88,8 +123,8 @@ pub async fn get_recipes_by_tag(
 
     Ok(ApiJson(Page {
         items,
-        limit: pagination.limit,
-        offset: pagination.offset,
+        limit: page.limit,
+        offset: page.offset,
         total,
     }))
 }

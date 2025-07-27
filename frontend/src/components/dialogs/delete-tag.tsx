@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
-import type { SimpleTag } from "@/api/model/tag.interface";
 
 /**
  * The properties for {@link DeleteTagDialog}
  */
 export type DeleteTagDialogProps = {
-    tag: SimpleTag;
-    onDeletion: () => void;
+    /** Simple Tag */
+    tag_uuid: string;
+    /** On close */
     onClose: () => void;
 };
 
@@ -22,7 +22,7 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
     const [tg] = useTranslation();
 
     const deleteTag = async () => {
-        toast.promise(Api.tags.delete(props.tag.uuid), {
+        toast.promise(Api.tags.delete(props.tag_uuid), {
             loading: tg("toast.loading"),
             success: (result) => {
                 if (result.error) {
@@ -30,7 +30,7 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
                     return;
                 }
 
-                props.onDeletion();
+                props.onClose();
                 return t("toast.deleted-success");
             },
             error: tg("toast.general-error"),
@@ -44,9 +44,6 @@ export function DeleteTagDialog(props: DeleteTagDialogProps) {
                     <DialogTitle>{t("dialog.delete-title")} </DialogTitle>
                     <DialogDescription className="flex w-full flex-col items-start gap-2">
                         {t("dialog.delete-description")}
-                        <span className="ml-1 max-w-[200px] truncate text-2xl" title={props.tag.name}>
-                            {props.tag.name}
-                        </span>
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

@@ -10,6 +10,10 @@
         "next": "Next",
         "update": "Update Recipe"
     },
+    "dialog": {
+        "delete-description": "Are you sure you want to delete this recipe? This action cannot be undone.",
+        "delete-title": "Delete Recipe"
+    },
     "error": {
         "description-required": "A description is required for the recipe",
         "ingre-amount": "Ingredient amount cannot be empty or zero",
@@ -23,9 +27,7 @@
     "filter": {
         "grid": "Grid",
         "layout": "Layout",
-        "show-all-tag": "Show All Tags",
         "table": "Table",
-        "tag": "Tag",
         "view": "View"
     },
     "heading": {
@@ -44,14 +46,10 @@
         "amount": "Amount",
         "description": "Description of the Recipe",
         "name": "Name of the Recipe",
-        "name-ingredients": "Ingredients name",
+        "name-ingredients": "Ingredient Name",
         "select-tags": "Select Tags",
         "step": "Step",
         "tags-empty": "No tags found"
-    },
-    "search": {
-        "recipes": "Search Recipes",
-        "recipes-empty": "No recipes found"
     },
     "stepper": {
         "ingredients-description": "Add ingredients for the recipe",
@@ -63,6 +61,7 @@
     },
     "toast": {
         "created-success": "Recipe was created successfully",
+        "deleted-success": "Recipe was deleted successfully",
         "updated-success": "Recipe was updated successfully"
     }
 }

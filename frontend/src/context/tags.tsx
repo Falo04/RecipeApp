@@ -63,7 +63,11 @@ export function TagsProvider(props: TagsProviderProps) {
         if (fetching) return;
         fetching = true;
 
-        const res = await Api.tags.getAll();
+        const res = await Api.tags.getAll({
+            limit: 999,
+            offset: 0,
+            filter_name: "",
+        });
         if (res.error) {
             toast.error(res.error.message);
             return;

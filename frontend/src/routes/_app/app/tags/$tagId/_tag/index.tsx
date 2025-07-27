@@ -68,7 +68,7 @@ export default function RecipeOverviewForTag() {
     return <DataTable filterTag={t("input.filter")} data={data.items} columns={columns} />;
 }
 
-export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/recipe")({
+export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/")({
     component: RecipeOverviewForTag,
     loader: async ({ params }) => {
         const res = await Api.tags.getRecipesByTag(params.tagId);

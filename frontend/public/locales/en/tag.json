@@ -2,30 +2,37 @@
     "button": {
         "create": "Create Tag",
         "delete": "Delete Tag",
+        "edit": "Edit Tag",
         "update": "Update Tag"
     },
     "dialog": {
-        "create-description": "Description for creating a tag",
-        "create-title": "Create a tag",
-        "delete-description": "Cannot be restored",
-        "delete-title": "Delete Tag: "
+        "create-description": "Provide a description for creating a new tag",
+        "create-title": "Create a Tag",
+        "delete-description": "This action cannot be undone",
+        "delete-title": "Delete Tag:",
+        "update-description": "Update the details of the tag",
+        "update-title": "Update Tag"
     },
     "error": {
-        "name-required": "Name is required of tag",
-        "too-long": "Name is too long, it cannot be longer than 255 characters"
+        "name-required": "Tag name is required.",
+        "too-long": "Name is too long, must be 255 characters or fewer."
     },
     "heading": {
+        "overview-description": "Manage your tags and organize them for your recipes",
         "overview-title": "Tag Overview"
     },
     "input": {
-        "filter": "Filter Tags"
+        "filter": "Search Tags"
+    },
+    "label": {
+        "placeholder": "Enter tag name"
     },
     "placeholder": {
-        "empty": "No tags are found"
+        "empty": "No tags found"
     },
     "toast": {
-        "created-success": "Tag successful created",
-        "deleted-success": "Tag successful deleted",
-        "updated-success": "Tag successful updated"
+        "created-success": "Tag created successfully",
+        "deleted-success": "Tag deleted successfully",
+        "updated-success": "Tag updated successfully"
     }
 }

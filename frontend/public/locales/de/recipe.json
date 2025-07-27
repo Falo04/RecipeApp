@@ -1,31 +1,33 @@
 {
     "button": {
-        "add-tags": "Tags hinzuf\u00fcgen",
-        "back": "Zur\u00fcck",
+        "add-tags": "Tags hinzufügen",
+        "back": "Zurück",
         "copy": "Kopieren",
         "create": "Rezept erstellen",
-        "create-short": "Erstellen",
-        "delete": "L\u00f6schen",
+        "create-short": "Hinzufügen",
+        "delete": "Löschen",
         "edit": "Bearbeiten",
         "next": "Weiter",
         "update": "Rezept aktualisieren"
     },
+    "dialog": {
+        "delete-description": "Möchtest du dieses Rezept wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "delete-title": "Rezept löschen"
+    },
     "error": {
-        "description-required": "Eine Beschreibung des Rezepts ist erforderlich",
-        "ingre-amount": "Zutatenmenge darf nicht leer oder null sein",
-        "ingre-name": "Bitte einen Namen angeben",
-        "ingre-unit": "Bitte eine Einheit angeben",
+        "description-required": "Eine Beschreibung für das Rezept ist erforderlich",
+        "ingre-amount": "Die Zutatenmenge darf nicht leer oder null sein",
+        "ingre-name": "Bitte gib einen Namen an",
+        "ingre-unit": "Bitte gib eine Einheit an",
         "name-required": "Ein Rezeptname ist erforderlich",
-        "step-length-255": "Einzelschritt darf nicht l\u00e4nger als 255 Zeichen sein",
+        "step-length-255": "Einzelschritt darf nicht länger als 255 Zeichen sein",
         "step-length-zero": "Einzelschritt darf nicht leer sein",
-        "too-long": "Die Eingabe ist zu lang, sie darf maximal 255 Zeichen enthalten"
+        "too-long": "Die Eingabe ist zu lang. Maximal 255 Zeichen erlaubt"
     },
     "filter": {
-        "grid": "Rasteransicht",
-        "layout": "Ansicht",
-        "show-all-tag": "Alle Tags anzeigen",
-        "table": "Tabellenansicht",
-        "tag": "Tag",
+        "grid": "Raster",
+        "layout": "Layout",
+        "table": "Tabelle",
         "view": "Ansicht"
     },
     "heading": {
@@ -33,36 +35,29 @@
         "ingredients": "Liste aller Zutaten",
         "ingredients-title": "Gib deine Zutaten ein",
         "overview-description": "Allgemeine Informationen zum Rezept",
-        "overview-title": "Rezept\u00fcbersicht",
+        "overview-title": "Rezeptübersicht",
         "step-title": "Gib deine Schritte ein",
         "steps": "Anleitung:"
     },
     "label": {
-        "placeholder": "Bitte Eingabe machen"
+        "placeholder": "Wert eingeben"
     },
     "placeholder": {
         "amount": "Menge",
         "description": "Beschreibung des Rezepts",
         "name": "Name des Rezepts",
-        "name-ingredients": "Zutaten name",
-        "select-tags": "Tags ausw\u00e4hlen",
+        "name-ingredients": "Zutatenname",
+        "select-tags": "Tags auswählen",
         "step": "Schritt",
         "tags-empty": "Keine Tags gefunden"
     },
-    "search": {
-        "recipes": "Rezepte suchen",
-        "recipes-empty": "Keine Rezepte gefunden"
-    },
     "stepper": {
-        "ingredients-description": "Gib die Zutaten f\u00fcr das Rezept an",
+        "ingredients-description": "Zutaten für das Rezept hinzufügen",
         "ingredients-title": "Zutaten",
         "meta-description": "Allgemeine Informationen angeben",
         "meta-title": "Allgemeine Informationen",
-        "steps-description": "Anleitungsschritte f\u00fcr das Rezept angeben",
+        "steps-description": "Anleitungsschritte für das Rezept hinzufügen",
         "steps-title": "Anleitung"
     },
     "toast": {
-        "created-success": "Rezept wurde erfolgreich erstellt",
-        "updated-success": "Rezept wurde erfolgreich aktualisiert"
-    }
-}
+        "created-success": "R

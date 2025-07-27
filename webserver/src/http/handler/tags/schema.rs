@@ -1,4 +1,6 @@
 //! Represents all recipe responses and requests.
+
+use galvyn::core::stuff::schema::GetPageRequest;
 use rorm::fields::types::MaxStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
@@ -28,4 +30,13 @@ pub struct CreateOrUpdateTag {
 
     /// The color associated with the tag, chosen from the `TagColors` enum.
     pub color: TagColors,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct GetAllTagsRequest {
+    /// Page request
+    #[serde(flatten)]
+    pub page: GetPageRequest,
+    /// Search for tag name
+    pub filter_name: Option<String>,
 }
