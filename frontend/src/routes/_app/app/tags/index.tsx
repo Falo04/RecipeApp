@@ -60,7 +60,7 @@ export function TagsOverview() {
     return (
         <HeadingLayout
             heading={t("heading.overview-title")}
-            description={t("headiner.overview-description")}
+            description={t("heading.overview-description")}
             headingChildren={<Button onClick={() => setOpenCreate(true)}>{t("button.create")}</Button>}
         >
             <Form onSubmit={form.handleSubmit}>
@@ -111,6 +111,7 @@ export function TagsOverview() {
                                     await navigate({
                                         to: "/app/tags/$tagId",
                                         params: { tagId: tag.uuid },
+                                        search: { page: 1, search: "" },
                                     });
                                 }
                             }}

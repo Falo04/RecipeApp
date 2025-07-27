@@ -4,7 +4,6 @@ import type {
     CreateRecipeRequest,
     FullRecipe,
     GetAllRecipesRequest,
-    SimpleRecipe,
     SimpleRecipeWithTags,
     UpdateRecipeRequest,
 } from "./model/recipe.interface";
@@ -45,8 +44,11 @@ export const Api = {
     tags: {
         getAll: async (request: GetAllTagRequest): Promise<ApiResponse<Page<SimpleTag>>> =>
             await callApi<Page<SimpleTag>>({ method: "POST", url: "/tags/all", data: request }),
-        getRecipesByTag: async (uuid: string): Promise<ApiResponse<Page<SimpleRecipe>>> =>
-            await callApi<Page<SimpleRecipe>>({ method: "GET", url: `/tags/${uuid}/recipes` }),
+        getRecipesByTag: async (
+            uuid: string,
+            request: GetAllRecipesRequest,
+        ): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> =>
+            await callApi<Page<SimpleRecipeWithTags>>({ method: "POST", url: `/tags/${uuid}/recipes`, data: request }),
         create: async (payload: CreateOrUpdateTag): Promise<ApiResponse<SingleUuid>> =>
             await callApi<SingleUuid>({ method: "POST", url: "/tags", data: payload }),
         update: async (uuid: string, payload: CreateOrUpdateTag) =>

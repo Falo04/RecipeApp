@@ -67,7 +67,7 @@ pub async fn get_all_recipes(
     }),];
 
     let items: Vec<_> = rorm::query(Database::global(), Recipe)
-        .condition(condition)
+        .condition(&condition)
         .order_asc(Recipe.name)
         .limit(page.limit)
         .offset(page.offset)

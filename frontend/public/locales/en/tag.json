@@ -19,7 +19,9 @@
     },
     "heading": {
         "overview-description": "Manage your tags and organize them for your recipes",
-        "overview-title": "Tag Overview"
+        "overview-title": "Tag Overview",
+        "tags-recipes-description": "All recipes which are mapped to this tag.",
+        "tags-recipes-title": "Tag: {{object}}"
     },
     "input": {
         "filter": "Search Tags"

@@ -1,25 +1,27 @@
 {
     "button": {
         "create": "Tag erstellen",
-        "delete": "Tag löschen",
+        "delete": "Tag l\u00f6schen",
         "edit": "Tag bearbeiten",
         "update": "Tag aktualisieren"
     },
     "dialog": {
         "create-description": "Beschreibung zum Erstellen eines Tags",
         "create-title": "Ein Tag erstellen",
-        "delete-description": "Diese Aktion kann nicht rückgängig gemacht werden",
-        "delete-title": "Tag löschen:",
+        "delete-description": "Diese Aktion kann nicht r\u00fcckg\u00e4ngig gemacht werden",
+        "delete-title": "Tag l\u00f6schen:",
         "update-description": "Details des Tags aktualisieren",
         "update-title": "Tag aktualisieren"
     },
     "error": {
-        "name-required": "Name vom Tag benötigt.",
+        "name-required": "Name vom Tag ben\u00f6tigt.",
         "too-long": "Name zu lang, maximal 255 Zeichen erlaubt."
     },
     "heading": {
-        "overview-description": "Verwalte deine Tags und organisiere sie für deine Rezepte",
-        "overview-title": "Tag Übersicht"
+        "overview-description": "Verwalte deine Tags und organisiere sie f\u00fcr deine Rezepte",
+        "overview-title": "Tag \u00dcbersicht",
+        "tags-recipes-description": "Alle Rezepte die zu dem Tag gemappt sind.",
+        "tags-recipes-title": "Tag: {{object}}"
     },
     "input": {
         "filter": "Tag suchen"
@@ -32,7 +34,7 @@
     },
     "toast": {
         "created-success": "Tag erfolgreich erstellt",
-        "deleted-success": "Tag erfolgreich gelöscht",
+        "deleted-success": "Tag erfolgreich gel\u00f6scht",
         "updated-success": "Tag erfolgreich aktualisiert"
     }
 }

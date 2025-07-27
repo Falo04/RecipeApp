@@ -1,26 +1,25 @@
 use std::borrow::Cow;
+use std::collections::HashMap;
 
 use axum::extract::Path;
-use axum::extract::Query;
-use futures_lite::StreamExt;
+use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::delete;
-use galvyn::get;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
 use rorm::and;
 use rorm::conditions;
+use rorm::conditions::DynamicCollection;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::handler::recipes::schema::GetAllRecipesRequest;
-use crate::http::handler::recipes::schema::SimpleRecipe;
+use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
 use crate::http::handler::tags::schema::GetAllTagsRequest;
 use crate::http::handler::tags::schema::SimpleTag;
@@ -60,7 +59,7 @@ pub async fn get_all_tags(
         .limit(page.limit)
         .offset(page.offset)
         .stream()
-        .map(|result| result.map(SimpleTag::from))
+        .map_ok(SimpleTag::from)
         .try_collect()
         .await?;
 
@@ -89,7 +88,7 @@ pub async fn get_all_tags(
 pub async fn get_recipes_by_tag(
     Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
     ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
-) -> ApiResult<ApiJson<Page<SimpleRecipe>>> {
+) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let GetAllRecipesRequest { page, filter_name } = pagination;
 
     let condition = and![
@@ -106,20 +105,53 @@ pub async fn get_recipes_by_tag(
         Some(RecipeTag.tag.equals(tag_uuid)),
     ];
 
+    let total = rorm::query(Database::global(), RecipeTag.uuid.count())
+        .condition(&condition)
+        .one()
+        .await?;
+
     let items: Vec<_> = rorm::query(Database::global(), RecipeTag.recipe.query_as(Recipe))
-        .condition(condition)
+        .condition(&condition)
         .order_asc(RecipeTag.recipe.name)
         .limit(page.limit)
         .offset(page.offset)
         .stream()
-        .map(|result| result.map(SimpleRecipe::from))
         .try_collect()
         .await?;
 
-    let total = rorm::query(Database::global(), RecipeTag.uuid.count())
-        .condition(RecipeTag.tag.equals(tag_uuid))
-        .one()
+    let mut map: HashMap<Uuid, Vec<SimpleTag>> =
+        HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
+
+    if !items.is_empty() {
+        let tags: Vec<_> = rorm::query(
+            Database::global(),
+            (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)),
+        )
+        .condition(DynamicCollection::or(
+            items
+                .iter()
+                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
+                .collect(),
+        ))
+        .stream()
+        .map_ok(|(recipe, tag)| (recipe.0, SimpleTag::from(tag)))
+        .try_collect()
         .await?;
+
+        for (recipe_uuid, tag) in tags {
+            map.entry(recipe_uuid).or_default().push(tag);
+        }
+    }
+
+    let items = items
+        .into_iter()
+        .map(|recipe| SimpleRecipeWithTags {
+            uuid: recipe.uuid,
+            name: recipe.name,
+            description: recipe.description,
+            tags: map.remove(&recipe.uuid).unwrap_or_default(),
+        })
+        .collect();
 
     Ok(ApiJson(Page {
         items,
