@@ -32,7 +32,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
             color: TagColors.Blue,
         },
         validators: {
-            onChangeAsync: async ({ value }) => {
+            onSubmitAsync: async ({ value }) => {
                 const res = await Api.tags.create({ name: value.name, color: value.color });
 
                 if (res.error) {
