@@ -67,7 +67,6 @@ export default function RecipeTable(props: RecipeTableProps) {
         },
     });
 
-    // @ts-ignore
     return (
         <>
             <div className={"flex items-start justify-between gap-4 lg:items-end"}>

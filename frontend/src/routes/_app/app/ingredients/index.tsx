@@ -37,7 +37,6 @@ const LIMIT = 50;
  */
 export default function IngredientsSearchOverview() {
     const [t] = useTranslation("ingredients");
-    const [tg] = useTranslation();
 
     const { page, search } = Route.useSearch();
 

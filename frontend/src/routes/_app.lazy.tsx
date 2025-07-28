@@ -26,6 +26,9 @@ import { Heading, Subheading } from "@/components/ui/heading";
  */
 export type FoodMenuProps = object;
 
+/**
+ *
+ */
 export function FoodMenu() {
     const [tg] = useTranslation();
 
