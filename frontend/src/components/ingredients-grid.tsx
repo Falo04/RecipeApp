@@ -3,7 +3,6 @@ import { Subheading } from "@/components/ui/heading.tsx";
 import type { Ingredients } from "@/api/model/ingredients.interface.ts";
 import { MinusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import { useElementHeight } from "@/hooks/element-height.ts";
 import { cn } from "@/lib/utils.ts";
 
 /**
@@ -26,31 +25,22 @@ export type IngredientsGridProps = {
 export default function IngredientsGrid(props: IngredientsGridProps) {
     const [t] = useTranslation("recipe");
 
-    const [ref, height] = useElementHeight<HTMLDivElement>();
-
     return (
-        <div className={cn(props.className, props.withScrolling ? "h-full" : "h-fit")} ref={ref}>
-            <div
-                className={"flex flex-col gap-4 overflow-y-auto"}
-                style={props.withScrolling ? { maxHeight: `${height}px` } : {}}
-            >
-                {(props.withScrolling || props.ingredients.length > 0) && (
-                    <Subheading>{t("heading.ingredients")}</Subheading>
-                )}
-                {props.ingredients.map((ingredient, index) => (
-                    <div className={"grid grid-cols-[125px_1fr_50px] items-center gap-4 gap-y-4"} key={ingredient.uuid}>
-                        <span className={"text-muted-foreground/80 text-right"}>
-                            {ingredient.amount + " " + ingredient.unit}
-                        </span>
-                        <span className={"text-foreground/90"}>{ingredient.name}</span>
-                        {props.onDelete && (
-                            <Button type="button" variant="ghost" onClick={() => props.onDelete?.(index)}>
-                                <MinusIcon />
-                            </Button>
-                        )}
-                    </div>
-                ))}
-            </div>
+        <div className={cn(props.className, "flex flex-col gap-4")}>
+            {!props.onDelete && <Subheading>{t("heading.ingredients")}</Subheading>}
+            {props.ingredients.map((ingredient, index) => (
+                <div className={"grid grid-cols-[125px_1fr_50px] items-center gap-4 gap-y-4"} key={ingredient.uuid}>
+                    <span className={"text-muted-foreground/80 text-right"}>
+                        {ingredient.amount + " " + ingredient.unit}
+                    </span>
+                    <span className={"text-foreground/90"}>{ingredient.name}</span>
+                    {props.onDelete && (
+                        <Button type="button" variant="ghost" onClick={() => props.onDelete?.(index)}>
+                            <MinusIcon />
+                        </Button>
+                    )}
+                </div>
+            ))}
         </div>
     );
 }

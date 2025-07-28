@@ -107,16 +107,19 @@ export default function RecipeTable(props: RecipeTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenu>
-                            <DropdownMenuLabel>{t("filter.layout")}</DropdownMenuLabel>
+                            <DropdownMenuLabel className={"flex items-center gap-2"}>
+                                <LayoutGridIcon className="size-4" />
+                                {t("filter.layout")}
+                            </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuRadioGroup value={"table"}>
+                            <DropdownMenuRadioGroup value={"table"} className={"px-1 pb-1"}>
                                 <DropdownMenuRadioItem value={"table"}>
                                     <LayoutListIcon className={"size-4"} />
-                                    <Button variant={"ghost"}>{t("filter.table")}</Button>
+                                    {t("filter.table")}
                                 </DropdownMenuRadioItem>
                                 <DropdownMenuRadioItem value={"grid"}>
                                     <LayoutGridIcon className={"size-4"} />
-                                    <Button variant={"ghost"}>{t("filter.grid")}</Button>
+                                    {t("filter.grid")}
                                 </DropdownMenuRadioItem>
                             </DropdownMenuRadioGroup>
                         </DropdownMenu>

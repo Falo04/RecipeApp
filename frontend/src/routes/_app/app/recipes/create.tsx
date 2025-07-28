@@ -1,8 +1,9 @@
 import { RecipeForm } from "@/components/recipe-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Heading } from "@/components/ui/heading.tsx";
-import { Separator } from "@/components/ui/separator.tsx";
+import HeadingLayout from "@/components/layouts/heading-layout.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { XIcon } from "lucide-react";
 
 /**
  * The properties for {@link CreateRecipe}
@@ -18,13 +19,26 @@ export function CreateRecipe() {
     const navigate = useNavigate();
 
     return (
-        <div className={"flex h-full w-full flex-col gap-2 lg:gap-6"}>
-            <div className={"flex w-full flex-col gap-2"}>
-                <Heading>{t("heading.create")}</Heading>
-                <Separator />
-            </div>
+        <HeadingLayout
+            heading={t("heading.create")}
+            description={t("heading.create-description")}
+            headingChildren={
+                <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() =>
+                        navigate({
+                            to: "/app/recipes",
+                            search: { page: 1, search: "" },
+                        })
+                    }
+                >
+                    <XIcon />
+                </Button>
+            }
+        >
             <RecipeForm navigate={(uuid) => navigate({ to: "/app/recipes/$recipeId", params: { recipeId: uuid } })} />
-        </div>
+        </HeadingLayout>
     );
 }
 

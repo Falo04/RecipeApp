@@ -6,7 +6,7 @@ import { PlusIcon } from "lucide-react";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
-import RecipeTable from "@/components/RecipeTable.tsx";
+import RecipeTable from "@/components/recipe-table.tsx";
 
 /**
  * The properties for {@link FoodOverview}
@@ -36,13 +36,10 @@ export function FoodOverview() {
             headingChildren={
                 <Link to={"/app/recipes/create"}>
                     <Button>
-                        {isMobile ? (
-                            <div className={"flex items-center gap-1"}>
-                                <PlusIcon size={"size-4"} /> {t("button.create-short")}
-                            </div>
-                        ) : (
-                            t("button.create")
-                        )}
+                        <div className={"flex items-center gap-1"}>
+                            <PlusIcon size={"size-4"} />
+                            {isMobile ? t("button.create-short") : t("button.create")}
+                        </div>
                     </Button>
                 </Link>
             }

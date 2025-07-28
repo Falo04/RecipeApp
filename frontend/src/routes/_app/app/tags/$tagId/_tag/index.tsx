@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
-import RecipeTable from "@/components/RecipeTable.tsx";
+import RecipeTable from "@/components/recipe-table.tsx";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import SINGLE_TAG_CONTEXT from "@/context/tag.tsx";

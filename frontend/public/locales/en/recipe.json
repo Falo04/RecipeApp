@@ -32,12 +32,16 @@
     },
     "heading": {
         "create": "Create Recipe",
+        "create-description": "",
         "ingredients": "List of All Ingredients",
         "ingredients-title": "Enter Your Ingredients",
         "overview-description": "General information about the recipe",
         "overview-title": "Recipe Overview",
+        "recipe": "Recipe: {{object}}",
         "step-title": "Enter Your Steps",
-        "steps": "Instructions:"
+        "steps": "Instructions:",
+        "update": "Update Recipe",
+        "update-description": ""
     },
     "label": {
         "placeholder": "Enter a value"

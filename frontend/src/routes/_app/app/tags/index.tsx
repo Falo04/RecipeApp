@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import React, { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { MoreHorizontalIcon, PenBoxIcon, Trash2Icon } from "lucide-react";
+import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Text } from "@/components/ui/text.tsx";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
 import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 /**
  * The properties for {@link TagsOverview}
@@ -40,6 +41,7 @@ export function TagsOverview() {
     const [tg] = useTranslation();
 
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const { search, page } = Route.useSearch();
     const data = Route.useLoaderData();
@@ -61,7 +63,14 @@ export function TagsOverview() {
         <HeadingLayout
             heading={t("heading.overview-title")}
             description={t("heading.overview-description")}
-            headingChildren={<Button onClick={() => setOpenCreate(true)}>{t("button.create")}</Button>}
+            headingChildren={
+                <Button onClick={() => setOpenCreate(true)}>
+                    <div className={"flex items-center gap-1"}>
+                        <PlusIcon size={"size-4"} />
+                        {isMobile ? t("button.create-short") : t("button.create")}
+                    </div>
+                </Button>
+            }
         >
             <Form onSubmit={form.handleSubmit}>
                 <form.Field

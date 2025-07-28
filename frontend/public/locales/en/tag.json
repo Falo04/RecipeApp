@@ -1,6 +1,7 @@
 {
     "button": {
         "create": "Create Tag",
+        "create-short": "Add",
         "delete": "Delete Tag",
         "edit": "Edit Tag",
         "update": "Update Tag"
@@ -23,9 +24,6 @@
         "tags-recipes-description": "All recipes which are mapped to this tag.",
         "tags-recipes-title": "Tag: {{object}}"
     },
-    "input": {
-        "filter": "Search Tags"
-    },
     "label": {
         "placeholder": "Enter tag name"
     },
@@ -33,7 +31,6 @@
         "empty": "No tags found"
     },
     "toast": {
-        "created-success": "Tag created successfully",
         "deleted-success": "Tag deleted successfully",
         "updated-success": "Tag updated successfully"
     }

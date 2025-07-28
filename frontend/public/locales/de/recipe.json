@@ -32,12 +32,16 @@
     },
     "heading": {
         "create": "Rezept erstellen",
+        "create-description": "",
         "ingredients": "Liste aller Zutaten",
         "ingredients-title": "Gib deine Zutaten ein",
         "overview-description": "Allgemeine Informationen zum Rezept",
         "overview-title": "Rezept\u00fcbersicht",
+        "recipe": "heading.recipe",
         "step-title": "Gib deine Schritte ein",
-        "steps": "Anleitung:"
+        "steps": "Anleitung:",
+        "update": "Rezept aktualisieren",
+        "update-description": ""
     },
     "label": {
         "placeholder": "Wert eingeben"

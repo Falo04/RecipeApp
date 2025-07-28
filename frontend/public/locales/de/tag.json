@@ -1,6 +1,7 @@
 {
     "button": {
         "create": "Tag erstellen",
+        "create-short": "Hinzuf\u00fcgen",
         "delete": "Tag l\u00f6schen",
         "edit": "Tag bearbeiten",
         "update": "Tag aktualisieren"
@@ -23,9 +24,6 @@
         "tags-recipes-description": "Alle Rezepte die zu dem Tag gemappt sind.",
         "tags-recipes-title": "Tag: {{object}}"
     },
-    "input": {
-        "filter": "Tag suchen"
-    },
     "label": {
         "placeholder": "Tag-Namen eingeben"
     },
@@ -33,7 +31,6 @@
         "empty": "Keine Tags gefunden"
     },
     "toast": {
-        "created-success": "Tag erfolgreich erstellt",
         "deleted-success": "Tag erfolgreich gel\u00f6scht",
         "updated-success": "Tag erfolgreich aktualisiert"
     }

@@ -39,7 +39,6 @@
         "breadcrumb-menu": "Breadcrumb Menu"
     },
     "table": {
-        "action": "Action",
         "color": "Color",
         "description": "Description",
         "name": "Name",
@@ -49,9 +48,5 @@
     "toast": {
         "general-error": "Something went wrong...",
         "loading": "Loading..."
-    },
-    "tooltip": {
-        "filter": "Filter {{object}}",
-        "info": "More information"
     }
 }
