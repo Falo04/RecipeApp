@@ -1,20 +1,21 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use axum::extract::Query;
 use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::get;
 use galvyn::post;
+use rorm::and;
+use rorm::conditions;
 use rorm::conditions::DynamicCollection;
 use rorm::Database;
 use uuid::Uuid;
 
-use super::schema::AllIngredientsRequest;
+use super::schema::GetAllRecipesByIngredientsRequest;
 use super::schema::SimpleIngredient;
 use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::List;
 use crate::http::common::schemas::Page;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
@@ -32,17 +33,35 @@ use crate::models::tags::Tag;
 /// provided UUIDs and then fetches all recipes matching the ingredient criteria.
 #[post("/recipes")]
 pub async fn get_recipes_by_ingredients(
-    pagination: Query<GetPageRequest>,
-    ApiJson(request): ApiJson<AllIngredientsRequest>,
+    ApiJson(request): ApiJson<GetAllRecipesByIngredientsRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
+    let GetAllRecipesByIngredientsRequest {
+        page,
+        filter_name,
+        filter_uuids,
+    } = request;
+
     let condition = DynamicCollection::or(
-        request
-            .uuids
+        filter_uuids
             .list
             .iter()
             .map(|uuid| RecipeIngredientModel.ingredients.equals(uuid))
             .collect(),
     );
+
+    let condition = and![
+        Some(condition),
+        filter_name.map(|name| conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(RecipeIngredientModel.recipe.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!(
+                "%{}%",
+                name.replace('_', "\\_")
+                    .replace('%', "\\%")
+                    .replace('\\', "\\\\")
+            ))),
+        })
+    ];
 
     let mut recipes_all: Vec<_> = rorm::query(
         Database::global(),
@@ -52,6 +71,8 @@ pub async fn get_recipes_by_ingredients(
         ),
     )
     .condition(&condition)
+    .limit(page.limit)
+    .offset(page.offset)
     .stream()
     .map_ok(|(_, recipe)| recipe)
     .try_collect()
@@ -79,7 +100,7 @@ pub async fn get_recipes_by_ingredients(
 
         if ingredients_uuids
             .iter()
-            .all(|uuid| request.uuids.list.contains(uuid))
+            .all(|uuid| filter_uuids.list.contains(uuid))
         {
             recipes.push(recipe);
         }
@@ -123,8 +144,8 @@ pub async fn get_recipes_by_ingredients(
 
     Ok(ApiJson(Page {
         items,
-        limit: pagination.limit,
-        offset: pagination.offset,
+        limit: page.limit,
+        offset: page.offset,
         total,
     }))
 }

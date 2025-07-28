@@ -1,5 +1,6 @@
 //! Represents all ingredients responses and requests.
 
+use galvyn::core::stuff::schema::GetPageRequest;
 use rorm::fields::types::MaxStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
@@ -47,4 +48,15 @@ pub struct SimpleIngredient {
     pub uuid: Uuid,
     /// The name of the ingredient.
     pub name: MaxStr<255>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct GetAllRecipesByIngredientsRequest {
+    /// Page request
+    #[serde(flatten)]
+    pub page: GetPageRequest,
+    /// Name of recipes to filter for
+    pub filter_name: Option<String>,
+    /// List of ingredients to filter for
+    pub filter_uuids: List<Uuid>,
 }

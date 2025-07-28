@@ -1,6 +1,6 @@
 {
     "button": {
-        "search": "Zutaten ausw\u00e4hlen, um zu suchen",
+        "search": "Suche",
         "select": "Zutaten suchen"
     },
     "command": {
@@ -13,13 +13,12 @@
         "all-ingredients": "Alle Zutaten",
         "overview-description": "W\u00e4hle Zutaten aus, um alle Rezepte zu finden, in denen sie enthalten sind.",
         "overview-title": "Rezepte nach Zutaten suchen",
-        "search-selected": "Ausgew\u00e4hlte Zutaten",
-        "select-ingredients": "Bitte w\u00e4hle Zutaten aus, um nach Rezepten zu suchen"
-    },
-    "input": {
-        "filter": "Rezepte filtern"
+        "search-selected": "Ausgew\u00e4hlte Zutaten"
     },
     "label": {
         "ingredients-empty": "Keine Zutaten vorhanden"
+    },
+    "tooltip": {
+        "filter": "Suche nach Rezepten"
     }
 }

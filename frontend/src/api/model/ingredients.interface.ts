@@ -23,5 +23,8 @@ export interface SimpleIngredient {
 }
 
 export interface AllIngredientsRequest {
-    uuids: List<string>;
+    limit: number;
+    offset: number;
+    filter_name: string | undefined;
+    filter_uuids: List<string>;
 }

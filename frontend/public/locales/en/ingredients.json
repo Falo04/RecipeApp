@@ -1,6 +1,6 @@
 {
     "button": {
-        "search": "Select ingredients to search",
+        "search": "Search",
         "select": "Search Ingredients"
     },
     "command": {
@@ -13,13 +13,12 @@
         "all-ingredients": "All Ingredients",
         "overview-description": "Select ingredients to find all recipes that include them.",
         "overview-title": "Search Recipes by Ingredients",
-        "search-selected": "Selected Ingredients",
-        "select-ingredients": "Please select ingredients to search for recipes"
-    },
-    "input": {
-        "filter": "Filter Recipes"
+        "search-selected": "Selected Ingredients"
     },
     "label": {
         "ingredients-empty": "No ingredients available"
+    },
+    "tooltip": {
+        "filter": "Search for Recipes"
     }
 }
