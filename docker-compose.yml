@@ -36,16 +36,6 @@ services:
     build:
       dockerfile: ./build/dockerfiles/postgres.Dockerfile
 
-  jaeger:
-    networks: [net-food]
-    env_file: [.env]
-    ports:
-      - "127.0.0.1:16686:16686"
-    volumes:
-      - jaeger-vol:/var/lib/jaeger/
-    build:
-      dockerfile: ./build/dockerfiles/jaeger.Dockerfile
-
 networks:
   net-food:
     driver: bridge

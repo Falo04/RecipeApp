@@ -38,12 +38,6 @@ services:
     build:
       dockerfile: ./build/dockerfiles/postgres.Dockerfile
 
-  jaeger-dev:
-    networks: [ net-food-dev ]
-    env_file: [ .env ]
-    build:
-      dockerfile: ./build/dockerfiles/jaeger.Dockerfile
-
   frontend-dev:
     restart: unless-stopped
     volumes:
