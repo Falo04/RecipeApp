@@ -29,6 +29,7 @@ mod config;
 mod http;
 mod models;
 mod tracing;
+mod modules;
 
 /// Represents the command-line arguments parsed by the program.
 ///

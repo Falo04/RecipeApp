@@ -9,6 +9,7 @@ pub mod meta;
 pub mod recipes;
 pub mod tags;
 pub mod users;
+pub mod websockets;
 
 pub fn initialize() -> GalvynRouter {
     let auth_not_required = GalvynRouter::new()
