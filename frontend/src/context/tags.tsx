@@ -4,6 +4,7 @@ import type { SimpleTag } from "@/api/model/tag.interface";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import WS from "@/api/websockets.ts";
 
 /**
  * Represents the context for managing and interacting with tags.
@@ -82,6 +83,12 @@ export function TagsProvider(props: TagsProviderProps) {
 
     useEffect(() => {
         fetchTags().then();
+
+        const listener = WS.addEventListener("message.TagsChanged", () => {
+            fetchTags().then();
+        });
+
+        return () => WS.removeEventListener(listener);
     }, []);
 
     if (tags === "loading") {

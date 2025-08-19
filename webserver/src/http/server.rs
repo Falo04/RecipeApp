@@ -1,3 +1,4 @@
+use galvyn::core::session;
 use galvyn::core::GalvynRouter;
 use galvyn::core::SchemalessJson;
 use galvyn::get;
@@ -34,6 +35,7 @@ pub fn initialize() -> GalvynRouter {
                         .on_response(DefaultOnResponse::new().level(Level::INFO))
                         .on_failure(()),
                 )
-                .layer(CatchUnwindLayer),
+                .layer(CatchUnwindLayer)
+                .layer(session::layer()),
         )
 }

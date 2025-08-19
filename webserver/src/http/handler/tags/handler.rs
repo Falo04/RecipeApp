@@ -23,9 +23,11 @@ use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
 use crate::http::handler::tags::schema::GetAllTagsRequest;
 use crate::http::handler::tags::schema::SimpleTag;
+use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::recipes::Recipe;
 use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
+use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all tags with pagination support.
 ///
@@ -195,6 +197,10 @@ pub async fn create_tag(
 
     tx.commit().await?;
 
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::TagsChanged {})
+        .await;
+
     Ok(ApiJson(SingleUuid { uuid }))
 }
 
@@ -224,6 +230,10 @@ pub async fn update_tag(
         .await?;
 
     tx.commit().await?;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::TagsChanged {})
+        .await;
 
     Ok(())
 }

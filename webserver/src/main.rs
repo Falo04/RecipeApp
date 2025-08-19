@@ -23,13 +23,14 @@ use crate::config::DB;
 use crate::config::SERVER_ADDRESS;
 use crate::config::SERVER_PORT;
 use crate::http::server;
+use crate::modules::websockets::WebsocketManager;
 use crate::tracing::opentelemetry_layer;
 
 mod config;
 mod http;
 mod models;
-mod tracing;
 mod modules;
+mod tracing;
 
 /// Represents the command-line arguments parsed by the program.
 ///
@@ -69,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("INFO")))
         .with(tracing_subscriber::fmt::layer());
 
-    let registry = registry.with(opentelemetry_layer()?);
+    //let registry = registry.with(opentelemetry_layer()?);
 
     registry.init();
     init_tracing_panic_hook();
@@ -133,6 +134,7 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
             DB.clone(),
         )))
+        .register_module::<WebsocketManager>(Default::default())
         .init_modules()
         .await?
         .add_routes(server::initialize())

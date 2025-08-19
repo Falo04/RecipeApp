@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { toast } from "sonner";
 import type { SimpleIngredient } from "@/api/model/ingredients.interface.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import WS from "@/api/websockets.ts";
 
 /**
  * Represents the context for managing and interacting with ingredients.
@@ -73,6 +74,12 @@ export function IngredientProvider(props: IngredientProviderProps) {
 
     useEffect(() => {
         fetchTags().then();
+
+        const listener = WS.addEventListener("message.IngredientsChanged", () => {
+            fetchTags().then();
+        });
+
+        return () => WS.removeEventListener(listener);
     }, []);
 
     if (ingredients === "loading") {

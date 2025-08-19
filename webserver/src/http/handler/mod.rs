@@ -20,7 +20,8 @@ pub fn initialize() -> GalvynRouter {
         .nest("/recipes", recipes::initialize())
         .nest("/users", users::initialize())
         .nest("/tags", tags::initialize())
-        .nest("/ingredients", ingredients::initialize());
+        .nest("/ingredients", ingredients::initialize())
+        .nest("/websocket", websockets::initialize());
 
     if *AUTHENTICATION_ENABLED {
         GalvynRouter::new().nest(

@@ -16,7 +16,6 @@ services:
       dockerfile: ./build/dockerfiles/webserver-dev.Dockerfile
     restart: unless-stopped
     depends_on:
-      
       - postgres-dev
     networks:
       - net-food-dev

@@ -1,9 +1,9 @@
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { CreateTagDialog } from "@/components/dialogs/create-tag";
 import { Button } from "@/components/ui/button";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Text } from "@/components/ui/text.tsx";
 import { Api } from "@/api/api.tsx";
@@ -25,6 +25,7 @@ import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import WS from "@/api/websockets.ts";
 
 /**
  * The properties for {@link TagsOverview}
@@ -41,6 +42,7 @@ export function TagsOverview() {
     const [tg] = useTranslation();
 
     const navigate = useNavigate();
+    const router = useRouter();
     const isMobile = useIsMobile();
 
     const { search, page } = Route.useSearch();
@@ -58,6 +60,14 @@ export function TagsOverview() {
             search: search,
         },
     });
+
+    useEffect(() => {
+        const listener = WS.addEventListener("message.TagsChanged", () => {
+            router.invalidate({ sync: true });
+        });
+
+        return () => WS.removeEventListener(listener);
+    }, []);
 
     return (
         <HeadingLayout

@@ -77,7 +77,7 @@ def main():
         subparser.add_parser(c)
 
     # special subcommands
-    subparser.add_parser("make-migratios")
+    subparser.add_parser("make-migrations")
     subparser.add_parser("create-user")
 
     prod = subparser.add_parser("prod")
@@ -91,7 +91,7 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    if args.command == "make-migratios":
+    if args.command == "make-migrations":
         webserver_name = get_webserver_service()
         if webserver_name is None:
             print("No service is running. Please run `up` first")

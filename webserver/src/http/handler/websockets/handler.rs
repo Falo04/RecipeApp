@@ -8,6 +8,7 @@ use axum::extract::ws::WebSocket;
 use axum::extract::WebSocketUpgrade;
 use axum::response::IntoResponse;
 use axum::response::Response;
+use galvyn::core::session::Session;
 use galvyn::core::Module;
 use galvyn::get;
 use tokio::select;
@@ -17,8 +18,8 @@ use tokio::time::interval;
 use tokio::time::sleep;
 use tokio::time::Instant;
 use tokio::time::MissedTickBehavior;
-use tower_sessions::Session;
 use tracing::debug;
+use tracing::error;
 use tracing::trace;
 
 use crate::http::common::errors::ApiError;
@@ -31,6 +32,8 @@ pub async fn open_websocket(ws: WebSocketUpgrade, session: Session) -> ApiResult
     let id = session
         .id()
         .ok_or(ApiError::server_error("The session should have an id"))?;
+
+    error!(id = ?id, "Session id");
 
     let on_upgrade = move |ws| async move {
         let (server_tx, server_rx) = channel(1);

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import RecipeTable from "@/components/recipe-table.tsx";
+import { useEffect } from "react";
+import WS from "@/api/websockets.ts";
 
 /**
  * The properties for {@link FoodOverview}
@@ -22,12 +24,21 @@ export function FoodOverview() {
     const [t] = useTranslation("recipe");
 
     const isMobile = useIsMobile();
+    const router = useRouter();
 
     const { search, page } = Route.useSearch();
     const data = Route.useLoaderData();
     if (!data) {
         return;
     }
+
+    useEffect(() => {
+        const listener = WS.addEventListener("message.RecipesChanged", () => {
+            router.invalidate({ sync: true });
+        });
+
+        return () => WS.removeEventListener(listener);
+    }, []);
 
     return (
         <HeadingLayout

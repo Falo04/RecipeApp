@@ -2,8 +2,8 @@ services:
   nginx:
     restart: unless-stopped
     stop_signal: SIGKILL
-    depends_on: []
-    networks: [net-food]
+    depends_on: [ ]
+    networks: [ net-food ]
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
@@ -17,10 +17,9 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-      - jaeger
     networks:
       - net-food
-    env_file: [.env]
+    env_file: [ .env ]
 
   postgres:
     shm_size: 128mb

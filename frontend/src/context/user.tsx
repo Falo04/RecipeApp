@@ -6,6 +6,7 @@ import { Navigate } from "@tanstack/react-router";
 import React from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import WS from "@/api/websockets.ts";
 
 /** The global {@link UserProvider} instance */
 let USER_PROVIDER: UserProvider | null = null;
@@ -115,6 +116,7 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
      */
     componentDidMount() {
         this.fetchConfig();
+        WS.connect(`${window.location.origin.replace("http", "ws")}/api/v1/websocket`);
 
         // Register as global singleton
         // eslint-disable-next-line @typescript-eslint/no-this-alias

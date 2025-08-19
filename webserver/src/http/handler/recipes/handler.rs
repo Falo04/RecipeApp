@@ -32,6 +32,7 @@ use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Step;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::users::schema::SimpleUser;
+use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::ingredients::Ingredient;
 use crate::models::ingredients::RecipeIngredientModel;
 use crate::models::recipes::Recipe;
@@ -40,6 +41,7 @@ use crate::models::recipes::RecipeStep;
 use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 use crate::models::users::User;
+use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all recipes with pagination support and associated tags.
 ///
@@ -239,6 +241,15 @@ pub async fn create_recipe(
     RecipeIngredientModel::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
 
     tx.commit().await?;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::RecipesChanged {})
+        .await;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::IngredientsChanged {})
+        .await;
+
     Ok(ApiJson(SingleUuid { uuid: recipe_uuid }))
 }
 
@@ -278,6 +289,15 @@ pub async fn update_recipe(
         .await?;
 
     tx.commit().await?;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::RecipesChanged {})
+        .await;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::IngredientsChanged {})
+        .await;
+
     Ok(())
 }
 
@@ -305,5 +325,10 @@ pub async fn delete_recipe(
         .await?;
 
     tx.commit().await?;
+
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::RecipesChanged {})
+        .await;
+
     Ok(())
 }
