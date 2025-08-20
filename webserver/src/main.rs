@@ -23,6 +23,7 @@ use crate::config::DB;
 use crate::config::SERVER_ADDRESS;
 use crate::config::SERVER_PORT;
 use crate::http::server;
+use crate::modules::oidc::OpenIdConnect;
 use crate::modules::websockets::WebsocketManager;
 use crate::tracing::opentelemetry_layer;
 
@@ -135,6 +136,7 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
             DB.clone(),
         )))
         .register_module::<WebsocketManager>(Default::default())
+        .register_module::<OpenIdConnect>(Default::default())
         .init_modules()
         .await?
         .add_routes(server::initialize())

@@ -11,7 +11,7 @@ dotenv = "0.15.0"
 
 # Webframework
 axum = { version = "~0.8", features = ["ws"] } # Main web library
-galvyn = { git = "https://github.com/myOmikron/galvyn.git", rev = "aa37f232a62fea4d8440e5cdeb81ab978c851d5d" }
+galvyn = { version = "~0.1", git = "https://github.com/myOmikron/galvyn" }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
 tower-sessions = { version = "~0.14" }
@@ -19,6 +19,7 @@ schemars = { version = "~0.8", features = [
     "uuid1",
     "raw_value",
 ] }
+reqwest = "0.12.23"
 
 # Cli
 clap = { version = "~4", features = ["derive"] }
@@ -66,5 +67,7 @@ argon2 = { version = "0.5.3", features = ["std"] }
 rpassword = "7.3.1"
 
 # Authentication
+openidconnect = { version = "~4", features = ["accept-rfc3339-timestamps", "timing-resistant-secret-traits"] }
+url = "2.5.4"
 
 [build-dependencies]
