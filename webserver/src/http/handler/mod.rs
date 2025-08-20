@@ -6,6 +6,7 @@ use crate::http::middleware::auth_required_layer::auth_required_layer;
 
 pub mod ingredients;
 pub mod meta;
+pub mod oidc;
 pub mod recipes;
 pub mod tags;
 pub mod users;
