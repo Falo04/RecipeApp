@@ -1,4 +1,5 @@
 //! Represents an ingredient in a recipe.
+
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModel;
 use rorm::DbEnum;

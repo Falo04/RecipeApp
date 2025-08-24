@@ -29,7 +29,6 @@ use openidconnect::PkceCodeVerifier;
 use openidconnect::RedirectUrl;
 use openidconnect::RequestTokenError;
 use openidconnect::TokenResponse;
-use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
 use tracing::error;
@@ -54,7 +53,7 @@ pub struct OpenIdConnect {
     /// A `reqwest::Client` used for making HTTP requests.
     http_client: reqwest::Client,
     /// An `OidcClient` instance for handling OpenID Connect details.
-    admin_oidc_client: OidcClient,
+    oidc_client: OidcClient,
 }
 
 type OidcClient = CoreClient<
@@ -78,8 +77,6 @@ pub struct OidcSessionState {
     pub pkce_code_verifier: PkceCodeVerifier,
     /// A unique, non-reusable value used to prevent replay attacks.
     pub nonce: Nonce,
-    /// The OIDC query parameter indicating the side of the flow (e.g., 'auth', 'token').
-    pub side: OidcQueryParam,
 }
 
 /// Represents the state of an OpenID Connect authorization code request.
@@ -95,39 +92,16 @@ pub struct OidcRequestState {
     pub state: CsrfToken,
 }
 
-/// Represents an OpenID Connect (OIDC) query parameter.
-///
-/// This enum defines a single possible value for an OIDC query parameter.
-/// It is designed to be flexible and handle different data types
-/// without requiring a specific tag.
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(untagged)]
-pub enum OidcQueryParam {
-    Admin,
-}
-
 impl OpenIdConnect {
-    /// Retrieves an OIDC client based on the specified side.
-    ///
-    /// This function returns an `ApiResult` containing a reference to an `OidcClient`.
-    /// The returned client depends on the `side` parameter:
-    ///
-    /// - If `side` is `OidcQueryParam::Admin`, it returns a reference to the `admin_oidc_client`.
-    pub fn client(&self, side: OidcQueryParam) -> ApiResult<&OidcClient> {
-        match side {
-            OidcQueryParam::Admin => Ok(&self.admin_oidc_client),
-        }
-    }
-
     /// Initiates the OIDC authorization flow for a given side.
     ///
     /// This function constructs the authorization URL and returns the necessary
     /// session state information.
-    pub fn begin_login(&self, side: OidcQueryParam) -> ApiResult<(Url, OidcSessionState)> {
+    pub fn begin_login(&self) -> ApiResult<(Url, OidcSessionState)> {
         let (pkce_code_challenge, pkce_code_verifier) = PkceCodeChallenge::new_random_sha256();
 
         let request = self
-            .client(side)?
+            .oidc_client
             .authorize_url(
                 CoreAuthenticationFlow::AuthorizationCode,
                 CsrfToken::new_random,
@@ -143,7 +117,6 @@ impl OpenIdConnect {
                 csrf_token,
                 pkce_code_verifier,
                 nonce,
-                side,
             },
         ))
     }
@@ -154,7 +127,7 @@ impl OpenIdConnect {
         &self,
         session: OidcSessionState,
         request: OidcRequestState,
-    ) -> ApiResult<(CoreIdTokenClaims, OidcQueryParam)> {
+    ) -> ApiResult<CoreIdTokenClaims> {
         if request.state != session.csrf_token {
             return Err(ApiError::new(
                 ApiStatusCode::Unauthenticated,
@@ -164,7 +137,7 @@ impl OpenIdConnect {
 
         // Exchange the authorization code with a token.
         let token_response = self
-            .client(session.side)?
+            .oidc_client
             .exchange_code(request.code)
             .set_pkce_verifier(session.pkce_code_verifier)
             .request_async(&self.http_client)
@@ -180,7 +153,7 @@ impl OpenIdConnect {
         let id_token = token_response.id_token().ok_or(ApiError::server_error(
             "Oidc provider did not provider an id token.",
         ))?;
-        let id_token_verifier = self.client(session.side)?.id_token_verifier();
+        let id_token_verifier = self.oidc_client.id_token_verifier();
         let claims = id_token
             .claims(&id_token_verifier, &session.nonce)
             .map_err(|error| {
@@ -209,7 +182,7 @@ impl OpenIdConnect {
             }
         }
 
-        Ok((claims.clone(), session.side))
+        Ok(claims.clone())
     }
 }
 
@@ -217,17 +190,19 @@ impl Module for OpenIdConnect {
     type Setup = ();
     type PreInit = Self;
 
-    async fn pre_init(setup: Self::Setup) -> Result<Self::PreInit, PreInitError> {
+    async fn pre_init(_setup: Self::Setup) -> Result<Self::PreInit, PreInitError> {
         let http_client = reqwest::Client::builder()
             .timeout(Duration::from_secs(60))
             .build()
             .expect("Should create a http client");
 
-        let admin_oidc_client = OidcConfig::new().discover_retry::<3>(&http_client).await?;
+        let oidc_client = OidcConfig::from_env()
+            .discover_retry::<3>(&http_client)
+            .await?;
 
         Ok(Self {
             http_client,
-            admin_oidc_client,
+            oidc_client,
         })
     }
 
@@ -259,7 +234,7 @@ impl OidcConfig {
     /// Creates a new `OidcConfig` instance.
     ///
     /// This function initializes the configuration with the provided values.
-    fn new() -> Self {
+    fn from_env() -> Self {
         OidcConfig {
             url: OIDC_DISCOVER_URL.clone(),
             client_id: OIDC_CLIENT_ID.clone(),

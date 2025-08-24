@@ -1,13 +1,13 @@
 use std::pin::pin;
 use std::time::Duration;
 
-use axum::body::Bytes;
 use axum::extract::ws::Message;
 use axum::extract::ws::Utf8Bytes;
 use axum::extract::ws::WebSocket;
 use axum::extract::WebSocketUpgrade;
-use axum::response::IntoResponse;
-use axum::response::Response;
+use galvyn::core::re_exports::axum::body::Bytes;
+use galvyn::core::re_exports::axum::response::IntoResponse;
+use galvyn::core::re_exports::axum::response::Response;
 use galvyn::core::session::Session;
 use galvyn::core::Module;
 use galvyn::get;

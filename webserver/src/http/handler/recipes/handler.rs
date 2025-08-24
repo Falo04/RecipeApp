@@ -26,13 +26,14 @@ use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
+use crate::http::handler::account::schema::SimpleAccount;
 use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Step;
 use crate::http::handler::tags::schema::SimpleTag;
-use crate::http::handler::users::schema::SimpleUser;
 use crate::http::handler::websockets::schema::WsServerMsg;
+use crate::models::account::Account;
 use crate::models::ingredients::Ingredient;
 use crate::models::ingredients::RecipeIngredientModel;
 use crate::models::recipes::Recipe;
@@ -40,7 +41,6 @@ use crate::models::recipes::RecipePatch;
 use crate::models::recipes::RecipeStep;
 use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
-use crate::models::users::User;
 use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all recipes with pagination support and associated tags.
@@ -146,8 +146,8 @@ pub async fn get_recipe(
 
     let user = match recipe.user {
         Some(user_uuid) => Some(
-            rorm::query(&mut tx, User)
-                .condition(User.uuid.equals(user_uuid.0))
+            rorm::query(&mut tx, Account)
+                .condition(Account.uuid.equals(user_uuid.0))
                 .optional()
                 .await?
                 .ok_or(ApiError::server_error("User not found from recipes"))?,
@@ -190,7 +190,7 @@ pub async fn get_recipe(
         uuid: recipe_uuid,
         name: recipe.name,
         description: recipe.description,
-        user: user.map(SimpleUser::from),
+        user: user.map(SimpleAccount::from),
         ingredients: recipe_ingredients,
         steps,
         tags,

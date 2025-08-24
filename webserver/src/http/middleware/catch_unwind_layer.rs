@@ -7,12 +7,12 @@ use std::panic::AssertUnwindSafe;
 use std::task::Context;
 use std::task::Poll;
 
-use axum::extract::Request;
-use axum::http::StatusCode;
-use axum::response::IntoResponse;
-use axum::response::Response;
 use futures_lite::future::Boxed;
 use futures_lite::FutureExt;
+use galvyn::core::re_exports::axum::extract::Request;
+use galvyn::core::re_exports::axum::http::StatusCode;
+use galvyn::core::re_exports::axum::response::IntoResponse;
+use galvyn::core::re_exports::axum::response::Response;
 use galvyn::core::stuff::api_json::ApiJson;
 use tower::Layer;
 use tower::Service;

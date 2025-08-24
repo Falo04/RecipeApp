@@ -7,9 +7,9 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use crate::http::common::schemas::GetPageRequest;
+use crate::http::handler::account::schema::SimpleAccount;
 use crate::http::handler::ingredients::schema::RecipeIngredients;
 use crate::http::handler::tags::schema::SimpleTag;
-use crate::http::handler::users::schema::SimpleUser;
 
 /// Represents a simple recipe.
 ///
@@ -61,7 +61,7 @@ pub struct FullRecipe {
     pub description: MaxStr<255>,
 
     /// An optional reference to a simple user object associated with the recipe.
-    pub user: Option<SimpleUser>,
+    pub user: Option<SimpleAccount>,
 
     /// A vector of `SimpleTag` objects representing the tags associated with the recipe.
     pub tags: Vec<SimpleTag>,

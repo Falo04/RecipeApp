@@ -1,23 +1,16 @@
 use std::fs;
 use std::net::SocketAddr;
 
-use ::tracing::info;
-use argon2::password_hash::rand_core::OsRng;
-use argon2::password_hash::SaltString;
-use argon2::Argon2;
-use argon2::PasswordHasher;
 use clap::Parser;
 use clap::Subcommand;
 use dotenv::dotenv;
 use galvyn::core::DatabaseSetup;
 use galvyn::rorm::Database;
 use galvyn::rorm::DatabaseConfiguration;
-use models::users::User;
 use tracing::init_tracing_panic_hook;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
-use uuid::Uuid;
 
 use crate::config::DB;
 use crate::config::SERVER_ADDRESS;
@@ -25,7 +18,6 @@ use crate::config::SERVER_PORT;
 use crate::http::server;
 use crate::modules::oidc::OpenIdConnect;
 use crate::modules::websockets::WebsocketManager;
-use crate::tracing::opentelemetry_layer;
 
 mod config;
 mod http;
@@ -50,7 +42,6 @@ pub enum Command {
     Start,
     Migrate { migrations_dir: String },
     MakeMigrations { migrations_dir: String },
-    CreateUser { email: String, display_name: String },
 }
 
 /// Main function to start the application.
@@ -117,10 +108,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             fs::remove_file(MODELS)?;
         }
-        Command::CreateUser {
-            email,
-            display_name,
-        } => create_user(email, display_name).await?,
     }
 
     Ok(())
@@ -143,47 +130,5 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
         .start(SocketAddr::new(*SERVER_ADDRESS, *SERVER_PORT))
         .await?;
 
-    Ok(())
-}
-
-/// Creates a new user account.
-///
-/// This function prompts the user for a password,
-/// hashes it, and inserts the user data into the database.
-async fn create_user(
-    email: String,
-    display_name: String,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let db = Database::connect(DatabaseConfiguration {
-        driver: DB.clone(),
-        min_connections: 2,
-        max_connections: 2,
-    })
-    .await?;
-    let mut tx = db.start_transaction().await?;
-    let mut password;
-    loop {
-        password = rpassword::prompt_password("Password: ").unwrap();
-        if password == rpassword::prompt_password("Confirm Password: ").unwrap() {
-            break;
-        }
-        println!("Password is incorrect, try again");
-    }
-    let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-    let hash = argon2.hash_password(password.as_ref(), &salt)?.to_string();
-    info!("user with {email}, {display_name}, {hash} will be inserted");
-    let uuid = rorm::insert(&mut tx, User)
-        .return_primary_key()
-        .single(&User {
-            uuid: Uuid::new_v4(),
-            display_name,
-            mail: email,
-            password: hash,
-        })
-        .await?;
-    info!("created user with uuid: {uuid}");
-    tx.commit().await?;
-    db.close().await;
     Ok(())
 }

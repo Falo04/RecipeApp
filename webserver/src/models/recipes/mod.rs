@@ -10,7 +10,7 @@ use rorm::Patch;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use super::users::User;
+use super::account::Account;
 use crate::models::ingredients::RecipeIngredientModel;
 use crate::models::tags::RecipeTag;
 
@@ -30,7 +30,7 @@ pub struct Recipe {
     pub description: MaxStr<255>,
 
     /// An optional foreign key referencing a `User` model.
-    pub user: Option<ForeignModel<User>>,
+    pub user: Option<ForeignModel<Account>>,
 
     /// A back-reference to the `RecipeTag` model
     ///
@@ -78,6 +78,6 @@ pub struct RecipePatch {
     pub uuid: Uuid,
     pub name: MaxStr<255>,
     pub description: MaxStr<255>,
-    pub user: Option<ForeignModel<User>>,
+    pub user: Option<ForeignModel<Account>>,
     pub created_at: OffsetDateTime,
 }
