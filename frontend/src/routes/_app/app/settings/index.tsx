@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { useForm } from "@tanstack/react-form";
@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import i18n from "@/i18n.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { toast } from "sonner";
+import { Api } from "@/api/api.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 
 /**
  * The properties for {@link Settings}
@@ -19,6 +21,8 @@ export type SettingsProps = object;
 export function Settings() {
     const [t] = useTranslation("settings");
     const [tg] = useTranslation();
+
+    const navigate = useNavigate();
 
     const form = useForm({
         defaultValues: {
@@ -44,6 +48,16 @@ export function Settings() {
             toast.success(t("toast.success"));
         },
     });
+
+    const logout = async () => {
+        await Api.oidc.logout().then((res) => {
+            if (res.error) {
+                toast.error(res.error.message);
+                return;
+            }
+            navigate({ to: "/" });
+        });
+    };
 
     return (
         <HeadingLayout heading={t("heading.title")} description={t("heading.description")}>
@@ -96,8 +110,14 @@ export function Settings() {
                         )}
                     </form.Field>
                 </div>
-                <div className={"flex justify-end p-4"}>
-                    <Button type={"submit"}>{t("button.update")}</Button>
+                <Separator />
+                <div className={"flex justify-between pt-4"}>
+                    <Button type={"button"} variant={"ghost"} onClick={() => logout()}>
+                        {t("button.logout")}
+                    </Button>
+                    <Button type={"submit"} className={"mr-4"}>
+                        {t("button.update")}
+                    </Button>
                 </div>
             </form>
         </HeadingLayout>

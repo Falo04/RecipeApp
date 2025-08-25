@@ -6,7 +6,6 @@ import { Form, FormLabel, Input } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
-import USER_CONTEXT from "@/context/user";
 import { useForm } from "@tanstack/react-form";
 import {
     ArrowLeft,
@@ -31,6 +30,7 @@ import { Subheading } from "@/components/ui/heading.tsx";
 import { type StepperSteps, StepperHorizontal, StepperVertical } from "@/components/ui/stepper.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import IngredientsGrid from "@/components/ingredients-grid.tsx";
+import ACCOUNT_CONTEXT from "@/context/account.tsx";
 
 /**
  * The properties for {@link RecipeForm}
@@ -62,7 +62,7 @@ export function RecipeForm(props: RecipeFormProps) {
     const [ingreUnitError, setIngreUnitError] = React.useState<string | undefined>(undefined);
 
     const tagContext = React.useContext(TAGS_CONTEXT);
-    const userContext = React.useContext(USER_CONTEXT);
+    const accountContext = React.useContext(ACCOUNT_CONTEXT);
 
     const initial = { x: 50, opacity: 0 };
     const animate = { x: 0, opacity: 1 };
@@ -79,7 +79,7 @@ export function RecipeForm(props: RecipeFormProps) {
         onSubmit: async ({ value }) => {
             if (props.formData) {
                 const payload: UpdateRecipeRequest = {
-                    user: userContext.user !== undefined ? userContext.user.uuid : undefined,
+                    user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
                     tags: value.tags.map((tag) => tag.uuid),
                     name: value.name,
                     description: value.description,
@@ -101,7 +101,7 @@ export function RecipeForm(props: RecipeFormProps) {
                 });
             } else {
                 const payload: CreateRecipeRequest = {
-                    user: userContext.user !== undefined ? userContext.user.uuid : undefined,
+                    user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
                     tags: value.tags.map((tag) => tag.uuid),
                     name: value.name,
                     description: value.description,

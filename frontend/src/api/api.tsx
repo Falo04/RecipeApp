@@ -1,5 +1,3 @@
-import type { TokenDataResponse, UserSignInRequest } from "./model/jwt.interface";
-import type { SimpleUser } from "./model/user.interface";
 import type {
     CreateRecipeRequest,
     FullRecipe,
@@ -11,24 +9,19 @@ import type { CreateOrUpdateTag, GetAllTagRequest, SimpleTag } from "./model/tag
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import type { ApiError, ApiResponse, List, Page, SingleUuid } from "./model/global.interface";
 import { ApiClient } from "./api-client";
-import type { MetaResponse } from "@/api/model/meta.interface.ts";
 import type { AllIngredientsRequest, SimpleIngredient } from "@/api/model/ingredients.interface.ts";
+import type { SimpleAccount } from "@/api/model/account.interface.ts";
 
 /**
  * Api wrapper containing various API endpoints.
  */
 export const Api = {
-    meta: {
-        get: async (): Promise<ApiResponse<MetaResponse>> =>
-            await callApi<MetaResponse>({ method: "GET", url: "/meta" }),
+    account: {
+        getMe: async (): Promise<ApiResponse<SimpleAccount>> =>
+            await callApi<SimpleAccount>({ method: "GET", url: "/account/me" }),
     },
-    jwt: {
-        login: async (payload: UserSignInRequest): Promise<ApiResponse<TokenDataResponse>> =>
-            await callApi<TokenDataResponse>({ method: "POST", url: "/jwt/login", data: payload }),
-    },
-    user: {
-        getMe: async (): Promise<ApiResponse<SimpleUser>> =>
-            await callApi<SimpleUser>({ method: "GET", url: "/users/me" }),
+    oidc: {
+        logout: async (): Promise<ApiResponse<void>> => await callApi<void>({ method: "POST", url: "/oidc/logout" }),
     },
     recipe: {
         getAll: async (request: GetAllRecipesRequest): Promise<ApiResponse<Page<SimpleRecipeWithTags>>> =>

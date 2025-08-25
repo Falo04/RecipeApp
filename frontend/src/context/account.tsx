@@ -1,41 +1,41 @@
 import { Api } from "@/api/api";
 import { StatusCode } from "@/api/error";
-import type { SimpleUser } from "@/api/model/user.interface";
 import { Login } from "@/components/login";
 import { Navigate } from "@tanstack/react-router";
 import React from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import WS from "@/api/websockets.ts";
+import type { SimpleAccount } from "@/api/model/account.interface.ts";
 
-/** The global {@link UserProvider} instance */
-let USER_PROVIDER: UserProvider | null = null;
+/** The global {@link AccountProvider} instance */
+let ACCOUNT_PROVIDER: AccountProvider | null = null;
 
-/** Data provided by the {@link USER_CONTEXT} */
-export type UserContext = {
-    /** The currently logged-in user */
-    user: SimpleUser | undefined;
+/** Data provided by the {@link ACCOUNT_CONTEXT} */
+export type AccountContext = {
+    /** The currently logged-in account */
+    account: SimpleAccount | undefined;
 
-    /** Reload the user's information */
+    /** Reload the account's information */
     reset: () => void;
 };
 
-/** {@link React.Context} to access {@link UserContext user information} */
-const USER_CONTEXT = React.createContext<UserContext>({
-    user: undefined,
+/** {@link React.Context} to access {@link AccountContext account information} */
+const ACCOUNT_CONTEXT = React.createContext<AccountContext>({
+    account: undefined,
 
     /**
-     * Reset the user's information
+     * Reset the account's information
      */
     reset: () => {},
 });
-USER_CONTEXT.displayName = "UserContext";
-export default USER_CONTEXT;
+ACCOUNT_CONTEXT.displayName = "AccountContext";
+export default ACCOUNT_CONTEXT;
 
 /**
- * The properties of the user provider
+ * The properties of the account provider
  */
-type UserProviderProps = {
+type AccountProviderProps = {
     /** The children of the properties */
     children: React.ReactNode | Array<React.ReactNode>;
 };
@@ -43,56 +43,34 @@ type UserProviderProps = {
 /**
  * The state of the user provider
  */
-type UserProviderState = {
+type AccountProviderState = {
     /** The user */
-    user: SimpleUser | "unauthenticated" | "loading" | "disabled";
+    user: SimpleAccount | "unauthenticated" | "loading" | "disabled";
 };
 
 /**
- * Component for managing and providing the {@link UserContext}
+ * Component for managing and providing the {@link AccountContext}
  *
- * This is a **singleton** only use at most **one** instance in your application.
+ * This is a **singleton** only used at most **one** instance in your application.
  */
-export class UserProvider extends React.Component<UserProviderProps, UserProviderState> {
-    state: UserProviderState = {
+export class AccountProvider extends React.Component<AccountProviderProps, AccountProviderState> {
+    state: AccountProviderState = {
         user: "loading",
     };
 
     fetching: boolean = false;
 
-    fetchConfig = () => {
-        if (this.fetching) return;
-        this.fetching = true;
-
-        this.setState({ user: "loading" });
-
-        Api.meta.get().then((result) => {
-            if (result.error) {
-                toast.error(result.error.message);
-            }
-
-            if (result.data) {
-                if (result.data.authentication_enabled) {
-                    this.fetchUser();
-                } else {
-                    this.setState({ user: "disabled" });
-                }
-            }
-        });
-        this.fetching = false;
-    };
-
     /**
-     * Fetch the user
+     * Fetch the account
      */
-    fetchUser = () => {
+    fetchAccount = () => {
         // Guard against a lot of calls
         if (this.fetching) return;
         this.fetching = true;
 
         this.setState({ user: "loading" });
 
-        Api.user.getMe().then((result) => {
+        Api.account.getMe().then((result) => {
             if (result.error) {
                 switch (result.error.status_code) {
                     case StatusCode.Unauthenticated:
@@ -115,14 +93,14 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
      * Hook when the component mounts
      */
     componentDidMount() {
-        this.fetchConfig();
+        this.fetchAccount();
         WS.connect(`${window.location.origin.replace("http", "ws")}/api/v1/websocket`);
 
         // Register as global singleton
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        if (USER_PROVIDER === null) USER_PROVIDER = this;
+        if (ACCOUNT_PROVIDER === null) ACCOUNT_PROVIDER = this;
         // eslint-disable-next-line no-console
-        else if (USER_PROVIDER === this) console.error("UserProvider did mount twice");
+        else if (ACCOUNT_PROVIDER === this) console.error("UserProvider did mount twice");
         // eslint-disable-next-line no-console
         else console.error("Two instances of UserProvider are used");
     }
@@ -132,9 +110,9 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
      */
     componentWillUnmount() {
         // Deregister as global singleton
-        if (USER_PROVIDER === this) USER_PROVIDER = null;
+        if (ACCOUNT_PROVIDER === this) ACCOUNT_PROVIDER = null;
         // eslint-disable-next-line no-console
-        else if (USER_PROVIDER === null) console.error("UserProvider instance did unmount twice");
+        else if (ACCOUNT_PROVIDER === null) console.error("UserProvider instance did unmount twice");
         // eslint-disable-next-line no-console
         else console.error("Two instances of UserProvider are used");
     }
@@ -154,23 +132,19 @@ export class UserProvider extends React.Component<UserProviderProps, UserProvide
                 return (
                     <>
                         <Navigate to="/" />
-                        <Login
-                            onLogin={() => {
-                                this.fetchUser();
-                            }}
-                        />
+                        <Login />
                     </>
                 );
             default:
                 return (
-                    <USER_CONTEXT.Provider
+                    <ACCOUNT_CONTEXT.Provider
                         value={{
-                            user: this.state.user === "disabled" ? undefined : this.state.user,
-                            reset: this.fetchConfig,
+                            account: this.state.user === "disabled" ? undefined : this.state.user,
+                            reset: this.fetchAccount,
                         }}
                     >
                         {this.props.children}
-                    </USER_CONTEXT.Provider>
+                    </ACCOUNT_CONTEXT.Provider>
                 );
         }
     }

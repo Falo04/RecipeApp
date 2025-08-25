@@ -1,6 +1,5 @@
 import { BaseLayout } from "@/components/layouts/base-layout";
 import { TagsProvider } from "@/context/tags";
-import { UserProvider } from "@/context/user";
 import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
 import { BookText, CarrotIcon, SettingsIcon, Soup, TagIcon } from "lucide-react";
 import { Suspense } from "react";
@@ -20,6 +19,7 @@ import {
     type SidebarNavItem,
 } from "@/components/ui/sidebar";
 import { Heading, Subheading } from "@/components/ui/heading";
+import { AccountProvider } from "@/context/account.tsx";
 
 /**
  * The properties for {@link FoodMenu}
@@ -106,12 +106,12 @@ export function FoodMenu() {
 
 export const Route = createLazyFileRoute("/_app")({
     component: () => (
-        <UserProvider>
+        <AccountProvider>
             <TagsProvider>
                 <IngredientProvider>
                     <FoodMenu />
                 </IngredientProvider>
             </TagsProvider>
-        </UserProvider>
+        </AccountProvider>
     ),
 });
