@@ -259,6 +259,10 @@ pub async fn delete_tag(Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>) -
         .condition(Tag.uuid.equals(tag.uuid))
         .await?;
 
+    WebsocketManager::global()
+        .send_to_all(WsServerMsg::TagsChanged {})
+        .await;
+
     tx.commit().await?;
     Ok(())
 }
