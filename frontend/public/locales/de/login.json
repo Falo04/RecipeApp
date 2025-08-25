@@ -1,21 +1,8 @@
 {
     "button": {
-        "login": "Anmelden"
-    },
-    "error": {
-        "invalid-email": "Invalide Email",
-        "password-too-short": "Das Passwort ist zu kurz"
+        "sign-in-with-sso": "Melde dich an"
     },
     "login": {
-        "description": "Gebe deine Anmelde Daten ein, um dich anmelden zu k\u00f6nnen",
-        "title": "Anmeldung"
-    },
-    "placeholder": {
-        "email": "test@test.com",
-        "password": "****"
-    },
-    "toast": {
-        "login-failed": "Anmeldeversuch gescheitert",
-        "login-success": "Erfolgreich angemeldet"
+        "title": "Recipe App"
     }
 }

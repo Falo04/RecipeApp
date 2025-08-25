@@ -1,21 +1,8 @@
 {
     "button": {
-        "login": "Login"
-    },
-    "error": {
-        "invalid-email": "Invalid email",
-        "password-too-short": "Password is to short"
+        "sign-in-with-sso": "Sign in"
     },
     "login": {
-        "description": "Enter your login details to be able to log in",
-        "title": "Login"
-    },
-    "placeholder": {
-        "email": "test@test.com",
-        "password": "****"
-    },
-    "toast": {
-        "login-failed": "Login failed",
-        "login-success": "Login successful"
+        "title": "Recipe App"
     }
 }

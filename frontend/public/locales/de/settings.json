@@ -1,5 +1,6 @@
 {
     "button": {
+        "logout": "Abmelden",
         "update": "Einstellungen aktualisieren"
     },
     "heading": {

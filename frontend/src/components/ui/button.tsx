@@ -48,4 +48,13 @@ function Button({
     return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 }
 
-export { Button, buttonVariants };
+function ButtonLink({
+    className,
+    variant,
+    size,
+    ...props
+}: React.ComponentProps<"a"> & VariantProps<typeof buttonVariants>) {
+    return <a data-slot="button-link" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+}
+
+export { Button, ButtonLink, buttonVariants };

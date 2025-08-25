@@ -1,5 +1,6 @@
 {
     "button": {
+        "logout": "Logout",
         "update": "Update Settings"
     },
     "heading": {

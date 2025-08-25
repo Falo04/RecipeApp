@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { ButtonLink } from "@/components/ui/button.tsx";
+import { Soup } from "lucide-react";
 
 /**
  * The properties for {@link Login}
@@ -20,12 +22,17 @@ export function Login() {
                 <div className="flex flex-col gap-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="test-2xl">{t("login.title")}</CardTitle>
+                            <div className={"flex items-center justify-center gap-4"}>
+                                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                                    <Soup className="size-4" />
+                                </div>
+                                <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <a className={"w-full"} href={"/api/v1/oidc/begin-login"}>
-                                {t("button.sign-in-with-sso-customer")}
-                            </a>
+                        <CardContent className={"mt-4"}>
+                            <ButtonLink className={"w-full"} href={"/api/v1/oidc/begin-login"}>
+                                {t("button.sign-in-with-sso")}
+                            </ButtonLink>
                         </CardContent>
                     </Card>
                 </div>
