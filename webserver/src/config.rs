@@ -44,8 +44,6 @@ pub fn init() -> Result<(), Vec<&'static EnvError>> {
         DB_USER.load(),
         DB_PASSWORD.load(),
         DB_SCHEMA.load(),
-        JWT.load(),
-        AUTHENTICATION_ENABLED.load(),
         OTEL_ENDPOINT.load(),
         OIDC_DISCOVER_URL.load(),
         OIDC_CLIENT_ID.load(),
@@ -85,14 +83,6 @@ pub static DB_PASSWORD: EnvVar = EnvVar::required("DB_PASSWORD");
 
 /// Represents the database schema environment variable.
 pub static DB_SCHEMA: EnvVar = EnvVar::required("DB_SCHEMA");
-
-/// This static variable defines the JWT (JSON Web Token) used for authentication.
-pub static JWT: EnvVar =
-    EnvVar::optional("JWT", || Alphanumeric.sample_string(&mut rand::rng(), 32));
-
-/// Represents the state of authentication.
-pub static AUTHENTICATION_ENABLED: EnvVar<bool> =
-    EnvVar::optional("AUTHENTICATION_ENABLED", || false);
 
 /// Defines an environment variable for the Jaeger OTLP endpoint.
 pub static OTEL_ENDPOINT: EnvVar =
