@@ -46,6 +46,11 @@ pub fn init() -> Result<(), Vec<&'static EnvError>> {
         DB_SCHEMA.load(),
         JWT.load(),
         AUTHENTICATION_ENABLED.load(),
+        OTEL_ENDPOINT.load(),
+        OIDC_DISCOVER_URL.load(),
+        OIDC_CLIENT_ID.load(),
+        OIDC_CLIENT_SECRET.load(),
+        OIDC_REDIRECT_URL.load(),
     ] {
         errors.extend(result.err());
     }
@@ -61,7 +66,7 @@ pub static SERVER_ADDRESS: EnvVar<IpAddr> =
     EnvVar::optional("SERVER_ADDRESS", || IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)));
 
 /// Defines the port to listen on for the server.
-pub static SERVER_PORT: EnvVar<u16> = EnvVar::optional("SERVER_PORT", || 8432);
+pub static SERVER_PORT: EnvVar<u16> = EnvVar::optional("SERVER_PORT", || 8080);
 
 /// Represents the database host environment variable.
 pub static DB_HOST: EnvVar = EnvVar::required("DB_HOST");
@@ -124,7 +129,7 @@ pub static OIDC_CLIENT_ID: EnvVar<ClientId> = EnvVar::required("OIDC_CLIENT_ID")
 ///
 /// It's configured via an environment variable named `OIDC_CLIENT_SECRECT`.
 /// The `EnvVar::required` ensures that the variable is mandatory.
-pub static OIDC_CLIENT_SECRECT: EnvVar<ClientSecret> = EnvVar::required("OIDC_CLIENT_SECRECT");
+pub static OIDC_CLIENT_SECRET: EnvVar<ClientSecret> = EnvVar::required("OIDC_CLIENT_SECRET");
 
 /// Defines an environment variable named `OIDC_REDIRECT_URL`.
 ///

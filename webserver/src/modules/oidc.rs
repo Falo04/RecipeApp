@@ -28,6 +28,7 @@ use openidconnect::PkceCodeChallenge;
 use openidconnect::PkceCodeVerifier;
 use openidconnect::RedirectUrl;
 use openidconnect::RequestTokenError;
+use openidconnect::Scope;
 use openidconnect::TokenResponse;
 use serde::Deserialize;
 use serde::Serialize;
@@ -36,7 +37,7 @@ use tracing::warn;
 use url::Url;
 
 use crate::config::OIDC_CLIENT_ID;
-use crate::config::OIDC_CLIENT_SECRECT;
+use crate::config::OIDC_CLIENT_SECRET;
 use crate::config::OIDC_DISCOVER_URL;
 use crate::config::OIDC_REDIRECT_URL;
 use crate::http::common::errors::ApiError;
@@ -107,7 +108,9 @@ impl OpenIdConnect {
                 CsrfToken::new_random,
                 Nonce::new_random,
             )
-            .set_pkce_challenge(pkce_code_challenge);
+            .set_pkce_challenge(pkce_code_challenge)
+            .add_scope(Scope::new("profile".to_string()))
+            .add_scope(Scope::new("email".to_string()));
 
         let (auth_url, csrf_token, nonce) = request.url();
 
@@ -238,7 +241,7 @@ impl OidcConfig {
         OidcConfig {
             url: OIDC_DISCOVER_URL.clone(),
             client_id: OIDC_CLIENT_ID.clone(),
-            client_secret: OIDC_CLIENT_SECRECT.clone(),
+            client_secret: OIDC_CLIENT_SECRET.clone(),
             redirect_url: OIDC_REDIRECT_URL.clone(),
         }
     }

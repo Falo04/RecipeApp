@@ -1,11 +1,11 @@
 [Migration]
-Hash = "17180227942339631799"
+Hash = "17010046262494556021"
 Initial = true
 Replaces = []
 
 [[Migration.Operations]]
 Type = "CreateModel"
-Name = "user"
+Name = "account"
 
 [[Migration.Operations.Fields]]
 Name = "uuid"
@@ -15,26 +15,7 @@ Type = "uuid"
 Type = "primary_key"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/users/mod.rs"
-Line = 8
-Column = 9
-
-[[Migration.Operations.Fields]]
-Name = "mail"
-Type = "varchar"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "max_length"
-Value = 255
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "unique"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "not_null"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/users/mod.rs"
+File = "webserver/src/models/account/mod.rs"
 Line = 12
 Column = 9
 
@@ -50,12 +31,12 @@ Value = 255
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/users/mod.rs"
-Line = 16
+File = "webserver/src/models/account/mod.rs"
+Line = 15
 Column = 9
 
 [[Migration.Operations.Fields]]
-Name = "password"
+Name = "email"
 Type = "varchar"
 
 [[Migration.Operations.Fields.Annotations]]
@@ -66,8 +47,56 @@ Value = 255
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/users/mod.rs"
-Line = 20
+File = "webserver/src/models/account/mod.rs"
+Line = 18
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateModel"
+Name = "accountoidc"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/account/mod.rs"
+Line = 26
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "issuer"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/account/mod.rs"
+Line = 33
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "subject"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/account/mod.rs"
+Line = 36
 Column = 9
 
 [[Migration.Operations]]
@@ -179,6 +208,94 @@ Column = 9
 
 [[Migration.Operations]]
 Type = "CreateModel"
+Name = "ingredient"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 22
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "name"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "unique"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 26
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateModel"
+Name = "recipeingredientmodel"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 36
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "amount"
+Type = "int32"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 46
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "unit"
+Type = "choices"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "choices"
+Value = [
+    "Cup",
+    "Gram",
+    "Kilogram",
+    "Liter",
+    "Milliliter",
+    "Tablespoon",
+    "Teaspoon",
+    "None",
+]
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "webserver/src/models/ingredients/mod.rs"
+Line = 49
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateModel"
 Name = "tag"
 
 [[Migration.Operations.Fields]]
@@ -265,94 +382,6 @@ Column = 9
 
 [[Migration.Operations]]
 Type = "CreateModel"
-Name = "ingredient"
-
-[[Migration.Operations.Fields]]
-Name = "uuid"
-Type = "uuid"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "primary_key"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/ingredients/mod.rs"
-Line = 21
-Column = 9
-
-[[Migration.Operations.Fields]]
-Name = "name"
-Type = "varchar"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "max_length"
-Value = 255
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "unique"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "not_null"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/ingredients/mod.rs"
-Line = 25
-Column = 9
-
-[[Migration.Operations]]
-Type = "CreateModel"
-Name = "recipeingredientmodel"
-
-[[Migration.Operations.Fields]]
-Name = "uuid"
-Type = "uuid"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "primary_key"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/ingredients/mod.rs"
-Line = 35
-Column = 9
-
-[[Migration.Operations.Fields]]
-Name = "amount"
-Type = "int32"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "not_null"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/ingredients/mod.rs"
-Line = 45
-Column = 9
-
-[[Migration.Operations.Fields]]
-Name = "unit"
-Type = "choices"
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "choices"
-Value = [
-    "Cup",
-    "Gram",
-    "Kilogram",
-    "Liter",
-    "Milliliter",
-    "Tablespoon",
-    "Teaspoon",
-    "None",
-]
-
-[[Migration.Operations.Fields.Annotations]]
-Type = "not_null"
-
-[Migration.Operations.Fields.SourceDefinedAt]
-File = "webserver/src/models/ingredients/mod.rs"
-Line = 48
-Column = 9
-
-[[Migration.Operations]]
-Type = "CreateModel"
 Name = "galvynsession"
 
 [[Migration.Operations.Fields]]
@@ -367,8 +396,8 @@ Value = 255
 Type = "primary_key"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/aa37f23/galvyn-core/src/session.rs"
-Line = 39
+File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/daf7d3d/galvyn-core/src/session.rs"
+Line = 40
 Column = 5
 
 [[Migration.Operations.Fields]]
@@ -379,8 +408,8 @@ Type = "datetime"
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/aa37f23/galvyn-core/src/session.rs"
-Line = 40
+File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/daf7d3d/galvyn-core/src/session.rs"
+Line = 41
 Column = 5
 
 [[Migration.Operations.Fields]]
@@ -391,9 +420,56 @@ Type = "binary"
 Type = "not_null"
 
 [Migration.Operations.Fields.SourceDefinedAt]
-File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/aa37f23/galvyn-core/src/session.rs"
-Line = 41
+File = "/usr/local/cargo/git/checkouts/galvyn-f52542b4eef301aa/daf7d3d/galvyn-core/src/session.rs"
+Line = 42
 Column = 5
+
+[[Migration.Operations]]
+Type = "CreateField"
+Model = "recipe"
+
+[Migration.Operations.Field]
+Name = "user"
+Type = "uuid"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "foreign_key"
+
+[Migration.Operations.Field.Annotations.Value]
+TableName = "account"
+ColumnName = "uuid"
+OnDelete = "Restrict"
+OnUpdate = "Restrict"
+
+[Migration.Operations.Field.SourceDefinedAt]
+File = "webserver/src/models/recipes/mod.rs"
+Line = 33
+Column = 9
+
+[[Migration.Operations]]
+Type = "CreateField"
+Model = "recipestep"
+
+[Migration.Operations.Field]
+Name = "recipe"
+Type = "uuid"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "foreign_key"
+
+[Migration.Operations.Field.Annotations.Value]
+TableName = "recipe"
+ColumnName = "uuid"
+OnDelete = "Cascade"
+OnUpdate = "Restrict"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Field.SourceDefinedAt]
+File = "webserver/src/models/recipes/mod.rs"
+Line = 63
+Column = 9
 
 [[Migration.Operations]]
 Type = "CreateField"
@@ -447,24 +523,27 @@ Column = 9
 
 [[Migration.Operations]]
 Type = "CreateField"
-Model = "recipe"
+Model = "accountoidc"
 
 [Migration.Operations.Field]
-Name = "user"
+Name = "account"
 Type = "uuid"
 
 [[Migration.Operations.Field.Annotations]]
 Type = "foreign_key"
 
 [Migration.Operations.Field.Annotations.Value]
-TableName = "user"
+TableName = "account"
 ColumnName = "uuid"
-OnDelete = "Restrict"
-OnUpdate = "Restrict"
+OnDelete = "Cascade"
+OnUpdate = "Cascade"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "not_null"
 
 [Migration.Operations.Field.SourceDefinedAt]
-File = "webserver/src/models/recipes/mod.rs"
-Line = 33
+File = "webserver/src/models/account/mod.rs"
+Line = 30
 Column = 9
 
 [[Migration.Operations]]
@@ -489,7 +568,7 @@ Type = "not_null"
 
 [Migration.Operations.Field.SourceDefinedAt]
 File = "webserver/src/models/ingredients/mod.rs"
-Line = 39
+Line = 40
 Column = 9
 
 [[Migration.Operations]]
@@ -514,30 +593,5 @@ Type = "not_null"
 
 [Migration.Operations.Field.SourceDefinedAt]
 File = "webserver/src/models/ingredients/mod.rs"
-Line = 42
-Column = 9
-
-[[Migration.Operations]]
-Type = "CreateField"
-Model = "recipestep"
-
-[Migration.Operations.Field]
-Name = "recipe"
-Type = "uuid"
-
-[[Migration.Operations.Field.Annotations]]
-Type = "foreign_key"
-
-[Migration.Operations.Field.Annotations.Value]
-TableName = "recipe"
-ColumnName = "uuid"
-OnDelete = "Cascade"
-OnUpdate = "Restrict"
-
-[[Migration.Operations.Field.Annotations]]
-Type = "not_null"
-
-[Migration.Operations.Field.SourceDefinedAt]
-File = "webserver/src/models/recipes/mod.rs"
-Line = 63
+Line = 43
 Column = 9

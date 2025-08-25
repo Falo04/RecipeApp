@@ -3,6 +3,7 @@ use axum::response::Redirect;
 use galvyn::core::session::Session;
 use galvyn::core::Module;
 use galvyn::get;
+use galvyn::post;
 use galvyn::rorm::and;
 use galvyn::rorm::Database;
 use rorm::fields::types::MaxStr;
@@ -115,3 +116,9 @@ pub async fn finish_oidc_login(
 }
 
 const SESSION_KEY: &str = "begin_oidc_login";
+
+#[post("/logout")]
+pub async fn logout(session: Session) -> ApiResult<()> {
+    Account::unset_logged_in(session).await?;
+    Ok(())
+}

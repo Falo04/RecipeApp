@@ -26,7 +26,7 @@ FROM debian:bookworm-slim AS final
 
 RUN <<EOF
 apt-get update
-apt-get install -y libssl-dev libpq-dev
+apt-get install -y libssl-dev libpq-dev ca-certificates sudo
 EOF
 
 # Copy startup script
@@ -43,8 +43,10 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
-    appuser
+    appuser \
 
+# Allow appuser to execute update-ca-certificates
+COPY ./build/webserver/sudoers-appuser /etc/sudoers.d/appuser
 
 # Copy migrations
 COPY ./webserver/migrations /migrations

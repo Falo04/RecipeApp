@@ -17,11 +17,5 @@ EOF
 
 FROM nginx:latest AS final
 
-RUN <<EOF
-set -e
-update-ca-certificates
-mkdir /certs
-EOF
-
 COPY --from=build /app/swagger-ui /usr/share/nginx/html/swagger-ui
 COPY ./build/nginx/swagger-initializer.js /usr/share/nginx/html/swagger-ui/swagger-initializer.js

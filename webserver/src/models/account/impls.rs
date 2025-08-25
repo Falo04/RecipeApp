@@ -22,9 +22,9 @@ impl Account {
         Ok(())
     }
 
-    pub async fn unset_logged_in(&self, session: &Session) -> ApiResult<()> {
-        if let Some(account_uuid) = session.remove::<Uuid>(SESSION_KEY).await? {
-            if let Some(session_id) = session.id() {
+    pub async fn unset_logged_in(session: Session) -> ApiResult<()> {
+        if let Some(_account_uuid) = session.remove::<Uuid>(SESSION_KEY).await? {
+            if let Some(_session_id) = session.id() {
                 // TODO
             } else {
                 warn!("A session with data should have an id!");

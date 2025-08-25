@@ -6,14 +6,13 @@ use crate::http::middleware::auth_required_layer::auth_required_layer;
 
 pub mod account;
 pub mod ingredients;
-pub mod meta;
 pub mod oidc;
 pub mod recipes;
 pub mod tags;
 pub mod websockets;
 
 pub fn initialize() -> GalvynRouter {
-    let auth_not_required = GalvynRouter::new().nest("/meta", meta::initialize());
+    let auth_not_required = GalvynRouter::new().nest("/oidc", oidc::initialize());
 
     let auth_required = GalvynRouter::new()
         .nest("/recipes", recipes::initialize())

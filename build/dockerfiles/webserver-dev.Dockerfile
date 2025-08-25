@@ -26,7 +26,7 @@ FROM debian:bookworm-slim AS final
 
 RUN <<EOF
 apt-get update
-apt-get install -y libssl-dev libpq-dev
+apt-get install -y libssl-dev libpq-dev ca-certificates sudo
 EOF
 
 # Copy startup script
@@ -44,6 +44,9 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
+
+# Allow appuser to execute update-ca-certificates
+COPY ./build/webserver/sudoers-appuser /etc/sudoers.d/appuser
 
 RUN mkdir -p /var/lib/webserver /migrations
 RUN chown ${UID} -R /var/lib/webserver

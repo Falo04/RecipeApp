@@ -7,7 +7,7 @@ services:
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
-      - ./build/nginx/food.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./data/nginx/recipe.conf:/etc/nginx/conf.d/default.conf:ro
     build:
       dockerfile: ./build/dockerfiles/nginx.Dockerfile
 
