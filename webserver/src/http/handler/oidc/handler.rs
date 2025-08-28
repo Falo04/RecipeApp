@@ -4,19 +4,14 @@ use galvyn::core::session::Session;
 use galvyn::core::Module;
 use galvyn::get;
 use galvyn::post;
-use galvyn::rorm::and;
 use galvyn::rorm::Database;
 use rorm::fields::types::MaxStr;
-use rorm::model::Identifiable;
-use rorm::prelude::ForeignModelByField;
 use tracing::trace;
-use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
 use crate::http::handler::oidc::schema::FinishOidcLoginRequest;
 use crate::models::account::Account;
-use crate::models::account::AccountOidc;
 use crate::modules::oidc::OidcRequestState;
 use crate::modules::oidc::OpenIdConnect;
 
@@ -71,40 +66,15 @@ pub async fn finish_oidc_login(
     let email = claims.email().ok_or(ApiError::server_error(
         "Oidc provider did not provide the email claims",
     ))?;
-    let email = MaxStr::new(display_name.to_string())
-        .map_err(ApiError::map_server_error("Email is too long"))?;
+    let email =
+        MaxStr::new(email.to_string()).map_err(ApiError::map_server_error("Email is too long"))?;
 
-    let existing_account = rorm::query(&mut tx, AccountOidc.account.query_as(Account))
-        .condition(and![
-            AccountOidc.issuer.equals(&*issuer),
-            AccountOidc.subject.equals(&*subject),
-        ])
-        .optional()
-        .await?;
-    let account = if let Some(mut account) = existing_account {
-        rorm::update(&mut tx, Account)
-            .set(Account.display_name, display_name.clone())
-            .condition(account.as_condition())
-            .await?;
-        account.display_name = display_name;
-        account
+    let existing_account = Account::query_after_oidc(&mut tx, &issuer, &subject).await?;
+    let account = if let Some(account) = existing_account {
+        Account::update(&mut tx, account.uuid, display_name).await?
     } else {
-        let account = rorm::insert(&mut tx, Account)
-            .single(&Account {
-                uuid: Uuid::new_v4(),
-                display_name,
-                email,
-            })
-            .await?;
-
-        rorm::insert(&mut tx, AccountOidc)
-            .single(&AccountOidc {
-                uuid: Uuid::new_v4(),
-                account: ForeignModelByField(account.uuid),
-                subject,
-                issuer,
-            })
-            .await?;
+        let account = Account::create(&mut tx, display_name, email).await?;
+        Account::create_oidc(&mut tx, account.uuid, issuer, subject).await?;
         account
     };
 
