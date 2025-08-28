@@ -1,83 +1,142 @@
 //! Represents a recipe.
-mod impls;
 
-use rorm::field;
+use std::borrow::Cow;
+
+use futures_util::TryStreamExt;
+use rorm::and;
+use rorm::conditions;
+use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
-use rorm::prelude::BackRef;
-use rorm::prelude::ForeignModel;
-use rorm::Model;
-use rorm::Patch;
+use rorm::prelude::ForeignModelByField;
+use schemars::JsonSchema;
+use serde::Deserialize;
+use serde::Serialize;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use super::account::Account;
-use crate::models::ingredients::RecipeIngredientModel;
-use crate::models::tags::RecipeTag;
+use crate::http::common::errors::ApiResult;
+use crate::http::common::schemas::GetPageRequest;
+use crate::models::account::AccountUuid;
+use crate::models::recipes::db::RecipeModel;
+use crate::models::recipes::db::RecipeModelInsert;
 
-/// Represents a recipe
-///
-/// With details like name, description, user association, tags, ingredients, and steps.
-#[derive(Model)]
+pub(in crate::models) mod db;
+
+#[derive(Debug, Clone)]
 pub struct Recipe {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
+    pub uuid: RecipeUuid,
 
     /// The name of the recipe, with a maximum length of 255 characters.  Must be unique.
-    #[rorm(unique)]
     pub name: MaxStr<255>,
 
     /// A longer description of the recipe, with a maximum length of 255 characters.
     pub description: MaxStr<255>,
 
     /// An optional foreign key referencing a `User` model.
-    pub user: Option<ForeignModel<Account>>,
-
-    /// A back-reference to the `RecipeTag` model
-    ///
-    /// Representing the tags associated with this recipe.
-    pub tags: BackRef<field!(RecipeTag.recipe)>,
-
-    /// A back-reference to the `RecipeIngredients` model
-    ///
-    /// Representing the ingredients used in this recipe.
-    pub ingredients: BackRef<field!(RecipeIngredientModel.recipe)>,
-
-    /// A back-reference to the `RecipeSteps` model
-    ///
-    /// Representing the steps involved in preparing this recipe.
-    pub steps: BackRef<field!(RecipeStep.recipe)>,
+    pub user: AccountUuid,
 
     pub created_at: OffsetDateTime,
 }
 
-/// Represents a single step in a recipe.
-///
-/// This struct is used to store the individual steps of a recipe.
-#[derive(Model)]
-pub struct RecipeStep {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
+pub struct RecipeUuid(pub Uuid);
 
-    /// A foreign key referencing the `Recipe` model
-    #[rorm(on_delete = "Cascade")]
-    pub recipe: ForeignModel<Recipe>,
+impl Recipe {
+    pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
+        rorm::query(exe, RecipeModel.uuid.count()).one().await?
+    }
 
-    /// The text of the step.
-    ///
-    /// It's a string with a maximum length of 256 characters.
-    pub step: MaxStr<255>,
+    pub async fn query_all(
+        exe: impl Executor<'_>,
+        page: GetPageRequest,
+        filter_name: Option<String>,
+    ) -> ApiResult<Vec<Self>> {
+        let condition = and![filter_name.map(|name| conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(RecipeModel.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!(
+                "%{}%",
+                name.replace('_', "\\_")
+                    .replace('%', "\\%")
+                    .replace('\\', "\\\\")
+            )))
+        }),];
 
-    /// The order of the step within the recipe.
-    pub index: i16,
+        let result: Vec<_> = rorm::query(exe, RecipeModel)
+            .condition(&condition)
+            .order_asc(RecipeModel.name)
+            .limit(page.limit)
+            .offset(page.offset)
+            .stream()
+            .map_ok(|model| Recipe::from(model))
+            .try_collect()
+            .await?;
+
+        Ok(result)
+    }
+
+    pub async fn query_by_uuid(
+        exe: impl Executor<'_>,
+        uuid: RecipeUuid,
+    ) -> ApiResult<Option<Self>> {
+        match rorm::query(exe, RecipeModel)
+            .condition(RecipeModel.uuid.equals(uuid.0))
+            .optional()
+            .await?
+        {
+            Some(model) => Ok(Some(Recipe::from(model))),
+            None => Ok(None),
+        }
+    }
+
+    pub async fn create(
+        exe: impl Executor<'_>,
+        name: MaxStr<255>,
+        description: MaxStr<255>,
+        user: AccountUuid,
+    ) -> ApiResult<Self> {
+        let model = rorm::insert(exe, RecipeModel)
+            .single(&RecipeModelInsert {
+                uuid: Uuid::new_v4(),
+                user: ForeignModelByField(user.0),
+                name,
+                description,
+                created_at: OffsetDateTime::now_utc(),
+            })
+            .await?;
+        Ok(Recipe::from(model))
+    }
+
+    pub async fn update(
+        exe: impl Executor<'_>,
+        recipe_uuid: RecipeUuid,
+        name: MaxStr<255>,
+        description: MaxStr<255>,
+    ) -> ApiResult<()> {
+        rorm::update(exe, RecipeModel)
+            .set(RecipeModel.name, name)
+            .set(RecipeModel.description, description)
+            .condition(RecipeModel.uuid.equals(recipe_uuid.0))
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete(exe: impl Executor<'_>, uuid: RecipeUuid) -> ApiResult<()> {
+        rorm::delete(exe, RecipeModel)
+            .condition(RecipeModel.uuid.equals(uuid.0))
+            .await?;
+        Ok(())
+    }
 }
 
-/// Represents a patch to update a `Recipe` model.
-#[derive(Patch)]
-#[rorm(model = "Recipe")]
-pub struct RecipePatch {
-    pub uuid: Uuid,
-    pub name: MaxStr<255>,
-    pub description: MaxStr<255>,
-    pub user: Option<ForeignModel<Account>>,
-    pub created_at: OffsetDateTime,
+impl From<RecipeModel> for Recipe {
+    fn from(model: RecipeModel) -> Self {
+        Self {
+            uuid: RecipeUuid(model.uuid),
+            name: model.name,
+            description: model.description,
+            created_at: model.created_at,
+            user: AccountUuid(model.user.0),
+        }
+    }
 }

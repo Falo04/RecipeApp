@@ -1,0 +1,60 @@
+use rorm::field;
+use rorm::fields::types::MaxStr;
+use rorm::prelude::BackRef;
+use rorm::prelude::ForeignModel;
+use rorm::Model;
+use rorm::Patch;
+use time::OffsetDateTime;
+use uuid::Uuid;
+
+use crate::models::account::db::AccountModel;
+use crate::models::recipe_ingredients::db::RecipeIngredientModel;
+use crate::models::recipe_steps::db::RecipeStepModel;
+use crate::models::tags::db::RecipeTagModel;
+
+/// Represents a recipe model
+///
+/// With details like name, description, user association, tags, ingredients, and steps.
+#[derive(Model)]
+#[rorm(rename = "Recipe")]
+pub struct RecipeModel {
+    #[rorm(primary_key)]
+    pub uuid: Uuid,
+
+    /// The name of the recipe, with a maximum length of 255 characters.  Must be unique.
+    #[rorm(unique)]
+    pub name: MaxStr<255>,
+
+    /// A longer description of the recipe, with a maximum length of 255 characters.
+    pub description: MaxStr<255>,
+
+    /// An optional foreign key referencing a `User` model.
+    pub user: ForeignModel<AccountModel>,
+
+    /// A back-reference to the `RecipeTag` model
+    ///
+    /// Representing the tags associated with this recipe.
+    pub tags: BackRef<field!(RecipeTagModel.recipe)>,
+
+    /// A back-reference to the `RecipeIngredients` model
+    ///
+    /// Representing the ingredients used in this recipe.
+    pub ingredients: BackRef<field!(RecipeIngredientModel.recipe)>,
+
+    /// A back-reference to the `RecipeSteps` model
+    ///
+    /// Representing the steps involved in preparing this recipe.
+    pub steps: BackRef<field!(RecipeStepModel.recipe)>,
+
+    pub created_at: OffsetDateTime,
+}
+
+#[derive(Debug, Patch)]
+#[rorm(model = "RecipeModel")]
+pub struct RecipeModelInsert {
+    pub uuid: Uuid,
+    pub name: MaxStr<255>,
+    pub description: MaxStr<255>,
+    pub user: ForeignModel<AccountModel>,
+    pub created_at: OffsetDateTime,
+}

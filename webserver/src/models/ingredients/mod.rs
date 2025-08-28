@@ -1,52 +1,69 @@
 //! Represents an ingredient in a recipe.
 
+use futures_util::TryStreamExt;
+use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
-use rorm::prelude::ForeignModel;
 use rorm::DbEnum;
-use rorm::Model;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
+use tracing::instrument;
 use uuid::Uuid;
 
-use crate::models::recipes::Recipe;
+use crate::http::common::errors::ApiResult;
+use crate::models::ingredients::db::IngredientModel;
 
-pub mod impls;
+pub(in crate::models) mod db;
 
-/// Represents an ingredient with a unique identifier and name.
-///
-/// This struct is used to store information about individual ingredients.
-#[derive(Model)]
+#[derive(Debug, Clone)]
 pub struct Ingredient {
-    #[rorm(primary_key)]
     pub uuid: Uuid,
 
     /// The name of the ingredient, with a maximum length of 255 characters.
-    #[rorm(unique)]
     pub name: MaxStr<255>,
 }
 
-/// Represents the ingredients for a recipe.
-///
-/// This struct models the ingredients within a recipe, linking to the
-/// `Recipe` and `Ingredients` models using foreign keys.
-#[derive(Model)]
-pub struct RecipeIngredientModel {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct IngredientUuid(pub Uuid);
 
-    /// A foreign key referencing the `Recipe` model, indicating which recipe this ingredient belongs to.
-    #[rorm(on_delete = "Cascade")]
-    pub recipe: ForeignModel<Recipe>,
+impl Ingredient {
+    pub async fn query_all(exe: impl Executor<'_>) -> ApiResult<Vec<Self>> {
+        let items: Vec<_> = rorm::query(exe, IngredientModel)
+            .order_asc(IngredientModel.name)
+            .stream()
+            .map_ok(|model| Ingredient::from(model))
+            .try_collect()
+            .await?;
 
-    /// A foreign key referencing the `Ingredients` model, specifying the type of ingredient.
-    pub ingredients: ForeignModel<Ingredient>,
+        Ok(items)
+    }
 
-    /// The quantity of the ingredient.
-    pub amount: i32,
-
-    /// The unit of measurement for the ingredient.
-    pub unit: Units,
+    /// Inserts a new ingredient into the database if one doesn't already exist.
+    ///
+    /// This function attempts to retrieve an ingredient by its name from the database.
+    /// If an ingredient with the given name exists, it's returned. Otherwise, a new
+    /// ingredient is inserted with a generated UUID and its name, and the UUID is returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `transaction`: A mutable reference to the database transaction.
+    /// * `name`: The name of the ingredient to search for.
+    #[instrument(name = "Ingredient::get_uuid_or_create", skip(exe))]
+    pub async fn get_uuid_or_create(exe: impl Executor<'_>, name: MaxStr<255>) -> ApiResult<Uuid> {
+        let Some(ingredient) = rorm::query(exe, IngredientModel)
+            .condition(IngredientModel.name.equals(&*name))
+            .optional()
+            .await?
+        else {
+            rorm::insert(exe, IngredientModel)
+                .single(&IngredientModel {
+                    uuid: Uuid::new_v4(),
+                    name,
+                })
+                .await?
+        };
+        Ok(ingredient.uuid)
+    }
 }
 
 /// Represents different units of measurement.

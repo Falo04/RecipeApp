@@ -1,75 +1,137 @@
 //! Represents a tag with a name and color.
-mod impls;
 
+use futures_util::TryStreamExt;
+use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
-use rorm::prelude::ForeignModel;
-use rorm::DbEnum;
-use rorm::Model;
+use rorm::prelude::ForeignModelByField;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
+use tracing::instrument;
 use uuid::Uuid;
 
-use crate::models::recipes::Recipe;
+use crate::http::common::errors::ApiResult;
+use crate::http::common::schemas::GetPageRequest;
+use crate::models::recipes::RecipeUuid;
+use crate::models::tags::db::RecipeTagModel;
+use crate::models::tags::db::TagColors;
+use crate::models::tags::db::TagModel;
 
-/// Represents a tag with a unique name and associated color.
-#[derive(Model)]
+pub(in crate::models) mod db;
+
+#[derive(Debug, Clone)]
 pub struct Tag {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
+    pub uuid: TagUuid,
 
-    /// The name of the tag, enforced to be unique across all tags.
-    ///
-    /// It has a maximum length of 255 characters.
-    #[rorm(unique)]
     pub name: MaxStr<255>,
 
     /// An enum representing the color associated with the tag.
     pub color: TagColors,
 }
 
-/// Represents a tag associated with a recipe.
-///
-/// This struct defines a relationship between a `Recipe` and a `Tag`.
-#[derive(Model)]
-pub struct RecipeTag {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
+pub struct TagUuid(pub Uuid);
+impl Tag {
+    #[instrument(name = "Tag::query_by_recipe", skip(exe))]
+    pub async fn query_by_recipe(
+        exe: impl Executor<'_>,
+        recipe_uuid: RecipeUuid,
+    ) -> ApiResult<Vec<Self>> {
+        let result: Vec<_> = rorm::query(exe, RecipeTagModel.tag.query_as(TagModel))
+            .condition(RecipeTagModel.recipe.equals(recipe_uuid.0))
+            .stream()
+            .map_ok(|model| Tag::from(model))
+            .try_collect()
+            .await?;
+        Ok(result)
+    }
 
-    /// A foreign key referencing a `Recipe` object.
-    ///
-    /// Deleting this tag will also delete the associated recipe.
-    #[rorm(on_delete = "Cascade")]
-    pub recipe: ForeignModel<Recipe>,
+    pub async fn query_all(
+        exe: impl Executor<'_>,
+        page_request: GetPageRequest,
+    ) -> ApiResult<Vec<Self>> {
+        let result: Vec<_> = rorm::query(exe, TagModel)
+            .limit(page_request.limit)
+            .offset(page_request.offset)
+            .stream()
+            .map_ok(|tag| Tag::from(tag))
+            .try_collect()
+            .await?;
+        Ok(result)
+    }
 
-    /// A foreign key referencing a `Tag` object.
-    ///
-    /// Deleting this tag will also delete the associated tag.
-    #[rorm(on_delete = "Cascade")]
-    pub tag: ForeignModel<Tag>,
+    pub async fn query_by_uuid(
+        exe: impl Executor<'_>,
+        tag_uuid: TagUuid,
+    ) -> ApiResult<Option<Self>> {
+        match rorm::query(exe, TagModel)
+            .condition(TagModel.uuid.equals(tag_uuid.0))
+            .optional()
+            .await?
+        {
+            Some(model) => Ok(Some(Tag::from(model))),
+            None => Ok(None),
+        }
+    }
+
+    #[instrument(name = "Tag::create", skip(exe))]
+    pub async fn create(
+        exe: impl Executor<'_>,
+        name: MaxStr<255>,
+        color: TagColors,
+    ) -> ApiResult<Self> {
+        let model = rorm::insert(exe, TagModel)
+            .single(&TagModel {
+                uuid: Uuid::new_v4(),
+                name,
+                color,
+            })
+            .await?;
+        Ok(Tag::from(model))
+    }
+
+    pub async fn delete(exe: impl Executor<'_>, tag_uuid: TagUuid) -> ApiResult<()> {
+        rorm::delete(exe, TagModel)
+            .condition(TagModel.uuid.equals(tag_uuid.0))
+            .await?;
+        Ok(())
+    }
+
+    #[instrument(name = "Tag::add_to_recipe", skip(exe))]
+    pub async fn add_to_recipe(
+        exe: impl Executor<'_>,
+        recipe_uuid: RecipeUuid,
+        tag_uuid: TagUuid,
+    ) -> ApiResult<()> {
+        rorm::insert(exe, RecipeTagModel)
+            .return_nothing()
+            .single(&RecipeTagModel {
+                uuid: Uuid::new_v4(),
+                recipe: ForeignModelByField(recipe_uuid.0),
+                tag: ForeignModelByField(tag_uuid.0),
+            })
+            .await?;
+        Ok(())
+    }
+
+    #[instrument(name = "Tag::remove_all_tags_from_recipe", skip(exe))]
+    pub async fn remove_all_tags_from_recipe(
+        exe: impl Executor<'_>,
+        recipe_uuid: RecipeUuid,
+    ) -> ApiResult<()> {
+        rorm::delete(exe, RecipeTagModel)
+            .condition(RecipeTagModel.recipe.equals(recipe_uuid.0))
+            .await?;
+        Ok(())
+    }
 }
 
-/// Represents different tag colors, each associated with a numerical value.
-///
-/// This enum defines a set of colors that can be used to represent tags.
-#[derive(DbEnum, Debug, Copy, Clone, Serialize, Deserialize, JsonSchema, PartialEq, PartialOrd)]
-pub enum TagColors {
-    Red = 0,
-    Orange = 1,
-    Amber = 2,
-    Yellow = 3,
-    Lime = 4,
-    Green = 5,
-    Emerald = 6,
-    Teal = 7,
-    Cyan = 8,
-    Sky = 9,
-    Blue = 10,
-    Indigo = 11,
-    Violet = 12,
-    Purple = 13,
-    Fuchsia = 14,
-    Pink = 15,
-    Rose = 16,
-    Zinc = 17,
+impl From<TagModel> for Tag {
+    fn from(model: TagModel) -> Self {
+        Self {
+            uuid: TagUuid(model.uuid),
+            name: model.name,
+            color: model.color,
+        }
+    }
 }

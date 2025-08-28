@@ -12,6 +12,7 @@ use rorm::prelude::ForeignModelByField;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
+use tracing::instrument;
 use tracing::warn;
 use uuid::Uuid;
 
@@ -38,6 +39,7 @@ pub struct AccountUuid(pub Uuid);
 const SESSION_KEY: &str = "current_account";
 
 impl Account {
+    #[instrument(name = "Account::set_logged_in", skip(self))]
     pub async fn set_logged_in(&self, session: &Session) -> ApiResult<()> {
         session
             .insert(SESSION_KEY, self.uuid)
@@ -46,6 +48,7 @@ impl Account {
         Ok(())
     }
 
+    #[instrument(name = "Account::unset_logged_in")]
     pub async fn unset_logged_in(session: Session) -> ApiResult<()> {
         if let Some(_account_uuid) = session.remove::<Uuid>(SESSION_KEY).await? {
             if let Some(_session_id) = session.id() {
@@ -59,6 +62,7 @@ impl Account {
 }
 
 impl Account {
+    #[instrument(name = "Account::query_after_oidc", skip(exe))]
     pub async fn query_after_oidc(
         exe: impl Executor<'_>,
         issuer: &MaxStr<255>,
@@ -76,6 +80,7 @@ impl Account {
             None => Ok(None),
         }
     }
+    #[instrument(name = "Account::query_by_uuid", skip(exe))]
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
         account_uuid: AccountUuid,
@@ -89,6 +94,8 @@ impl Account {
             None => Ok(None),
         }
     }
+
+    #[instrument(name = "Account::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
         display_name: MaxStr<255>,
@@ -105,6 +112,7 @@ impl Account {
         Ok(Account::from(account_model))
     }
 
+    #[instrument(name = "Account::create_oidc", skip(exe))]
     pub async fn create_oidc(
         exe: impl Executor<'_>,
         account_uuid: AccountUuid,
@@ -121,6 +129,7 @@ impl Account {
             .await?
     }
 
+    #[instrument(name = "Account::update", skip(exe))]
     pub async fn update(
         exe: impl Executor<'_>,
         account_uuid: AccountUuid,
@@ -134,6 +143,7 @@ impl Account {
         Ok(Account::from(account_model))
     }
 
+    #[instrument(name = "Account::delete", skip(exe))]
     pub async fn delete(exe: impl Executor<'_>, account_uuid: AccountUuid) -> ApiResult<()> {
         rorm::delete(exe, AccountModel)
             .condition(AccountModel.uuid.equals(account_uuid.0))
