@@ -1,10 +1,6 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
 use std::ops::Deref;
 
 use axum::extract::Path;
-use futures_util::StreamExt;
-use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::delete;
@@ -12,13 +8,6 @@ use galvyn::get;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
-use rorm::and;
-use rorm::conditions;
-use rorm::conditions::DynamicCollection;
-use rorm::model::Identifiable;
-use rorm::prelude::ForeignModelByField;
-use time::OffsetDateTime;
-use uuid::Uuid;
 
 use super::schema::CreateOrUpdateRecipe;
 use super::schema::GetAllRecipesRequest;
@@ -27,7 +16,7 @@ use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::Page;
 use crate::http::common::schemas::SingleUuid;
 use crate::http::handler::account::schema::SimpleAccount;
-use crate::http::handler::ingredients::schema::RecipeIngredients;
+use crate::http::handler::ingredients::schema::FullIngredient;
 use crate::http::handler::recipes::schema::FullRecipe;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::recipes::schema::Step;
@@ -35,12 +24,12 @@ use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::account::Account;
 use crate::models::ingredients::Ingredient;
-use crate::models::ingredients::RecipeIngredientModel;
+use crate::models::recipe_ingredients::RecipeIngredient;
+use crate::models::recipe_steps::RecipeStep;
 use crate::models::recipes::Recipe;
-use crate::models::recipes::RecipePatch;
-use crate::models::recipes::RecipeStep;
-use crate::models::tags::RecipeTag;
+use crate::models::recipes::RecipeUuid;
 use crate::models::tags::Tag;
+use crate::models::tags::TagUuid;
 use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all recipes with pagination support and associated tags.
@@ -57,66 +46,27 @@ pub async fn get_all_recipes(
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let GetAllRecipesRequest { page, filter_name } = pagination;
 
-    let condition = and![filter_name.map(|name| conditions::Binary {
-        operator: conditions::BinaryOperator::Like,
-        fst_arg: conditions::Column(Recipe.name),
-        snd_arg: conditions::Value::String(Cow::Owned(format!(
-            "%{}%",
-            name.replace('_', "\\_")
-                .replace('%', "\\%")
-                .replace('\\', "\\\\")
-        )))
-    }),];
+    let mut tx = Database::global().start_transaction().await?;
 
-    let items: Vec<_> = rorm::query(Database::global(), Recipe)
-        .condition(&condition)
-        .order_asc(Recipe.name)
-        .limit(page.limit)
-        .offset(page.offset)
-        .stream()
-        .try_collect()
-        .await?;
+    let recipes = Recipe::query_all(&mut tx, &page, filter_name).await?;
+    let total = Recipe::query_total(&mut tx).await?;
 
-    let total = rorm::query(Database::global(), Recipe.uuid.count())
-        .one()
-        .await?;
+    let mut result = Vec::new();
+    for recipe in recipes {
+        let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
-    let mut map: HashMap<Uuid, Vec<SimpleTag>> =
-        HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
-
-    if !items.is_empty() {
-        let tags: Vec<_> = rorm::query(
-            Database::global(),
-            (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)),
-        )
-        .condition(DynamicCollection::or(
-            items
-                .iter()
-                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
-                .collect(),
-        ))
-        .stream()
-        .map_ok(|(recipe, tag)| (recipe.0, SimpleTag::from(tag)))
-        .try_collect()
-        .await?;
-
-        for (recipe_uuid, tag) in tags {
-            map.entry(recipe_uuid).or_default().push(tag);
-        }
-    }
-
-    let items = items
-        .into_iter()
-        .map(|recipe| SimpleRecipeWithTags {
-            uuid: recipe.uuid,
+        result.push(SimpleRecipeWithTags {
+            uuid: recipe.uuid.0,
             name: recipe.name,
             description: recipe.description,
-            tags: map.remove(&recipe.uuid).unwrap_or_default(),
+            tags: tags.into_iter().map(SimpleTag::from).collect(),
         })
-        .collect();
+    }
+
+    tx.commit().await?;
 
     Ok(ApiJson(Page {
-        items,
+        items: result,
         limit: page.limit,
         offset: page.offset,
         total,
@@ -138,62 +88,42 @@ pub async fn get_recipe(
 ) -> ApiResult<ApiJson<FullRecipe>> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let recipe = rorm::query(&mut tx, Recipe)
-        .condition(Recipe.uuid.equals(recipe_uuid))
-        .optional()
-        .await?
-        .ok_or(ApiError::bad_request("recipes id not found"))?;
-
-    let user = match recipe.user {
-        Some(user_uuid) => Some(
-            rorm::query(&mut tx, Account)
-                .condition(Account.uuid.equals(user_uuid.0))
-                .optional()
-                .await?
-                .ok_or(ApiError::server_error("User not found from recipes"))?,
-        ),
-        None => None,
+    let Some(recipe) = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid }).await? else {
+        return Err(ApiError::bad_request("Recipe not found"));
     };
 
-    let tags: Vec<_> = rorm::query(&mut tx, RecipeTag.tag.query_as(Tag))
-        .condition(RecipeTag.recipe.equals(recipe_uuid))
-        .stream()
-        .map(|result| result.map(SimpleTag::from))
-        .try_collect()
-        .await?;
-
-    let ingredients: Vec<_> = rorm::query(&mut tx, RecipeIngredientModel)
-        .condition(RecipeIngredientModel.recipe.equals(recipe_uuid))
-        .all()
-        .await?;
-
-    let mut recipe_ingredients = Vec::new();
-    for mapping in ingredients {
-        let Some(ingredient) = rorm::query(&mut tx, Ingredient)
-            .condition(Ingredient.uuid.equals(mapping.ingredients.0))
-            .optional()
-            .await?
+    let recipe_ingredients = RecipeIngredient::query_by_recipe(&mut tx, &recipe.uuid).await?;
+    let mut full_ingredients = Vec::new();
+    for recipe_ingredient in recipe_ingredients {
+        let Some(ingredient) = Ingredient::query_by_uuid(&mut tx, &recipe_ingredient.uuid).await?
         else {
-            return Err(ApiError::server_error("Ingredient not found from recipes"));
+            return Err(ApiError::bad_request("Ingredient not found"));
         };
-        recipe_ingredients.push(RecipeIngredients::new(mapping, ingredient.name));
+        full_ingredients.push(FullIngredient {
+            uuid: Some(recipe_ingredient.uuid.0),
+            name: ingredient.name,
+            amount: recipe_ingredient.amount,
+            unit: recipe_ingredient.unit,
+        })
     }
 
-    let steps: Vec<_> = rorm::query(&mut tx, RecipeStep)
-        .condition(RecipeStep.recipe.equals(recipe_uuid))
-        .stream()
-        .map(|result| result.map(Step::from))
-        .try_collect()
-        .await?;
+    let Some(account) = Account::query_by_uuid(&mut tx, &recipe.user).await? else {
+        return Err(ApiError::bad_request("Account not found"));
+    };
+
+    let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
+    let steps = RecipeStep::query_by_recipe(&mut tx, &recipe.uuid).await?;
+
+    tx.commit().await?;
 
     let full_recipe = FullRecipe {
-        uuid: recipe_uuid,
+        uuid: recipe.uuid.0,
         name: recipe.name,
         description: recipe.description,
-        user: user.map(SimpleAccount::from),
-        ingredients: recipe_ingredients,
-        steps,
-        tags,
+        user: SimpleAccount::from(account),
+        ingredients: full_ingredients,
+        tags: tags.into_iter().map(SimpleTag::from).collect(),
+        steps: steps.into_iter().map(Step::from).collect(),
     };
 
     Ok(ApiJson(full_recipe))
@@ -210,35 +140,42 @@ pub async fn get_recipe(
 /// * `ApiJson<CreateOrUpdateRecipe>` - The request body containing the recipe data.
 #[post("/")]
 pub async fn create_recipe(
+    user: Account,
     ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
 ) -> ApiResult<ApiJson<SingleUuid>> {
     let mut tx = Database::global().start_transaction().await?;
-    let recipe_uuid = Uuid::new_v4();
 
-    // check for existing recipes with this name
-    if rorm::query(&mut tx, Recipe)
-        .condition(Recipe.name.equals(request.name.deref()))
-        .optional()
+    if Recipe::query_by_name(&mut tx, request.name.deref())
         .await?
         .is_some()
     {
-        return Err(ApiError::bad_request("Recipe name is not unique"));
+        return Err(ApiError::bad_request("Recipe name already exists"));
     }
 
-    rorm::insert(&mut tx, Recipe)
-        .return_nothing()
-        .single(&RecipePatch {
-            uuid: recipe_uuid,
-            name: request.name,
-            description: request.description,
-            user: request.user.map(ForeignModelByField),
-            created_at: OffsetDateTime::now_utc(),
-        })
-        .await?;
+    let recipe = Recipe::create(&mut tx, request.name, request.description, user.uuid).await?;
 
-    RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    RecipeIngredientModel::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeStep::delete_by_recipe(&mut tx, &recipe.uuid).await?;
+    for step in request.steps {
+        RecipeStep::create(&mut tx, recipe.uuid, step.step, step.index).await?;
+    }
+
+    Tag::remove_from_recipe(&mut tx, recipe.uuid).await?;
+    for tag in request.tags {
+        Tag::add_to_recipe(&mut tx, &recipe.uuid, &TagUuid { 0: tag }).await?;
+    }
+
+    RecipeIngredient::delete_by_recipe(&mut tx, &recipe.uuid).await?;
+    for ingredient in request.ingredients {
+        let uuid = Ingredient::get_uuid_or_create(&mut tx, ingredient.name).await?;
+        RecipeIngredient::create(
+            &mut tx,
+            recipe.uuid,
+            uuid,
+            ingredient.amount,
+            ingredient.unit,
+        )
+        .await?;
+    }
 
     tx.commit().await?;
 
@@ -250,7 +187,9 @@ pub async fn create_recipe(
         .send_to_all(WsServerMsg::IngredientsChanged {})
         .await;
 
-    Ok(ApiJson(SingleUuid { uuid: recipe_uuid }))
+    Ok(ApiJson(SingleUuid {
+        uuid: recipe.uuid.0,
+    }))
 }
 
 /// Updates an existing recipe based on its UUID.
@@ -270,23 +209,34 @@ pub async fn update_recipe(
 ) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let recipe = rorm::query(&mut tx, Recipe)
-        .condition(Recipe.uuid.equals(recipe_uuid))
-        .optional()
+    let recipe = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid })
         .await?
-        .ok_or(ApiError::bad_request("Invalid recipes uuid"))?;
+        .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
 
-    RecipeTag::create_or_delete_mappings(&mut tx, recipe_uuid, &request.tags).await?;
-    RecipeStep::handle_mapping(&mut tx, recipe_uuid, request.steps).await?;
-    RecipeIngredientModel::handle_mapping(&mut tx, recipe_uuid, request.ingredients).await?;
+    RecipeStep::delete_by_recipe(&mut tx, &recipe.uuid).await?;
+    for step in request.steps {
+        RecipeStep::create(&mut tx, recipe.uuid, step.step, step.index).await?;
+    }
 
-    rorm::update(&mut tx, Recipe)
-        .begin_dyn_set()
-        .set_if(Recipe.name, Some(request.name))
-        .set_if(Recipe.description, Some(request.description))
-        .finish_dyn_set()?
-        .condition(recipe.as_condition())
+    Tag::remove_from_recipe(&mut tx, recipe.uuid).await?;
+    for tag in request.tags {
+        Tag::add_to_recipe(&mut tx, &recipe.uuid, &TagUuid { 0: tag }).await?;
+    }
+
+    RecipeIngredient::delete_by_recipe(&mut tx, &recipe.uuid).await?;
+    for ingredient in request.ingredients {
+        let uuid = Ingredient::get_uuid_or_create(&mut tx, ingredient.name).await?;
+        RecipeIngredient::create(
+            &mut tx,
+            recipe.uuid,
+            uuid,
+            ingredient.amount,
+            ingredient.unit,
+        )
         .await?;
+    }
+
+    Recipe::update(&mut tx, &recipe.uuid, request.name, request.description).await?;
 
     tx.commit().await?;
 
@@ -314,15 +264,11 @@ pub async fn delete_recipe(
 ) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let recipe = rorm::query(&mut tx, Recipe)
-        .condition(Recipe.uuid.equals(recipe_uuid))
-        .optional()
+    let recipe = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid })
         .await?
-        .ok_or(ApiError::bad_request("Invalid recipes uuid"))?;
+        .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
 
-    rorm::delete(&mut tx, Recipe)
-        .condition(recipe.as_condition())
-        .await?;
+    Recipe::delete(&mut tx, &recipe.uuid).await?;
 
     tx.commit().await?;
 

@@ -1,9 +1,5 @@
 use rorm::fields::types::MaxStr;
-use rorm::DbEnum;
 use rorm::Model;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
 use uuid::Uuid;
 
 /// Represents an ingredient with a unique identifier and name.

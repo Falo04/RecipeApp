@@ -1,15 +1,12 @@
 use futures_util::TryStreamExt;
 use rorm::db::Executor;
 use rorm::prelude::ForeignModelByField;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
 use tracing::instrument;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiResult;
-use crate::models::ingredients::db::Units;
 use crate::models::ingredients::IngredientUuid;
+use crate::models::ingredients::Units;
 use crate::models::recipe_ingredients::db::RecipeIngredientModel;
 use crate::models::recipes::RecipeUuid;
 
@@ -17,7 +14,7 @@ pub(in crate::models) mod db;
 
 #[derive(Debug, Clone)]
 pub struct RecipeIngredient {
-    pub uuid: RecipeIngredientUuid,
+    pub uuid: IngredientUuid,
 
     /// A foreign key referencing the `Recipe` model, indicating which recipe this ingredient belongs to.
     pub recipe: RecipeUuid,
@@ -32,14 +29,11 @@ pub struct RecipeIngredient {
     pub unit: Units,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
-pub struct RecipeIngredientUuid(pub Uuid);
-
 impl RecipeIngredient {
     #[instrument(name = "RecipeIngredient::query_by_recipe", skip(exe))]
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
-        recipe_uuid: RecipeUuid,
+        recipe_uuid: &RecipeUuid,
     ) -> ApiResult<Vec<Self>> {
         let result: Vec<_> = rorm::query(exe, RecipeIngredientModel)
             .condition(RecipeIngredientModel.recipe.equals(recipe_uuid.0))
@@ -74,10 +68,21 @@ impl RecipeIngredient {
     #[instrument(name = "RecipeIngredient::delete", skip(exe))]
     pub async fn delete(
         exe: impl Executor<'_>,
-        recipe_ingredient_uuid: RecipeIngredientUuid,
+        recipe_ingredient_uuid: IngredientUuid,
     ) -> ApiResult<()> {
         rorm::delete(exe, RecipeIngredientModel)
             .condition(RecipeIngredientModel.uuid.equals(recipe_ingredient_uuid.0))
+            .await?;
+        Ok(())
+    }
+
+    #[instrument(name = "RecipeIngredient::delete_by_recipe", skip(exe))]
+    pub async fn delete_by_recipe(
+        exe: impl Executor<'_>,
+        recipe_uuid: &RecipeUuid,
+    ) -> ApiResult<()> {
+        rorm::delete(exe, RecipeIngredientModel)
+            .condition(RecipeIngredientModel.recipe.equals(recipe_uuid.0))
             .await?;
         Ok(())
     }
@@ -86,7 +91,7 @@ impl RecipeIngredient {
 impl From<RecipeIngredientModel> for RecipeIngredient {
     fn from(model: RecipeIngredientModel) -> Self {
         Self {
-            uuid: RecipeIngredientUuid(model.uuid),
+            uuid: IngredientUuid(model.uuid),
             recipe: RecipeUuid(model.recipe.0),
             ingredients: IngredientUuid(model.ingredients.0),
             unit: model.unit,

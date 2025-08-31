@@ -1,13 +1,13 @@
 use super::schema::SimpleRecipe;
 use super::schema::Step;
+use crate::models::recipe_steps::RecipeStep;
 use crate::models::recipes::Recipe;
-use crate::models::recipes::RecipeStep;
 
 impl From<Recipe> for SimpleRecipe {
     /// Creates a new `SimpleRecipe` instance from a given `Recipe` instance.
     fn from(value: Recipe) -> Self {
         Self {
-            uuid: value.uuid,
+            uuid: value.uuid.0,
             name: value.name,
             description: value.description,
         }
@@ -18,7 +18,7 @@ impl From<RecipeStep> for Step {
     /// Creates a new `RecipeSteps` instance from a given `Steps` instance.
     fn from(value: RecipeStep) -> Self {
         Self {
-            uuid: Some(value.uuid),
+            uuid: Some(value.uuid.0),
             step: value.step,
             index: value.index,
         }

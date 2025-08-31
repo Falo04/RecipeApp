@@ -3,6 +3,7 @@ use rorm::Model;
 use uuid::Uuid;
 
 use crate::models::ingredients::db::IngredientModel;
+use crate::models::ingredients::Units;
 use crate::models::recipes::db::RecipeModel;
 
 /// Represents the ingredients for a recipe.
@@ -26,5 +27,5 @@ pub struct RecipeIngredientModel {
     pub amount: i32,
 
     /// The unit of measurement for the ingredient.
-    pub unit: crate::models::ingredients::db::Units,
+    pub unit: Units,
 }

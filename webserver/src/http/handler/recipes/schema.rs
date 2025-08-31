@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::http::common::schemas::GetPageRequest;
 use crate::http::handler::account::schema::SimpleAccount;
-use crate::http::handler::ingredients::schema::RecipeIngredients;
+use crate::http::handler::ingredients::schema::FullIngredient;
 use crate::http::handler::tags::schema::SimpleTag;
 
 /// Represents a simple recipe.
@@ -61,14 +61,14 @@ pub struct FullRecipe {
     pub description: MaxStr<255>,
 
     /// An optional reference to a simple user object associated with the recipe.
-    pub user: Option<SimpleAccount>,
+    pub user: SimpleAccount,
 
     /// A vector of `SimpleTag` objects representing the tags associated with the recipe.
     pub tags: Vec<SimpleTag>,
 
     /// A vector of `RecipeIngredients` objects representing
     /// the ingredients associated with the recipe.
-    pub ingredients: Vec<RecipeIngredients>,
+    pub ingredients: Vec<FullIngredient>,
 
     /// A vector of `Steps` objects representing the steps associated with the recipe.
     pub steps: Vec<Step>,
@@ -114,7 +114,7 @@ pub struct CreateOrUpdateRecipe {
     pub tags: Vec<Uuid>,
 
     /// Vector of all `RecipeIngredients`.
-    pub ingredients: Vec<RecipeIngredients>,
+    pub ingredients: Vec<FullIngredient>,
 
     /// Vector of all `Steps`.
     pub steps: Vec<Step>,

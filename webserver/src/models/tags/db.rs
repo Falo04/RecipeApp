@@ -1,13 +1,10 @@
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModel;
-use rorm::DbEnum;
 use rorm::Model;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
 use uuid::Uuid;
 
 use crate::models::recipes::db::RecipeModel;
+use crate::models::tags::TagColors;
 
 /// Represents a tag with a unique name and associated color.
 #[derive(Model)]
@@ -24,31 +21,6 @@ pub struct TagModel {
 
     /// An enum representing the color associated with the tag.
     pub color: TagColors,
-}
-
-/// Represents different tag colors, each associated with a numerical value.
-///
-/// This enum defines a set of colors that can be used to represent tags.
-#[derive(DbEnum, Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
-pub enum TagColors {
-    Red = 0,
-    Orange = 1,
-    Amber = 2,
-    Yellow = 3,
-    Lime = 4,
-    Green = 5,
-    Emerald = 6,
-    Teal = 7,
-    Cyan = 8,
-    Sky = 9,
-    Blue = 10,
-    Indigo = 11,
-    Violet = 12,
-    Purple = 13,
-    Fuchsia = 14,
-    Pink = 15,
-    Rose = 16,
-    Zinc = 17,
 }
 
 /// Represents a tag associated with a recipe.

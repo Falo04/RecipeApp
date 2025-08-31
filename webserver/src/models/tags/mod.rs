@@ -1,9 +1,14 @@
 //! Represents a tag with a name and color.
 
+use std::borrow::Cow;
+
 use futures_util::TryStreamExt;
+use rorm::and;
+use rorm::conditions;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModelByField;
+use rorm::DbEnum;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
@@ -14,7 +19,6 @@ use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::models::recipes::RecipeUuid;
 use crate::models::tags::db::RecipeTagModel;
-use crate::models::tags::db::TagColors;
 use crate::models::tags::db::TagModel;
 
 pub(in crate::models) mod db;
@@ -32,10 +36,16 @@ pub struct Tag {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
 pub struct TagUuid(pub Uuid);
 impl Tag {
+    #[instrument(name = "Tag::query_total", skip(exe))]
+    pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
+        let total = rorm::query(exe, TagModel.uuid.count()).one().await?;
+        Ok(total)
+    }
+
     #[instrument(name = "Tag::query_by_recipe", skip(exe))]
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
-        recipe_uuid: RecipeUuid,
+        recipe_uuid: &RecipeUuid,
     ) -> ApiResult<Vec<Self>> {
         let result: Vec<_> = rorm::query(exe, RecipeTagModel.tag.query_as(TagModel))
             .condition(RecipeTagModel.recipe.equals(recipe_uuid.0))
@@ -48,24 +58,49 @@ impl Tag {
 
     pub async fn query_all(
         exe: impl Executor<'_>,
-        page_request: GetPageRequest,
+        page_request: &GetPageRequest,
+        filter_name: Option<String>,
     ) -> ApiResult<Vec<Self>> {
+        let condition = and![filter_name.map(|name| conditions::Binary {
+            operator: conditions::BinaryOperator::Like,
+            fst_arg: conditions::Column(TagModel.name),
+            snd_arg: conditions::Value::String(Cow::Owned(format!(
+                "%{}%",
+                name.replace('_', "\\_")
+                    .replace('%', "\\%")
+                    .replace('\\', "\\\\")
+            )))
+        })];
+
         let result: Vec<_> = rorm::query(exe, TagModel)
+            .condition(condition)
             .limit(page_request.limit)
             .offset(page_request.offset)
             .stream()
             .map_ok(|tag| Tag::from(tag))
             .try_collect()
             .await?;
+
         Ok(result)
     }
 
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
-        tag_uuid: TagUuid,
+        tag_uuid: &TagUuid,
     ) -> ApiResult<Option<Self>> {
         match rorm::query(exe, TagModel)
             .condition(TagModel.uuid.equals(tag_uuid.0))
+            .optional()
+            .await?
+        {
+            Some(model) => Ok(Some(Tag::from(model))),
+            None => Ok(None),
+        }
+    }
+
+    pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> ApiResult<Option<Self>> {
+        match rorm::query(exe, TagModel)
+            .condition(TagModel.name.equals(name))
             .optional()
             .await?
         {
@@ -90,7 +125,21 @@ impl Tag {
         Ok(Tag::from(model))
     }
 
-    pub async fn delete(exe: impl Executor<'_>, tag_uuid: TagUuid) -> ApiResult<()> {
+    pub async fn update(
+        exe: impl Executor<'_>,
+        tag_uuid: &TagUuid,
+        name: MaxStr<255>,
+        color: TagColors,
+    ) -> ApiResult<()> {
+        rorm::update(exe, TagModel)
+            .set(TagModel.name, name)
+            .set(TagModel.color, color)
+            .condition(TagModel.uuid.equals(tag_uuid.0))
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete(exe: impl Executor<'_>, tag_uuid: &TagUuid) -> ApiResult<()> {
         rorm::delete(exe, TagModel)
             .condition(TagModel.uuid.equals(tag_uuid.0))
             .await?;
@@ -100,8 +149,8 @@ impl Tag {
     #[instrument(name = "Tag::add_to_recipe", skip(exe))]
     pub async fn add_to_recipe(
         exe: impl Executor<'_>,
-        recipe_uuid: RecipeUuid,
-        tag_uuid: TagUuid,
+        recipe_uuid: &RecipeUuid,
+        tag_uuid: &TagUuid,
     ) -> ApiResult<()> {
         rorm::insert(exe, RecipeTagModel)
             .return_nothing()
@@ -114,8 +163,8 @@ impl Tag {
         Ok(())
     }
 
-    #[instrument(name = "Tag::remove_all_tags_from_recipe", skip(exe))]
-    pub async fn remove_all_tags_from_recipe(
+    #[instrument(name = "Tag::remove_from_recipe", skip(exe))]
+    pub async fn remove_from_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: RecipeUuid,
     ) -> ApiResult<()> {
@@ -134,4 +183,29 @@ impl From<TagModel> for Tag {
             color: model.color,
         }
     }
+}
+
+/// Represents different tag colors, each associated with a numerical value.
+///
+/// This enum defines a set of colors that can be used to represent tags.
+#[derive(DbEnum, Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
+pub enum TagColors {
+    Red = 0,
+    Orange = 1,
+    Amber = 2,
+    Yellow = 3,
+    Lime = 4,
+    Green = 5,
+    Emerald = 6,
+    Teal = 7,
+    Cyan = 8,
+    Sky = 9,
+    Blue = 10,
+    Indigo = 11,
+    Violet = 12,
+    Purple = 13,
+    Fuchsia = 14,
+    Pink = 15,
+    Rose = 16,
+    Zinc = 17,
 }

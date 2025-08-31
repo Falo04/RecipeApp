@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use futures_util::TryStreamExt;
 use rorm::and;
 use rorm::conditions;
+use rorm::conditions::DynamicCollection;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModelByField;
@@ -17,8 +18,11 @@ use uuid::Uuid;
 use crate::http::common::errors::ApiResult;
 use crate::http::common::schemas::GetPageRequest;
 use crate::models::account::AccountUuid;
+use crate::models::recipe_ingredients::db::RecipeIngredientModel;
 use crate::models::recipes::db::RecipeModel;
 use crate::models::recipes::db::RecipeModelInsert;
+use crate::models::tags::db::RecipeTagModel;
+use crate::models::tags::TagUuid;
 
 pub(in crate::models) mod db;
 
@@ -38,17 +42,17 @@ pub struct Recipe {
     pub created_at: OffsetDateTime,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Copy, Hash, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
 pub struct RecipeUuid(pub Uuid);
 
 impl Recipe {
     pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
-        rorm::query(exe, RecipeModel.uuid.count()).one().await?
+        Ok(rorm::query(exe, RecipeModel.uuid.count()).one().await?)
     }
 
     pub async fn query_all(
         exe: impl Executor<'_>,
-        page: GetPageRequest,
+        page: &GetPageRequest,
         filter_name: Option<String>,
     ) -> ApiResult<Vec<Self>> {
         let condition = and![filter_name.map(|name| conditions::Binary {
@@ -77,10 +81,99 @@ impl Recipe {
 
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
-        uuid: RecipeUuid,
+        uuid: &RecipeUuid,
     ) -> ApiResult<Option<Self>> {
         match rorm::query(exe, RecipeModel)
             .condition(RecipeModel.uuid.equals(uuid.0))
+            .optional()
+            .await?
+        {
+            Some(model) => Ok(Some(Recipe::from(model))),
+            None => Ok(None),
+        }
+    }
+
+    pub async fn query_by_ingredient(
+        exe: impl Executor<'_>,
+        page: &GetPageRequest,
+        filter_name: Option<String>,
+        ingredient_uuids: &Vec<Uuid>,
+    ) -> ApiResult<Vec<Self>> {
+        let condition = DynamicCollection::or(
+            ingredient_uuids
+                .iter()
+                .map(|uuid| RecipeIngredientModel.ingredients.equals(uuid))
+                .collect(),
+        );
+
+        let condition = and![
+            Some(condition),
+            filter_name.map(|name| conditions::Binary {
+                operator: conditions::BinaryOperator::Like,
+                fst_arg: conditions::Column(RecipeIngredientModel.recipe.name),
+                snd_arg: conditions::Value::String(Cow::Owned(format!(
+                    "%{}%",
+                    name.replace('_', "\\_")
+                        .replace('%', "\\%")
+                        .replace('\\', "\\\\")
+                ))),
+            })
+        ];
+
+        let result: Vec<_> = rorm::query(
+            exe,
+            (
+                RecipeIngredientModel.ingredients,
+                RecipeIngredientModel.recipe.query_as(RecipeModel),
+            ),
+        )
+        .condition(&condition)
+        .limit(page.limit)
+        .offset(page.offset)
+        .stream()
+        .map_ok(|(_, recipe)| Recipe::from(recipe))
+        .try_collect()
+        .await?;
+
+        Ok(result)
+    }
+
+    pub async fn query_by_tag(
+        exe: impl Executor<'_>,
+        tag_uuid: &TagUuid,
+        page: &GetPageRequest,
+        filter_name: Option<String>,
+    ) -> ApiResult<Vec<Self>> {
+        let condition = and![
+            filter_name.map(|name| conditions::Binary {
+                operator: conditions::BinaryOperator::Like,
+                fst_arg: conditions::Column(RecipeTagModel.recipe.name),
+                snd_arg: conditions::Value::String(Cow::Owned(format!(
+                    "%{}%",
+                    name.replace('_', "\\_")
+                        .replace('%', "\\%")
+                        .replace('\\', "\\\\")
+                ))),
+            }),
+            Some(RecipeTagModel.tag.equals(tag_uuid.0)),
+        ];
+
+        let result: Vec<_> = rorm::query(exe, RecipeTagModel.recipe.query_as(RecipeModel))
+            .condition(&condition)
+            .order_asc(RecipeTagModel.recipe.name)
+            .limit(page.limit)
+            .offset(page.offset)
+            .stream()
+            .map_ok(Recipe::from)
+            .try_collect()
+            .await?;
+
+        Ok(result)
+    }
+
+    pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> ApiResult<Option<Self>> {
+        match rorm::query(exe, RecipeModel)
+            .condition(RecipeModel.name.equals(name))
             .optional()
             .await?
         {
@@ -109,7 +202,7 @@ impl Recipe {
 
     pub async fn update(
         exe: impl Executor<'_>,
-        recipe_uuid: RecipeUuid,
+        recipe_uuid: &RecipeUuid,
         name: MaxStr<255>,
         description: MaxStr<255>,
     ) -> ApiResult<()> {
@@ -121,7 +214,7 @@ impl Recipe {
         Ok(())
     }
 
-    pub async fn delete(exe: impl Executor<'_>, uuid: RecipeUuid) -> ApiResult<()> {
+    pub async fn delete(exe: impl Executor<'_>, uuid: &RecipeUuid) -> ApiResult<()> {
         rorm::delete(exe, RecipeModel)
             .condition(RecipeModel.uuid.equals(uuid.0))
             .await?;

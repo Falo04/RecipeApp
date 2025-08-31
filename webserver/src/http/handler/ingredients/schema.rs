@@ -1,12 +1,12 @@
 //! Represents all ingredients responses and requests.
 
-use galvyn::core::stuff::schema::GetPageRequest;
 use rorm::fields::types::MaxStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::http::common::schemas::GetPageRequest;
 use crate::http::common::schemas::List;
 use crate::models::ingredients::Units;
 
@@ -21,7 +21,7 @@ pub struct AllIngredientsRequest {
 ///
 /// This struct will be used for Response and Request.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct RecipeIngredients {
+pub struct FullIngredient {
     /// An optional UUID representing the ingredient mapping.
     ///
     /// In case of a request:

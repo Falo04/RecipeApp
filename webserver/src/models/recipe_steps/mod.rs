@@ -1,5 +1,4 @@
 use futures_util::TryStreamExt;
-use galvyn::core::stuff::api_error::ApiResult;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
 use rorm::prelude::ForeignModelByField;
@@ -9,6 +8,7 @@ use serde::Serialize;
 use tracing::instrument;
 use uuid::Uuid;
 
+use crate::http::common::errors::ApiResult;
 use crate::models::ingredients::IngredientUuid;
 use crate::models::recipe_steps::db::RecipeStepModel;
 use crate::models::recipes::RecipeUuid;
@@ -36,9 +36,9 @@ pub struct RecipeStepUuid(pub Uuid);
 
 impl RecipeStep {
     #[instrument(name = "RecipeStep::query_by_recipe", skip(exe))]
-    pub async fn query_all_for_recipe(
+    pub async fn query_by_recipe(
         exe: impl Executor<'_>,
-        recipe_uuid: RecipeUuid,
+        recipe_uuid: &RecipeUuid,
     ) -> ApiResult<Vec<Self>> {
         let result = rorm::query(exe, RecipeStepModel)
             .condition(RecipeStepModel.recipe.equals(recipe_uuid.0))
@@ -72,6 +72,17 @@ impl RecipeStep {
     pub async fn delete(exe: impl Executor<'_>, ingredient_uuid: IngredientUuid) -> ApiResult<()> {
         rorm::delete(exe, RecipeStepModel)
             .condition(RecipeStepModel.uuid.equals(ingredient_uuid.0))
+            .await?;
+        Ok(())
+    }
+
+    #[instrument(name = "RecipeStep::delete_by_recipe", skip(exe))]
+    pub async fn delete_by_recipe(
+        exe: impl Executor<'_>,
+        recipe_uuid: &RecipeUuid,
+    ) -> ApiResult<()> {
+        rorm::delete(exe, RecipeStepModel)
+            .condition(RecipeStepModel.recipe.equals(recipe_uuid.0))
             .await?;
         Ok(())
     }

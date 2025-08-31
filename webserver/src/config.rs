@@ -21,8 +21,6 @@ use openidconnect::ClientId;
 use openidconnect::ClientSecret;
 use openidconnect::IssuerUrl;
 use openidconnect::RedirectUrl;
-use rand::distr::Alphanumeric;
-use rand::distr::SampleString;
 use rorm::DatabaseDriver;
 
 use crate::config::env::EnvError;

@@ -1,12 +1,12 @@
 //! Represents all recipe responses and requests.
 
-use galvyn::core::stuff::schema::GetPageRequest;
 use rorm::fields::types::MaxStr;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::http::common::schemas::GetPageRequest;
 use crate::models::tags::TagColors;
 
 /// Represents a simple tag

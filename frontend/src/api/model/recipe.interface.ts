@@ -1,6 +1,6 @@
 import type { Ingredients } from "./ingredients.interface";
 import type { SimpleTag } from "./tag.interface";
-import type { SimpleUser } from "./user.interface";
+import type { SimpleAccount } from "@/api/model/account.interface.ts";
 
 export interface SimpleRecipe {
     uuid: string;
@@ -19,7 +19,7 @@ export interface FullRecipe {
     uuid: string;
     name: string;
     description: string;
-    user?: SimpleUser;
+    user?: SimpleAccount;
     tags: SimpleTag[];
     ingredients: Ingredients[];
     steps: Steps[];

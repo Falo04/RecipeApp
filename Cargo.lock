@@ -1024,7 +1024,7 @@ dependencies = [
 [[package]]
 name = "galvyn"
 version = "0.1.0"
-source = "git+https://github.com/myOmikron/galvyn#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
 dependencies = [
  "axum 0.8.1",
  "futures-lite",
@@ -1045,7 +1045,7 @@ dependencies = [
 [[package]]
 name = "galvyn-core"
 version = "0.1.0"
-source = "git+https://github.com/myOmikron/galvyn#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1074,7 +1074,7 @@ dependencies = [
 [[package]]
 name = "galvyn-macros"
 version = "0.2.0"
-source = "git+https://github.com/myOmikron/galvyn#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
 dependencies = [
  "proc-macro2",
  "quote",

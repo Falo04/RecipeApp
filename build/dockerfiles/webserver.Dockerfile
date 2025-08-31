@@ -43,7 +43,7 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
-    appuser \
+    appuser
 
 # Allow appuser to execute update-ca-certificates
 COPY ./build/webserver/sudoers-appuser /etc/sudoers.d/appuser

@@ -65,13 +65,13 @@ impl Account {
     #[instrument(name = "Account::query_after_oidc", skip(exe))]
     pub async fn query_after_oidc(
         exe: impl Executor<'_>,
-        issuer: &MaxStr<255>,
-        subject: &MaxStr<255>,
+        issuer: &str,
+        subject: &str,
     ) -> ApiResult<Option<Account>> {
         match rorm::query(exe, AccountOidcModel.account.query_as(AccountModel))
             .condition(and![
-                AccountOidcModel.issuer.equals(&*issuer),
-                AccountOidcModel.subject.equals(&*subject),
+                AccountOidcModel.issuer.equals(issuer),
+                AccountOidcModel.subject.equals(subject),
             ])
             .optional()
             .await?
@@ -83,7 +83,7 @@ impl Account {
     #[instrument(name = "Account::query_by_uuid", skip(exe))]
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
-        account_uuid: AccountUuid,
+        account_uuid: &AccountUuid,
     ) -> ApiResult<Option<Account>> {
         match rorm::query(exe, AccountModel)
             .condition(AccountModel.uuid.equals(account_uuid.0))
@@ -126,21 +126,21 @@ impl Account {
                 subject,
                 issuer,
             })
-            .await?
+            .await?;
+        Ok(())
     }
 
     #[instrument(name = "Account::update", skip(exe))]
     pub async fn update(
         exe: impl Executor<'_>,
-        account_uuid: AccountUuid,
+        account_uuid: &AccountUuid,
         display_name: MaxStr<255>,
-    ) -> ApiResult<Account> {
+    ) -> ApiResult<()> {
         rorm::update(exe, AccountModel)
             .set(AccountModel.display_name, display_name)
             .condition(AccountModel.uuid.equals(account_uuid.0))
             .await?;
-        let account_model = Self::query_by_uuid(exe, account_uuid).await?;
-        Ok(Account::from(account_model))
+        Ok(())
     }
 
     #[instrument(name = "Account::delete", skip(exe))]
@@ -196,7 +196,7 @@ where
             ))?;
 
         let Some(account) =
-            Account::query_by_uuid(Database::global(), AccountUuid(account_uuid)).await?
+            Account::query_by_uuid(Database::global(), &AccountUuid(account_uuid)).await?
         else {
             session.remove_value(SESSION_KEY).await?;
             session.save().await?;

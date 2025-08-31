@@ -27,6 +27,7 @@ pub struct Ingredient {
 pub struct IngredientUuid(pub Uuid);
 
 impl Ingredient {
+    #[instrument(name = "Ingredient::query_all", skip(exe))]
     pub async fn query_all(exe: impl Executor<'_>) -> ApiResult<Vec<Self>> {
         let items: Vec<_> = rorm::query(exe, IngredientModel)
             .order_asc(IngredientModel.name)
@@ -36,6 +37,21 @@ impl Ingredient {
             .await?;
 
         Ok(items)
+    }
+
+    #[instrument(name = "Ingredient::query_by_uuid", skip(exe))]
+    pub async fn query_by_uuid(
+        exe: impl Executor<'_>,
+        uuid: &IngredientUuid,
+    ) -> ApiResult<Option<Self>> {
+        match rorm::query(exe, IngredientModel)
+            .condition(IngredientModel.uuid.equals(uuid.0))
+            .optional()
+            .await?
+        {
+            Some(ingredient) => Ok(Some(Ingredient::from(ingredient))),
+            None => Ok(None),
+        }
     }
 
     /// Inserts a new ingredient into the database if one doesn't already exist.
@@ -49,20 +65,28 @@ impl Ingredient {
     /// * `transaction`: A mutable reference to the database transaction.
     /// * `name`: The name of the ingredient to search for.
     #[instrument(name = "Ingredient::get_uuid_or_create", skip(exe))]
-    pub async fn get_uuid_or_create(exe: impl Executor<'_>, name: MaxStr<255>) -> ApiResult<Uuid> {
-        let Some(ingredient) = rorm::query(exe, IngredientModel)
+    pub async fn get_uuid_or_create(
+        exe: impl Executor<'_>,
+        name: MaxStr<255>,
+    ) -> ApiResult<IngredientUuid> {
+        let mut guard = exe.ensure_transaction().await?;
+        let ingredient = match rorm::query(guard.get_transaction(), IngredientModel)
             .condition(IngredientModel.name.equals(&*name))
             .optional()
             .await?
-        else {
-            rorm::insert(exe, IngredientModel)
-                .single(&IngredientModel {
-                    uuid: Uuid::new_v4(),
-                    name,
-                })
-                .await?
+        {
+            Some(ingredient) => ingredient,
+            None => {
+                rorm::insert(guard.get_transaction(), IngredientModel)
+                    .single(&IngredientModel {
+                        uuid: Uuid::new_v4(),
+                        name,
+                    })
+                    .await?
+            }
         };
-        Ok(ingredient.uuid)
+
+        Ok(IngredientUuid(ingredient.uuid))
     }
 }
 
@@ -86,4 +110,13 @@ pub enum Units {
     ///
     /// e.g., 1 egg
     None = 7,
+}
+
+impl From<IngredientModel> for Ingredient {
+    fn from(model: IngredientModel) -> Self {
+        Self {
+            name: model.name,
+            uuid: model.uuid,
+        }
+    }
 }

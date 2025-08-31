@@ -1,18 +1,12 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
+use std::ops::Deref;
 
 use axum::extract::Path;
-use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::delete;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
-use rorm::and;
-use rorm::conditions;
-use rorm::conditions::DynamicCollection;
-use uuid::Uuid;
 
 use crate::http::common::errors::ApiError;
 use crate::http::common::errors::ApiResult;
@@ -25,8 +19,8 @@ use crate::http::handler::tags::schema::GetAllTagsRequest;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::recipes::Recipe;
-use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
+use crate::models::tags::TagUuid;
 use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all tags with pagination support.
@@ -44,33 +38,11 @@ pub async fn get_all_tags(
 ) -> ApiResult<ApiJson<Page<SimpleTag>>> {
     let GetAllTagsRequest { page, filter_name } = pagination;
 
-    let condition = and![filter_name.map(|name| conditions::Binary {
-        operator: conditions::BinaryOperator::Like,
-        fst_arg: conditions::Column(Tag.name),
-        snd_arg: conditions::Value::String(Cow::Owned(format!(
-            "%{}%",
-            name.replace('_', "\\_")
-                .replace('%', "\\%")
-                .replace('\\', "\\\\")
-        )))
-    })];
-
-    let items: Vec<_> = rorm::query(Database::global(), Tag)
-        .condition(condition)
-        .order_asc(Tag.name)
-        .limit(page.limit)
-        .offset(page.offset)
-        .stream()
-        .map_ok(SimpleTag::from)
-        .try_collect()
-        .await?;
-
-    let total = rorm::query(Database::global(), Tag.uuid.count())
-        .one()
-        .await?;
+    let result = Tag::query_all(Database::global(), &page, filter_name).await?;
+    let total = Tag::query_total(Database::global()).await?;
 
     Ok(ApiJson(Page {
-        items,
+        items: result.into_iter().map(SimpleTag::from).collect(),
         limit: page.limit,
         offset: page.offset,
         total,
@@ -93,70 +65,29 @@ pub async fn get_recipes_by_tag(
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let GetAllRecipesRequest { page, filter_name } = pagination;
 
-    let condition = and![
-        filter_name.map(|name| conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(RecipeTag.recipe.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!(
-                "%{}%",
-                name.replace('_', "\\_")
-                    .replace('%', "\\%")
-                    .replace('\\', "\\\\")
-            ))),
-        }),
-        Some(RecipeTag.tag.equals(tag_uuid)),
-    ];
+    let mut tx = Database::global().start_transaction().await?;
 
-    let total = rorm::query(Database::global(), RecipeTag.uuid.count())
-        .condition(&condition)
-        .one()
-        .await?;
+    let recipes =
+        Recipe::query_by_tag(&mut tx, &TagUuid { 0: tag_uuid }, &page, filter_name).await?;
 
-    let items: Vec<_> = rorm::query(Database::global(), RecipeTag.recipe.query_as(Recipe))
-        .condition(&condition)
-        .order_asc(RecipeTag.recipe.name)
-        .limit(page.limit)
-        .offset(page.offset)
-        .stream()
-        .try_collect()
-        .await?;
+    let mut result = Vec::new();
+    for recipe in recipes {
+        let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
-    let mut map: HashMap<Uuid, Vec<SimpleTag>> =
-        HashMap::from_iter(items.iter().map(|rec| (rec.uuid, Vec::new())));
-
-    if !items.is_empty() {
-        let tags: Vec<_> = rorm::query(
-            Database::global(),
-            (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)),
-        )
-        .condition(DynamicCollection::or(
-            items
-                .iter()
-                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
-                .collect(),
-        ))
-        .stream()
-        .map_ok(|(recipe, tag)| (recipe.0, SimpleTag::from(tag)))
-        .try_collect()
-        .await?;
-
-        for (recipe_uuid, tag) in tags {
-            map.entry(recipe_uuid).or_default().push(tag);
-        }
-    }
-
-    let items = items
-        .into_iter()
-        .map(|recipe| SimpleRecipeWithTags {
-            uuid: recipe.uuid,
+        result.push(SimpleRecipeWithTags {
+            uuid: recipe.uuid.0,
             name: recipe.name,
             description: recipe.description,
-            tags: map.remove(&recipe.uuid).unwrap_or_default(),
+            tags: tags.into_iter().map(SimpleTag::from).collect(),
         })
-        .collect();
+    }
+
+    let total = Recipe::query_total(&mut tx).await?;
+
+    tx.commit().await?;
 
     Ok(ApiJson(Page {
-        items,
+        items: result,
         limit: page.limit,
         offset: page.offset,
         total,
@@ -177,23 +108,14 @@ pub async fn create_tag(
 ) -> ApiResult<ApiJson<SingleUuid>> {
     let mut tx = Database::global().start_transaction().await?;
 
-    if rorm::query(&mut tx, Tag)
-        .condition(Tag.name.equals(&*request.name))
-        .optional()
+    if Tag::query_by_name(&mut tx, request.name.deref())
         .await?
         .is_some()
     {
         return Err(ApiError::bad_request("Tag already exists"));
     }
 
-    let uuid = rorm::insert(&mut tx, Tag)
-        .return_primary_key()
-        .single(&Tag {
-            uuid: Uuid::new_v4(),
-            name: request.name,
-            color: request.color,
-        })
-        .await?;
+    let tag = Tag::create(&mut tx, request.name, request.color).await?;
 
     tx.commit().await?;
 
@@ -201,7 +123,7 @@ pub async fn create_tag(
         .send_to_all(WsServerMsg::TagsChanged {})
         .await;
 
-    Ok(ApiJson(SingleUuid { uuid }))
+    Ok(ApiJson(SingleUuid { uuid: tag.uuid.0 }))
 }
 
 #[put("/{uuid}")]
@@ -211,23 +133,26 @@ pub async fn update_tag(
 ) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    if rorm::query(&mut tx, Tag)
-        .condition(and![
-            Tag.name.equals(&*request.name),
-            Tag.uuid.not_equals(tag_uuid)
-        ])
-        .optional()
+    if Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid })
         .await?
         .is_some()
     {
-        return Err(ApiError::bad_request("Name already exists"));
+        return Err(ApiError::bad_request("Invalid tag uuid"));
     }
 
-    rorm::update(&mut tx, Tag)
-        .set(Tag.name, request.name)
-        .set(Tag.color, request.color)
-        .condition(Tag.uuid.equals(tag_uuid))
-        .await?;
+    if let Some(tag) = Tag::query_by_name(&mut tx, request.name.deref()).await? {
+        if tag.uuid.0 == tag_uuid {
+            return Err(ApiError::bad_request("Tag name already exists"));
+        }
+    }
+
+    Tag::update(
+        &mut tx,
+        &TagUuid { 0: tag_uuid },
+        request.name,
+        request.color,
+    )
+    .await?;
 
     tx.commit().await?;
 
@@ -249,15 +174,14 @@ pub async fn update_tag(
 pub async fn delete_tag(Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let tag = rorm::query(&mut tx, Tag)
-        .condition(Tag.uuid.equals(tag_uuid))
-        .optional()
+    if Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid })
         .await?
-        .ok_or(ApiError::bad_request("tag id invalid"))?;
+        .is_none()
+    {
+        return Err(ApiError::bad_request("Invalid tag uuid"));
+    }
 
-    rorm::delete(&mut tx, Tag)
-        .condition(Tag.uuid.equals(tag.uuid))
-        .await?;
+    Tag::delete(&mut tx, &TagUuid { 0: tag_uuid }).await?;
 
     WebsocketManager::global()
         .send_to_all(WsServerMsg::TagsChanged {})

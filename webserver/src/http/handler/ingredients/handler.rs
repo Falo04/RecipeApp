@@ -1,17 +1,10 @@
-use std::borrow::Cow;
-use std::collections::HashMap;
 use std::collections::HashSet;
 
-use futures_util::TryStreamExt;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::get;
 use galvyn::post;
-use rorm::and;
-use rorm::conditions;
-use rorm::conditions::DynamicCollection;
 use rorm::Database;
-use uuid::Uuid;
 
 use super::schema::GetAllRecipesByIngredientsRequest;
 use super::schema::SimpleIngredient;
@@ -21,9 +14,8 @@ use crate::http::common::schemas::Page;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::ingredients::Ingredient;
-use crate::models::ingredients::RecipeIngredientModel;
+use crate::models::recipe_ingredients::RecipeIngredient;
 use crate::models::recipes::Recipe;
-use crate::models::tags::RecipeTag;
 use crate::models::tags::Tag;
 
 /// Retrieves recipes based on specified ingredients.
@@ -41,109 +33,44 @@ pub async fn get_recipes_by_ingredients(
         filter_uuids,
     } = request;
 
-    let condition = DynamicCollection::or(
-        filter_uuids
-            .list
-            .iter()
-            .map(|uuid| RecipeIngredientModel.ingredients.equals(uuid))
-            .collect(),
-    );
+    let mut tx = Database::global().start_transaction().await?;
 
-    let condition = and![
-        Some(condition),
-        filter_name.map(|name| conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(RecipeIngredientModel.recipe.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!(
-                "%{}%",
-                name.replace('_', "\\_")
-                    .replace('%', "\\%")
-                    .replace('\\', "\\\\")
-            ))),
-        })
-    ];
+    let mut recipes =
+        Recipe::query_by_ingredient(&mut tx, &page, filter_name, &filter_uuids.list).await?;
 
-    let mut recipes_all: Vec<_> = rorm::query(
-        Database::global(),
-        (
-            RecipeIngredientModel.ingredients,
-            RecipeIngredientModel.recipe.query_as(Recipe),
-        ),
-    )
-    .condition(&condition)
-    .limit(page.limit)
-    .offset(page.offset)
-    .stream()
-    .map_ok(|(_, recipe)| recipe)
-    .try_collect()
-    .await?;
-
-    let mut seen = HashSet::new();
-    recipes_all.retain(|recipe| {
-        let is_first = !seen.contains(&recipe.uuid);
-        seen.insert(recipe.uuid);
+    let mut recipe_uuids = HashSet::new();
+    recipes.retain(|recipe| {
+        let is_first = !recipe_uuids.contains(&recipe.uuid);
+        recipe_uuids.insert(recipe.uuid);
         is_first
     });
 
-    let ingredients_mapping: Vec<_> = rorm::query(Database::global(), RecipeIngredientModel)
-        .condition(&condition)
-        .all()
-        .await?;
+    let mut result = Vec::new();
 
-    let mut recipes = Vec::new();
-    for recipe in recipes_all {
-        let ingredients_uuids: Vec<_> = ingredients_mapping
-            .iter()
-            .filter(|ingredient| ingredient.recipe.0 == recipe.uuid)
-            .map(|ingredient| ingredient.ingredients.0)
-            .collect();
+    for recipe in recipes {
+        let ingredients = RecipeIngredient::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
-        if ingredients_uuids
+        if ingredients
             .iter()
-            .all(|uuid| filter_uuids.list.contains(uuid))
+            .all(|ingredient| !filter_uuids.list.contains(&ingredient.uuid.0))
         {
-            recipes.push(recipe);
+            continue;
         }
-    }
 
-    let mut map: HashMap<Uuid, Vec<SimpleTag>> =
-        HashMap::from_iter(recipes.iter().map(|rec| (rec.uuid, Vec::new())));
+        let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
-    if !recipes.is_empty() {
-        let tags: Vec<_> = rorm::query(
-            Database::global(),
-            (RecipeTag.recipe, RecipeTag.tag.query_as(Tag)),
-        )
-        .condition(DynamicCollection::or(
-            recipes
-                .iter()
-                .map(|recipe| RecipeTag.recipe.equals(recipe.uuid))
-                .collect(),
-        ))
-        .stream()
-        .map_ok(|(recipe, tag)| (recipe.0, SimpleTag::from(tag)))
-        .try_collect()
-        .await?;
-
-        for (recipe_uuid, tag) in tags {
-            map.entry(recipe_uuid).or_default().push(tag);
-        }
-    }
-
-    let items: Vec<_> = recipes
-        .into_iter()
-        .map(|recipe| SimpleRecipeWithTags {
-            uuid: recipe.uuid,
+        result.push(SimpleRecipeWithTags {
+            uuid: recipe.uuid.0,
+            tags: tags.into_iter().map(SimpleTag::from).collect(),
             name: recipe.name,
             description: recipe.description,
-            tags: map.remove(&recipe.uuid).unwrap_or_default(),
         })
-        .collect();
+    }
 
-    let total = items.len().try_into().unwrap_or_default();
+    let total = result.len().try_into().unwrap_or_default();
 
     Ok(ApiJson(Page {
-        items,
+        items: result,
         limit: page.limit,
         offset: page.offset,
         total,
@@ -160,13 +87,8 @@ pub async fn get_recipes_by_ingredients(
 /// * `IngredientSearchRequest` - object containing the search term
 #[get("/all")]
 pub async fn get_all_ingredients() -> ApiResult<ApiJson<List<SimpleIngredient>>> {
-    let items: Vec<_> = rorm::query(Database::global(), Ingredient)
-        .order_asc(Ingredient.name)
-        .all()
-        .await?
-        .into_iter()
-        .map(SimpleIngredient::from)
-        .collect();
+    let items = Ingredient::query_all(Database::global()).await?;
+    let items: Vec<_> = items.into_iter().map(SimpleIngredient::from).collect();
 
     Ok(ApiJson(List { list: items }))
 }

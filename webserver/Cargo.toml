@@ -13,7 +13,7 @@ dotenv = "0.15.0"
 
 # Webframework
 axum = { version = "~0.8.0", features = ["ws"] }
-galvyn = { version = "~0.1", git = "https://github.com/myOmikron/galvyn" }
+galvyn = { git = "https://github.com/myOmikron/galvyn.git" }
 tower = { version = "~0.5", features = ["full"] } # Base traits
 tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
 tower-sessions = { version = "~0.14.0" } # Cookie based sessions
