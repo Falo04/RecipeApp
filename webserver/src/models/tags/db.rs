@@ -13,9 +13,7 @@ pub struct TagModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
-    /// The name of the tag, enforced to be unique across all tags.
-    ///
-    /// It has a maximum length of 255 characters.
+    /// The name of the tag.
     #[rorm(unique)]
     pub name: MaxStr<255>,
 
@@ -32,14 +30,10 @@ pub struct RecipeTagModel {
     pub uuid: Uuid,
 
     /// A foreign key referencing a `Recipe` object.
-    ///
-    /// Deleting this tag will also delete the associated recipe.
     #[rorm(on_delete = "Cascade")]
     pub recipe: ForeignModel<RecipeModel>,
 
     /// A foreign key referencing a `Tag` object.
-    ///
-    /// Deleting this tag will also delete the associated tag.
     #[rorm(on_delete = "Cascade")]
     pub tag: ForeignModel<TagModel>,
 }

@@ -1,4 +1,4 @@
-//! Represents a tag with a name and color.
+//! Tags domain model and helpers.
 
 use std::borrow::Cow;
 
@@ -23,6 +23,7 @@ use crate::models::tags::db::TagModel;
 
 pub(in crate::models) mod db;
 
+/// Domain representation of a tag used to label recipes.
 #[derive(Debug, Clone)]
 pub struct Tag {
     pub uuid: TagUuid,
@@ -33,15 +34,18 @@ pub struct Tag {
     pub color: TagColors,
 }
 
+/// New type wrapper around Uuid to provide type safety for tag identifiers.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
 pub struct TagUuid(pub Uuid);
 impl Tag {
+    /// Count all tags in the database.
     #[instrument(name = "Tag::query_total", skip(exe))]
     pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
         let total = rorm::query(exe, TagModel.uuid.count()).one().await?;
         Ok(total)
     }
 
+    /// List all tags associated with a given recipe.
     #[instrument(name = "Tag::query_by_recipe", skip(exe))]
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
@@ -56,6 +60,7 @@ impl Tag {
         Ok(result)
     }
 
+    /// List tags with optional name filter and pagination support.
     pub async fn query_all(
         exe: impl Executor<'_>,
         page_request: &GetPageRequest,
@@ -84,6 +89,7 @@ impl Tag {
         Ok(result)
     }
 
+    /// Fetch a tag by its UUID if it exists.
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
         tag_uuid: &TagUuid,
@@ -98,6 +104,7 @@ impl Tag {
         }
     }
 
+    /// Find a tag by its unique name.
     pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> ApiResult<Option<Self>> {
         match rorm::query(exe, TagModel)
             .condition(TagModel.name.equals(name))
@@ -109,6 +116,7 @@ impl Tag {
         }
     }
 
+    /// Create a new tag.
     #[instrument(name = "Tag::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
@@ -125,6 +133,7 @@ impl Tag {
         Ok(Tag::from(model))
     }
 
+    /// Update an existing tag's name and color.
     pub async fn update(
         exe: impl Executor<'_>,
         tag_uuid: &TagUuid,
@@ -139,6 +148,7 @@ impl Tag {
         Ok(())
     }
 
+    /// Delete a tag by its UUID.
     pub async fn delete(exe: impl Executor<'_>, tag_uuid: &TagUuid) -> ApiResult<()> {
         rorm::delete(exe, TagModel)
             .condition(TagModel.uuid.equals(tag_uuid.0))
@@ -146,6 +156,7 @@ impl Tag {
         Ok(())
     }
 
+    /// Attach a tag to a recipe.
     #[instrument(name = "Tag::add_to_recipe", skip(exe))]
     pub async fn add_to_recipe(
         exe: impl Executor<'_>,
@@ -163,6 +174,7 @@ impl Tag {
         Ok(())
     }
 
+    /// Remove all tag associations for a recipe.
     #[instrument(name = "Tag::remove_from_recipe", skip(exe))]
     pub async fn remove_from_recipe(
         exe: impl Executor<'_>,

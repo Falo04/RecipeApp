@@ -11,7 +11,7 @@ pub struct IngredientModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
-    /// The name of the ingredient, with a maximum length of 255 characters.
+    /// The name of the ingredient.
     #[rorm(unique)]
     pub name: MaxStr<255>,
 }

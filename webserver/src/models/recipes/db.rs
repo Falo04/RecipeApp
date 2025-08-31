@@ -21,14 +21,14 @@ pub struct RecipeModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
-    /// The name of the recipe, with a maximum length of 255 characters.  Must be unique.
+    /// The name of the recipe.
     #[rorm(unique)]
     pub name: MaxStr<255>,
 
-    /// A longer description of the recipe, with a maximum length of 255 characters.
+    /// A longer description of the recipe.
     pub description: MaxStr<255>,
 
-    /// An optional foreign key referencing a `User` model.
+    /// A foreign key referencing a `User` model.
     pub user: ForeignModel<AccountModel>,
 
     /// A back-reference to the `RecipeTag` model

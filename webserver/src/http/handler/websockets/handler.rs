@@ -27,6 +27,7 @@ use crate::http::common::errors::ApiResult;
 use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::modules::websockets::WebsocketManager;
 
+/// Open a websocket to the frontend.
 #[get("/")]
 pub async fn open_websocket(ws: WebSocketUpgrade, session: Session) -> ApiResult<WsResponse> {
     let id = session

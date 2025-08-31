@@ -163,9 +163,6 @@ mod env {
         /// as a string, creating a new `OnceLock` for its value, and setting the
         /// default value to `None`.
         ///
-        /// # Arguments
-        ///
-        /// * `name`: A static string slice representing the name of the required value.
         pub const fn required(name: &'static str) -> Self {
             Self {
                 name,
@@ -179,10 +176,6 @@ mod env {
         /// This function initializes a new `Optional` instance with a given name and a default value function.
         /// The default value function is used if the `Optional`'s internal value is not explicitly set.
         ///
-        /// # Arguments
-        ///
-        /// * `name`: A static string slice representing the name of the optional value.
-        /// * `default`: A function that returns the default value.  This function is called if the value is not explicitly set.
         pub const fn optional(name: &'static str, default: fn() -> T) -> Self {
             Self {
                 name,

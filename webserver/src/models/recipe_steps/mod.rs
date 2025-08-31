@@ -1,3 +1,4 @@
+//! Domain model and data access helpers for recipe steps.
 use futures_util::TryStreamExt;
 use rorm::db::Executor;
 use rorm::fields::types::MaxStr;
@@ -15,26 +16,28 @@ use crate::models::recipes::RecipeUuid;
 
 pub(in crate::models) mod db;
 
+/// A single instruction step within a recipe.
+///
+/// Steps are ordered and carry a concise textual description to guide the
+/// preparation process.
 #[derive(Debug, Clone)]
 pub struct RecipeStep {
+    /// Stable identifier for this recipe step.
     pub uuid: RecipeStepUuid,
 
-    /// A foreign key referencing the `Recipe` model
-    pub recipe: RecipeUuid,
-
-    /// The text of the step.
-    ///
-    /// It's a string with a maximum length of 256 characters.
+    /// The textual content of the step.
     pub step: MaxStr<255>,
 
-    /// The order of the step within the recipe.
+    /// The position of the step within the recipe flow.
     pub index: i16,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
+/// Strongly typed UUID wrapper for recipe steps to prevent cross-domain ID mix-ups.
 pub struct RecipeStepUuid(pub Uuid);
 
 impl RecipeStep {
+    /// Lists all steps belonging to a recipe.
     #[instrument(name = "RecipeStep::query_by_recipe", skip(exe))]
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
@@ -42,6 +45,7 @@ impl RecipeStep {
     ) -> ApiResult<Vec<Self>> {
         let result = rorm::query(exe, RecipeStepModel)
             .condition(RecipeStepModel.recipe.equals(recipe_uuid.0))
+            .order_asc(RecipeStepModel.index)
             .stream()
             .map_ok(|model| RecipeStep::from(model))
             .try_collect()
@@ -49,6 +53,7 @@ impl RecipeStep {
         Ok(result)
     }
 
+    /// Creates a new step for a recipe.
     #[instrument(name = "RecipeStep::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
@@ -68,6 +73,7 @@ impl RecipeStep {
         Ok(RecipeStep::from(model))
     }
 
+    /// Deletes a single step by its identifier.
     #[instrument(name = "RecipeStep::delete", skip(exe))]
     pub async fn delete(exe: impl Executor<'_>, ingredient_uuid: IngredientUuid) -> ApiResult<()> {
         rorm::delete(exe, RecipeStepModel)
@@ -76,6 +82,7 @@ impl RecipeStep {
         Ok(())
     }
 
+    /// Deletes all steps associated with a recipe.
     #[instrument(name = "RecipeStep::delete_by_recipe", skip(exe))]
     pub async fn delete_by_recipe(
         exe: impl Executor<'_>,
@@ -92,7 +99,6 @@ impl From<RecipeStepModel> for RecipeStep {
     fn from(model: RecipeStepModel) -> Self {
         Self {
             uuid: RecipeStepUuid(model.uuid),
-            recipe: RecipeUuid(model.recipe.0),
             index: model.index,
             step: model.step,
         }

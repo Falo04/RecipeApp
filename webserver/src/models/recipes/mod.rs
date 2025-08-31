@@ -1,4 +1,4 @@
-//! Represents a recipe.
+//! Recipes domain model and database access layer.
 
 use std::borrow::Cow;
 
@@ -13,6 +13,7 @@ use schemars::JsonSchema;
 use serde::Deserialize;
 use serde::Serialize;
 use time::OffsetDateTime;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::http::common::errors::ApiResult;
@@ -26,14 +27,18 @@ use crate::models::tags::TagUuid;
 
 pub(in crate::models) mod db;
 
+/// Domain representation of a recipe.
+///
+/// This struct mirrors the database model (RecipeModel) but is decoupled from
+/// the ORM's generated types.
 #[derive(Debug, Clone)]
 pub struct Recipe {
     pub uuid: RecipeUuid,
 
-    /// The name of the recipe, with a maximum length of 255 characters.  Must be unique.
+    /// The name of the recipe. Must be unique.
     pub name: MaxStr<255>,
 
-    /// A longer description of the recipe, with a maximum length of 255 characters.
+    /// A longer description of the recipe.
     pub description: MaxStr<255>,
 
     /// An optional foreign key referencing a `User` model.
@@ -42,14 +47,19 @@ pub struct Recipe {
     pub created_at: OffsetDateTime,
 }
 
+/// Type‑safe new type around Uuid for recipe identifiers.
 #[derive(Debug, Clone, Copy, Hash, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
 pub struct RecipeUuid(pub Uuid);
 
 impl Recipe {
+    /// Return the total number of recipes in the database.
+    #[instrument(name = "Recipe::query_total", skip(exe))]
     pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
         Ok(rorm::query(exe, RecipeModel.uuid.count()).one().await?)
     }
 
+    /// List recipes with optional name filter and pagination.
+    #[instrument(name = "Recipe::query_all", skip(exe))]
     pub async fn query_all(
         exe: impl Executor<'_>,
         page: &GetPageRequest,
@@ -79,6 +89,8 @@ impl Recipe {
         Ok(result)
     }
 
+    /// Fetch a single recipe by its UUID.
+    #[instrument(name = "Recipe::query_uuid", skip(exe))]
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
         uuid: &RecipeUuid,
@@ -93,6 +105,8 @@ impl Recipe {
         }
     }
 
+    /// List recipes that use any of the given ingredients.
+    #[instrument(name = "Recipe::query_by_ingredient", skip(exe))]
     pub async fn query_by_ingredient(
         exe: impl Executor<'_>,
         page: &GetPageRequest,
@@ -138,6 +152,8 @@ impl Recipe {
         Ok(result)
     }
 
+    /// List recipes associated with a specific tag.
+    #[instrument(name = "Recipe::query_by_tag", skip(exe))]
     pub async fn query_by_tag(
         exe: impl Executor<'_>,
         tag_uuid: &TagUuid,
@@ -171,6 +187,8 @@ impl Recipe {
         Ok(result)
     }
 
+    /// Fetch a recipe by its unique name.
+    #[instrument(name = "Recipe::query_by_name", skip(exe))]
     pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> ApiResult<Option<Self>> {
         match rorm::query(exe, RecipeModel)
             .condition(RecipeModel.name.equals(name))
@@ -182,6 +200,8 @@ impl Recipe {
         }
     }
 
+    /// Create and return a new recipe.
+    #[instrument(name = "Recipe::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
         name: MaxStr<255>,
@@ -200,6 +220,8 @@ impl Recipe {
         Ok(Recipe::from(model))
     }
 
+    /// Update a recipe's name and description.
+    #[instrument(name = "Recipe::update", skip(exe))]
     pub async fn update(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
@@ -214,6 +236,8 @@ impl Recipe {
         Ok(())
     }
 
+    /// Delete a recipe by UUID.
+    #[instrument(name = "Recipe::delete", skip(exe))]
     pub async fn delete(exe: impl Executor<'_>, uuid: &RecipeUuid) -> ApiResult<()> {
         rorm::delete(exe, RecipeModel)
             .condition(RecipeModel.uuid.equals(uuid.0))

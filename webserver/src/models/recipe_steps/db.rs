@@ -19,8 +19,6 @@ pub struct RecipeStepModel {
     pub recipe: ForeignModel<RecipeModel>,
 
     /// The text of the step.
-    ///
-    /// It's a string with a maximum length of 256 characters.
     pub step: MaxStr<255>,
 
     /// The order of the step within the recipe.

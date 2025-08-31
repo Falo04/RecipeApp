@@ -15,6 +15,7 @@ use crate::models::account::Account;
 use crate::modules::oidc::OidcRequestState;
 use crate::modules::oidc::OpenIdConnect;
 
+/// Begin to log in with the oidc provider.
 #[get("/begin-login")]
 pub async fn begin_oidc_login(session: Session) -> ApiResult<Redirect> {
     let (auth_url, session_state) = OpenIdConnect::global().begin_login()?;
@@ -24,6 +25,7 @@ pub async fn begin_oidc_login(session: Session) -> ApiResult<Redirect> {
     Ok(Redirect::temporary(auth_url.as_str()))
 }
 
+/// Redirected from oidc provider. Finish login.
 #[get("/finish-login")]
 pub async fn finish_oidc_login(
     session: Session,
@@ -90,6 +92,7 @@ pub async fn finish_oidc_login(
 
 const SESSION_KEY: &str = "begin_oidc_login";
 
+/// Log out the current user.
 #[post("/logout")]
 pub async fn logout(session: Session) -> ApiResult<()> {
     Account::unset_logged_in(session).await?;

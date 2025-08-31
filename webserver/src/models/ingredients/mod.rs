@@ -15,18 +15,22 @@ use crate::models::ingredients::db::IngredientModel;
 
 pub(in crate::models) mod db;
 
+/// Domain representation of ingredient.
 #[derive(Debug, Clone)]
 pub struct Ingredient {
-    pub uuid: Uuid,
+    /// Stable identifier for this ingredient.
+    pub uuid: IngredientUuid,
 
-    /// The name of the ingredient, with a maximum length of 255 characters.
+    /// The name of the ingredient
     pub name: MaxStr<255>,
 }
 
+/// Strongly typed UUID for ingredients to avoid mixing IDs across domains.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct IngredientUuid(pub Uuid);
 
 impl Ingredient {
+    /// Fetches all ingredients ordered by name.
     #[instrument(name = "Ingredient::query_all", skip(exe))]
     pub async fn query_all(exe: impl Executor<'_>) -> ApiResult<Vec<Self>> {
         let items: Vec<_> = rorm::query(exe, IngredientModel)
@@ -39,6 +43,9 @@ impl Ingredient {
         Ok(items)
     }
 
+    /// Looks up a single ingredient by its UUID.
+    ///
+    /// Returns None if there is no matching record.
     #[instrument(name = "Ingredient::query_by_uuid", skip(exe))]
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
@@ -59,11 +66,6 @@ impl Ingredient {
     /// This function attempts to retrieve an ingredient by its name from the database.
     /// If an ingredient with the given name exists, it's returned. Otherwise, a new
     /// ingredient is inserted with a generated UUID and its name, and the UUID is returned.
-    ///
-    /// # Arguments
-    ///
-    /// * `transaction`: A mutable reference to the database transaction.
-    /// * `name`: The name of the ingredient to search for.
     #[instrument(name = "Ingredient::get_uuid_or_create", skip(exe))]
     pub async fn get_uuid_or_create(
         exe: impl Executor<'_>,
@@ -115,8 +117,8 @@ pub enum Units {
 impl From<IngredientModel> for Ingredient {
     fn from(model: IngredientModel) -> Self {
         Self {
+            uuid: IngredientUuid { 0: model.uuid },
             name: model.name,
-            uuid: model.uuid,
         }
     }
 }

@@ -1,3 +1,4 @@
+//! Domain model and data access helpers for ingredients attached to recipes.
 use futures_util::TryStreamExt;
 use rorm::db::Executor;
 use rorm::prelude::ForeignModelByField;
@@ -12,24 +13,30 @@ use crate::models::recipes::RecipeUuid;
 
 pub(in crate::models) mod db;
 
+/// A concrete ingredient entry within a specific recipe.
+///
+/// This type connects a recipe to an ingredient, along with the amount and
+/// unit used in that recipe context.
 #[derive(Debug, Clone)]
 pub struct RecipeIngredient {
+    /// Stable identifier for this recipe-ingredient association.
     pub uuid: IngredientUuid,
 
-    /// A foreign key referencing the `Recipe` model, indicating which recipe this ingredient belongs to.
+    /// The recipe this ingredient entry belongs to.
     pub recipe: RecipeUuid,
 
-    /// A foreign key referencing the `Ingredients` model, specifying the type of ingredient.
+    /// The ingredient referenced by this entry.
     pub ingredients: IngredientUuid,
 
-    /// The quantity of the ingredient.
+    /// The quantity of the ingredient used in the recipe.
     pub amount: i32,
 
-    /// The unit of measurement for the ingredient.
+    /// The unit of measurement for the quantity.
     pub unit: Units,
 }
 
 impl RecipeIngredient {
+    /// Lists all ingredient entries for a given recipe.
     #[instrument(name = "RecipeIngredient::query_by_recipe", skip(exe))]
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
@@ -44,6 +51,7 @@ impl RecipeIngredient {
         Ok(result)
     }
 
+    /// Creates a new ingredient entry for a recipe.
     #[instrument(name = "RecipeIngredient::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
@@ -65,6 +73,7 @@ impl RecipeIngredient {
         Ok(RecipeIngredient::from(model))
     }
 
+    /// Removes a single ingredient entry from a recipe by its identifier.
     #[instrument(name = "RecipeIngredient::delete", skip(exe))]
     pub async fn delete(
         exe: impl Executor<'_>,
@@ -76,6 +85,7 @@ impl RecipeIngredient {
         Ok(())
     }
 
+    /// Removes all ingredient entries associated with a recipe.
     #[instrument(name = "RecipeIngredient::delete_by_recipe", skip(exe))]
     pub async fn delete_by_recipe(
         exe: impl Executor<'_>,

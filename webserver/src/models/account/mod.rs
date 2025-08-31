@@ -1,3 +1,4 @@
+//! Account domain model and session-backed authentication extractor.
 pub(in crate::models) mod db;
 
 use axum::extract::FromRequestParts;
@@ -22,6 +23,7 @@ use crate::http::common::schemas::ApiStatusCode;
 use crate::models::account::db::AccountModel;
 use crate::models::account::db::AccountOidcModel;
 
+/// Domain representation of an account used across handlers and services.
 #[derive(Clone, Debug)]
 pub struct Account {
     pub uuid: AccountUuid,
@@ -33,12 +35,14 @@ pub struct Account {
     pub email: MaxStr<255>,
 }
 
+/// Wrapper type to give stronger typing to account identifiers.
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, JsonSchema)]
 pub struct AccountUuid(pub Uuid);
 
 const SESSION_KEY: &str = "current_account";
 
 impl Account {
+    /// Marks this account as logged in by storing its UUID in the session.
     #[instrument(name = "Account::set_logged_in", skip(self))]
     pub async fn set_logged_in(&self, session: &Session) -> ApiResult<()> {
         session
@@ -48,6 +52,7 @@ impl Account {
         Ok(())
     }
 
+    /// Clears the login state by removing the account UUID from the session.
     #[instrument(name = "Account::unset_logged_in")]
     pub async fn unset_logged_in(session: Session) -> ApiResult<()> {
         if let Some(_account_uuid) = session.remove::<Uuid>(SESSION_KEY).await? {
@@ -62,6 +67,7 @@ impl Account {
 }
 
 impl Account {
+    /// Looks up an account linked to the given OIDC issuer and subject.
     #[instrument(name = "Account::query_after_oidc", skip(exe))]
     pub async fn query_after_oidc(
         exe: impl Executor<'_>,
@@ -80,6 +86,8 @@ impl Account {
             None => Ok(None),
         }
     }
+
+    /// Fetches an account by its UUID.
     #[instrument(name = "Account::query_by_uuid", skip(exe))]
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
@@ -95,6 +103,7 @@ impl Account {
         }
     }
 
+    /// Creates a new account record.
     #[instrument(name = "Account::create", skip(exe))]
     pub async fn create(
         exe: impl Executor<'_>,
@@ -112,6 +121,7 @@ impl Account {
         Ok(Account::from(account_model))
     }
 
+    /// Associates an existing account with an OIDC identity.
     #[instrument(name = "Account::create_oidc", skip(exe))]
     pub async fn create_oidc(
         exe: impl Executor<'_>,
@@ -130,6 +140,7 @@ impl Account {
         Ok(())
     }
 
+    /// Updates an existing account record.
     #[instrument(name = "Account::update", skip(exe))]
     pub async fn update(
         exe: impl Executor<'_>,
@@ -143,6 +154,7 @@ impl Account {
         Ok(())
     }
 
+    /// Deletes an account record.
     #[instrument(name = "Account::delete", skip(exe))]
     pub async fn delete(exe: impl Executor<'_>, account_uuid: AccountUuid) -> ApiResult<()> {
         rorm::delete(exe, AccountModel)
@@ -172,11 +184,6 @@ where
     ///
     /// This function takes a mutable `Parts` struct containing HTTP request parts
     /// and attempts to decode a JWT token from the Authorization header.
-    ///
-    /// # Arguments
-    ///
-    /// * `parts`: A mutable reference to a `Parts` struct containing the HTTP request parts.
-    /// * `s`: A reference to a context object (unused in this implementation).
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
         if let Some(CachedAccount(account)) = parts.extensions.get() {
             return Ok(account.clone());

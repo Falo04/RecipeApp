@@ -19,10 +19,6 @@ use crate::models::recipes::Recipe;
 use crate::models::tags::Tag;
 
 /// Retrieves recipes based on specified ingredients.
-///
-/// This function handles requests to `/recipes` and returns a list of recipes
-/// that contain the provided ingredients. It constructs a query using the
-/// provided UUIDs and then fetches all recipes matching the ingredient criteria.
 #[post("/recipes")]
 pub async fn get_recipes_by_ingredients(
     ApiJson(request): ApiJson<GetAllRecipesByIngredientsRequest>,
@@ -77,14 +73,7 @@ pub async fn get_recipes_by_ingredients(
     }))
 }
 
-/// Handles ingredient search requests.
-///
-/// This function takes a search query and retrieves ingredients from the database
-/// that match the query.
-///
-/// # Arguments
-///
-/// * `IngredientSearchRequest` - object containing the search term
+/// Retrieves all ingredients.
 #[get("/all")]
 pub async fn get_all_ingredients() -> ApiResult<ApiJson<List<SimpleIngredient>>> {
     let items = Ingredient::query_all(Database::global()).await?;

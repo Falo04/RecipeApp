@@ -33,13 +33,6 @@ use crate::models::tags::TagUuid;
 use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all recipes with pagination support and associated tags.
-///
-/// This function handles retrieving recipes from the database, applying pagination,
-/// and fetching associated tags.
-///
-/// # Arguments
-///
-/// * `Query<GetPageRequest>` - object containing pagination parameters
 #[post("/all")]
 pub async fn get_all_recipes(
     ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
@@ -74,14 +67,6 @@ pub async fn get_all_recipes(
 }
 
 /// Retrieves a recipe by its UUID.
-///
-/// This function queries the database for a recipe based on the provided UUID.
-/// It also fetches associated data such as the recipe's user, tags,
-/// ingredients, and steps.
-///
-/// # Arguments
-///
-/// * `Path<SingleUuid>` - The UUID of the recipe to retrieve.
 #[get("/{uuid}")]
 pub async fn get_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
@@ -130,14 +115,6 @@ pub async fn get_recipe(
 }
 
 /// Creates a new recipe.
-///
-/// This endpoint handles the creation of a new recipe, performing validation,
-/// inserting the recipe into the database, and associating it with tags, steps,
-/// and ingredients.
-///
-/// # Arguments
-///
-/// * `ApiJson<CreateOrUpdateRecipe>` - The request body containing the recipe data.
 #[post("/")]
 pub async fn create_recipe(
     user: Account,
@@ -193,15 +170,6 @@ pub async fn create_recipe(
 }
 
 /// Updates an existing recipe based on its UUID.
-///
-/// This function takes a UUID as input and updates the corresponding recipe
-/// in the database. It handles updates to the recipe's name, description,
-/// tags, steps, and ingredients.
-///
-/// # Arguments
-///
-/// * `Path<SingleUuid>` - The UUID of the recipe to update.
-/// * `ApiJson<CreateOrUpdateRecipe>` - The request body containing the recipe data.
 #[put("/{uuid}")]
 pub async fn update_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
@@ -252,12 +220,6 @@ pub async fn update_recipe(
 }
 
 /// Deletes a recipe by its UUID.
-///
-/// This function deletes a recipe from the database based on the provided UUID.
-///
-/// # Arguments
-///
-/// * `Path<SingleUuid>` - The UUID of the recipe to delete.
 #[delete("/{uuid}")]
 pub async fn delete_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
