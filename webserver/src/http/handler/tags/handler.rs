@@ -113,13 +113,13 @@ pub async fn update_tag(
 
     if Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid })
         .await?
-        .is_some()
+        .is_none()
     {
         return Err(ApiError::bad_request("Invalid tag uuid"));
     }
 
     if let Some(tag) = Tag::query_by_name(&mut tx, request.name.deref()).await? {
-        if tag.uuid.0 == tag_uuid {
+        if tag.uuid.0 != tag_uuid {
             return Err(ApiError::bad_request("Tag name already exists"));
         }
     }

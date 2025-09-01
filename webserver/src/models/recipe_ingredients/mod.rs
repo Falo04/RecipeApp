@@ -2,6 +2,9 @@
 use futures_util::TryStreamExt;
 use rorm::db::Executor;
 use rorm::prelude::ForeignModelByField;
+use schemars::JsonSchema;
+use serde::Deserialize;
+use serde::Serialize;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -20,7 +23,7 @@ pub(in crate::models) mod db;
 #[derive(Debug, Clone)]
 pub struct RecipeIngredient {
     /// Stable identifier for this recipe-ingredient association.
-    pub uuid: IngredientUuid,
+    pub uuid: RecipeIngredientUuid,
 
     /// The recipe this ingredient entry belongs to.
     pub recipe: RecipeUuid,
@@ -34,6 +37,9 @@ pub struct RecipeIngredient {
     /// The unit of measurement for the quantity.
     pub unit: Units,
 }
+
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct RecipeIngredientUuid(pub Uuid);
 
 impl RecipeIngredient {
     /// Lists all ingredient entries for a given recipe.
@@ -101,7 +107,7 @@ impl RecipeIngredient {
 impl From<RecipeIngredientModel> for RecipeIngredient {
     fn from(model: RecipeIngredientModel) -> Self {
         Self {
-            uuid: IngredientUuid(model.uuid),
+            uuid: RecipeIngredientUuid(model.uuid),
             recipe: RecipeUuid(model.recipe.0),
             ingredients: IngredientUuid(model.ingredients.0),
             unit: model.unit,

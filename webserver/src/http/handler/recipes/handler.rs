@@ -8,6 +8,7 @@ use galvyn::get;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
+use tracing::debug;
 
 use super::schema::CreateOrUpdateRecipe;
 use super::schema::GetAllRecipesRequest;
@@ -78,9 +79,11 @@ pub async fn get_recipe(
     };
 
     let recipe_ingredients = RecipeIngredient::query_by_recipe(&mut tx, &recipe.uuid).await?;
+    debug!(recipe_ingredients = ?recipe_ingredients, "recipe_ingredients");
     let mut full_ingredients = Vec::new();
     for recipe_ingredient in recipe_ingredients {
-        let Some(ingredient) = Ingredient::query_by_uuid(&mut tx, &recipe_ingredient.uuid).await?
+        let Some(ingredient) =
+            Ingredient::query_by_uuid(&mut tx, &recipe_ingredient.ingredients).await?
         else {
             return Err(ApiError::bad_request("Ingredient not found"));
         };
