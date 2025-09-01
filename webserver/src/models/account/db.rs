@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 /// Represents an account in the system.
 #[derive(Model, Clone, Debug)]
-#[rorm(rename = "Account")]
+#[rorm(rename = "account")]
 pub struct AccountModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
@@ -19,7 +19,7 @@ pub struct AccountModel {
 
 /// An account managed by an open id connect provider
 #[derive(Model, Clone, Debug)]
-#[rorm(rename = "AccountOidc")]
+#[rorm(rename = "account_oidc")]
 pub struct AccountOidcModel {
     /// Primary key
     #[rorm(primary_key)]

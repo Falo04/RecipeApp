@@ -9,7 +9,7 @@ use crate::models::recipes::db::RecipeModel;
 ///
 /// This struct is used to store the individual steps of a recipe.
 #[derive(Model)]
-#[rorm(rename = "RecipeStep")]
+#[rorm(rename = "recipe_step")]
 pub struct RecipeStepModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,

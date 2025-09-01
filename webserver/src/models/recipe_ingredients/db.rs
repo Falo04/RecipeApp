@@ -11,7 +11,7 @@ use crate::models::recipes::db::RecipeModel;
 /// This struct models the ingredients within a recipe, linking to the
 /// `Recipe` and `Ingredients` models using foreign keys.
 #[derive(Model)]
-#[rorm(rename = "RecipeIngredient")]
+#[rorm(rename = "recipe_ingredient")]
 pub struct RecipeIngredientModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,

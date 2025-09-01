@@ -8,7 +8,7 @@ use crate::models::tags::TagColors;
 
 /// Represents a tag with a unique name and associated color.
 #[derive(Model)]
-#[rorm(rename = "Tag")]
+#[rorm(rename = "tag")]
 pub struct TagModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
@@ -25,6 +25,7 @@ pub struct TagModel {
 ///
 /// This struct defines a relationship between a `Recipe` and a `Tag`.
 #[derive(Model)]
+#[rorm(rename = "recipe_tag")]
 pub struct RecipeTagModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,

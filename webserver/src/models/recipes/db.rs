@@ -16,7 +16,7 @@ use crate::models::tags::db::RecipeTagModel;
 ///
 /// With details like name, description, user association, tags, ingredients, and steps.
 #[derive(Model)]
-#[rorm(rename = "Recipe")]
+#[rorm(rename = "recipe")]
 pub struct RecipeModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,

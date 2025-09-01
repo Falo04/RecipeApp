@@ -6,7 +6,7 @@ use uuid::Uuid;
 ///
 /// This struct is used to store information about individual ingredients.
 #[derive(Model)]
-#[rorm(rename = "Ingredient")]
+#[rorm(rename = "ingredient")]
 pub struct IngredientModel {
     #[rorm(primary_key)]
     pub uuid: Uuid,
