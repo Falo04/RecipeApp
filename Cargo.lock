@@ -4311,7 +4311,6 @@ dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
- "rand 0.9.1",
  "reqwest",
  "rorm",
  "schemars 0.8.22",

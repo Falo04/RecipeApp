@@ -1,8 +1,8 @@
 //! Account domain model and session-backed authentication extractor.
 pub(in crate::models) mod db;
 
-use axum::extract::FromRequestParts;
-use axum::http::request::Parts;
+use galvyn::core::re_exports::axum::extract::FromRequestParts;
+use galvyn::core::re_exports::axum::http::request::Parts;
 use galvyn::core::session::Session;
 use galvyn::core::Module;
 use galvyn::rorm::Database;

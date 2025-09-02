@@ -4,7 +4,7 @@
 //! it passes the request to the next handler in the chain. If an error
 //! occurs during user extraction, it returns the error.
 
-use axum::extract::FromRequestParts;
+use galvyn::core::re_exports::axum::extract::FromRequestParts;
 use galvyn::core::re_exports::axum::extract::Request;
 use galvyn::core::re_exports::axum::middleware::Next;
 use galvyn::core::re_exports::axum::response::Response;

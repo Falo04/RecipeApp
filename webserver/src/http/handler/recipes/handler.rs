@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use axum::extract::Path;
+use galvyn::core::re_exports::axum::extract::Path;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::Module;
 use galvyn::delete;
