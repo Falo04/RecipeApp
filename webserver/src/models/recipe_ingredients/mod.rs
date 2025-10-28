@@ -1,14 +1,15 @@
 //! Domain model and data access helpers for ingredients attached to recipes.
 use futures_util::TryStreamExt;
-use rorm::db::Executor;
-use rorm::prelude::ForeignModelByField;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
+use galvyn::core::re_exports::rorm;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::rorm::db::Executor;
+use galvyn::rorm::prelude::ForeignModelByField;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::common::errors::ApiResult;
 use crate::models::ingredients::IngredientUuid;
 use crate::models::ingredients::Units;
 use crate::models::recipe_ingredients::db::RecipeIngredientModel;
@@ -32,7 +33,7 @@ pub struct RecipeIngredient {
     pub ingredients: IngredientUuid,
 
     /// The quantity of the ingredient used in the recipe.
-    pub amount: i32,
+    pub amount: i64,
 
     /// The unit of measurement for the quantity.
     pub unit: Units,
@@ -47,7 +48,7 @@ impl RecipeIngredient {
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
-    ) -> ApiResult<Vec<Self>> {
+    ) -> anyhow::Result<Vec<Self>> {
         let result: Vec<_> = rorm::query(exe, RecipeIngredientModel)
             .condition(RecipeIngredientModel.recipe.equals(recipe_uuid.0))
             .stream()
@@ -63,9 +64,9 @@ impl RecipeIngredient {
         exe: impl Executor<'_>,
         recipe_uuid: RecipeUuid,
         ingredient_uuid: IngredientUuid,
-        amount: i32,
+        amount: i64,
         unit: Units,
-    ) -> ApiResult<RecipeIngredient> {
+    ) -> anyhow::Result<RecipeIngredient> {
         let model = rorm::insert(exe, RecipeIngredientModel)
             .single(&RecipeIngredientModel {
                 uuid: Uuid::new_v4(),
@@ -84,7 +85,7 @@ impl RecipeIngredient {
     pub async fn delete(
         exe: impl Executor<'_>,
         recipe_ingredient_uuid: IngredientUuid,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeIngredientModel)
             .condition(RecipeIngredientModel.uuid.equals(recipe_ingredient_uuid.0))
             .await?;
@@ -96,7 +97,7 @@ impl RecipeIngredient {
     pub async fn delete_by_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeIngredientModel)
             .condition(RecipeIngredientModel.recipe.equals(recipe_uuid.0))
             .await?;

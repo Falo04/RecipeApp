@@ -1,9 +1,9 @@
-use rorm::field;
-use rorm::fields::types::MaxStr;
-use rorm::prelude::BackRef;
-use rorm::prelude::ForeignModel;
-use rorm::Model;
-use rorm::Patch;
+use galvyn::rorm::field;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::prelude::BackRef;
+use galvyn::rorm::prelude::ForeignModel;
+use galvyn::rorm::Model;
+use galvyn::rorm::Patch;
 use time::OffsetDateTime;
 use uuid::Uuid;
 

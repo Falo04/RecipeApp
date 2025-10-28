@@ -1,17 +1,17 @@
 use std::ops::Deref;
 
 use galvyn::core::re_exports::axum::extract::Path;
+use galvyn::core::stuff::api_error::ApiError;
+use galvyn::core::stuff::api_error::ApiResult;
 use galvyn::core::stuff::api_json::ApiJson;
+use galvyn::core::stuff::schema::Page;
+use galvyn::core::stuff::schema::SingleUuid;
 use galvyn::core::Module;
 use galvyn::delete;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
 
-use crate::http::common::errors::ApiError;
-use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::Page;
-use crate::http::common::schemas::SingleUuid;
 use crate::http::handler::recipes::schema::GetAllRecipesRequest;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
@@ -59,7 +59,7 @@ pub async fn get_recipes_by_tag(
         let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
         result.push(SimpleRecipeWithTags {
-            uuid: recipe.uuid.0,
+            uuid: recipe.uuid,
             name: recipe.name,
             description: recipe.description,
             tags: tags.into_iter().map(SimpleTag::from).collect(),

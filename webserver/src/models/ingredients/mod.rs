@@ -1,16 +1,17 @@
 //! Represents an ingredient in a recipe.
 
 use futures_util::TryStreamExt;
-use rorm::db::Executor;
-use rorm::fields::types::MaxStr;
-use rorm::DbEnum;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
+use galvyn::core::re_exports::rorm;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::rorm::db::Executor;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::DbEnum;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::common::errors::ApiResult;
 use crate::models::ingredients::db::IngredientModel;
 
 pub(in crate::models) mod db;
@@ -32,7 +33,7 @@ pub struct IngredientUuid(pub Uuid);
 impl Ingredient {
     /// Fetches all ingredients ordered by name.
     #[instrument(name = "Ingredient::query_all", skip(exe))]
-    pub async fn query_all(exe: impl Executor<'_>) -> ApiResult<Vec<Self>> {
+    pub async fn query_all(exe: impl Executor<'_>) -> anyhow::Result<Vec<Self>> {
         let items: Vec<_> = rorm::query(exe, IngredientModel)
             .order_asc(IngredientModel.name)
             .stream()
@@ -50,7 +51,7 @@ impl Ingredient {
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
         uuid: &IngredientUuid,
-    ) -> ApiResult<Option<Self>> {
+    ) -> anyhow::Result<Option<Self>> {
         match rorm::query(exe, IngredientModel)
             .condition(IngredientModel.uuid.equals(uuid.0))
             .optional()
@@ -70,7 +71,7 @@ impl Ingredient {
     pub async fn get_uuid_or_create(
         exe: impl Executor<'_>,
         name: MaxStr<255>,
-    ) -> ApiResult<IngredientUuid> {
+    ) -> anyhow::Result<IngredientUuid> {
         let mut guard = exe.ensure_transaction().await?;
         let ingredient = match rorm::query(guard.get_transaction(), IngredientModel)
             .condition(IngredientModel.name.equals(&*name))

@@ -1,15 +1,16 @@
 //! Domain model and data access helpers for recipe steps.
 use futures_util::TryStreamExt;
-use rorm::db::Executor;
-use rorm::fields::types::MaxStr;
-use rorm::prelude::ForeignModelByField;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
+use galvyn::core::re_exports::rorm;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::rorm::db::Executor;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::prelude::ForeignModelByField;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::common::errors::ApiResult;
 use crate::models::ingredients::IngredientUuid;
 use crate::models::recipe_steps::db::RecipeStepModel;
 use crate::models::recipes::RecipeUuid;
@@ -42,7 +43,7 @@ impl RecipeStep {
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
-    ) -> ApiResult<Vec<Self>> {
+    ) -> anyhow::Result<Vec<Self>> {
         let result = rorm::query(exe, RecipeStepModel)
             .condition(RecipeStepModel.recipe.equals(recipe_uuid.0))
             .order_asc(RecipeStepModel.index)
@@ -60,7 +61,7 @@ impl RecipeStep {
         recipe_uuid: RecipeUuid,
         step: MaxStr<255>,
         index: i16,
-    ) -> ApiResult<RecipeStep> {
+    ) -> anyhow::Result<RecipeStep> {
         let model = rorm::insert(exe, RecipeStepModel)
             .single(&RecipeStepModel {
                 uuid: Uuid::new_v4(),
@@ -75,7 +76,10 @@ impl RecipeStep {
 
     /// Deletes a single step by its identifier.
     #[instrument(name = "RecipeStep::delete", skip(exe))]
-    pub async fn delete(exe: impl Executor<'_>, ingredient_uuid: IngredientUuid) -> ApiResult<()> {
+    pub async fn delete(
+        exe: impl Executor<'_>,
+        ingredient_uuid: IngredientUuid,
+    ) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeStepModel)
             .condition(RecipeStepModel.uuid.equals(ingredient_uuid.0))
             .await?;
@@ -87,7 +91,7 @@ impl RecipeStep {
     pub async fn delete_by_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeStepModel)
             .condition(RecipeStepModel.recipe.equals(recipe_uuid.0))
             .await?;

@@ -8,8 +8,8 @@ use galvyn::core::re_exports::axum::extract::FromRequestParts;
 use galvyn::core::re_exports::axum::extract::Request;
 use galvyn::core::re_exports::axum::middleware::Next;
 use galvyn::core::re_exports::axum::response::Response;
+use galvyn::core::stuff::api_error::ApiError;
 
-use crate::http::common::errors::ApiError;
 use crate::models::account::Account;
 
 /// This layer is responsible for authentication.

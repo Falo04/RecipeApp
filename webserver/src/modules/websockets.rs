@@ -1,11 +1,11 @@
 //! Manages websockets and handles commands.
+use galvyn::core::session::Id;
 use galvyn::core::InitError;
 use galvyn::core::Module;
 use galvyn::core::PreInitError;
 use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
-use tower_sessions::session::Id;
 use tracing::error;
 
 use crate::http::handler::websockets::schema::WsServerMsg;

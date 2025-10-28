@@ -42,7 +42,7 @@ export function EditTagDialog(props: EditTagDialogProps) {
                     return;
                 }
 
-                t("toast.updated-success");
+                toast.success(t("toast.updated-success"));
                 return;
             },
         },

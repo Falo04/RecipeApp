@@ -1,16 +1,16 @@
 use std::collections::HashSet;
 
+use galvyn::core::stuff::api_error::ApiResult;
 use galvyn::core::stuff::api_json::ApiJson;
+use galvyn::core::stuff::schema::List;
+use galvyn::core::stuff::schema::Page;
 use galvyn::core::Module;
 use galvyn::get;
 use galvyn::post;
-use rorm::Database;
+use galvyn::rorm::Database;
 
 use super::schema::GetAllRecipesByIngredientsRequest;
 use super::schema::SimpleIngredient;
-use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::List;
-use crate::http::common::schemas::Page;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::models::ingredients::Ingredient;
@@ -46,17 +46,19 @@ pub async fn get_recipes_by_ingredients(
     for recipe in recipes {
         let ingredients = RecipeIngredient::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
-        if ingredients
-            .iter()
-            .all(|ingredient| !filter_uuids.list.contains(&ingredient.uuid.0))
-        {
+        if ingredients.iter().all(|ingredient| {
+            !filter_uuids
+                .list
+                .iter()
+                .any(|uuid| uuid.0 == ingredient.uuid.0)
+        }) {
             continue;
         }
 
         let tags = Tag::query_by_recipe(&mut tx, &recipe.uuid).await?;
 
         result.push(SimpleRecipeWithTags {
-            uuid: recipe.uuid.0,
+            uuid: recipe.uuid,
             tags: tags.into_iter().map(SimpleTag::from).collect(),
             name: recipe.name,
             description: recipe.description,

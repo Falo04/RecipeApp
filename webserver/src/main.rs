@@ -1,16 +1,19 @@
 use std::fs;
 use std::net::SocketAddr;
 
+use ::tracing::level_filters::LevelFilter;
 use clap::Parser;
 use clap::Subcommand;
-use dotenv::dotenv;
+use galvyn::core::re_exports::rorm;
 use galvyn::core::DatabaseSetup;
 use galvyn::rorm::Database;
 use galvyn::rorm::DatabaseConfiguration;
-use tracing::init_tracing_panic_hook;
+use galvyn::Galvyn;
+use galvyn::GalvynSetup;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::Layer;
 
 use crate::config::DB;
 use crate::config::SERVER_ADDRESS;
@@ -23,7 +26,6 @@ mod config;
 mod http;
 mod models;
 mod modules;
-mod tracing;
 
 /// Represents the command-line arguments parsed by the program.
 ///
@@ -50,22 +52,17 @@ pub enum Command {
 /// It parses command-line arguments and executes the corresponding command.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenv().ok();
-    if let Err(errors) = config::init() {
+    if let Err(errors) = config::load_env() {
         for error in errors {
             eprintln!("error: {error}");
         }
         return Err("Failed to load configuration".into());
     }
 
-    let registry = tracing_subscriber::registry()
+    tracing_subscriber::registry()
         .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("INFO")))
-        .with(tracing_subscriber::fmt::layer());
-
-    //let registry = registry.with(opentelemetry_layer()?);
-
-    registry.init();
-    init_tracing_panic_hook();
+        .with(tracing_forest::ForestLayer::default().with_filter(LevelFilter::DEBUG))
+        .init();
 
     let cli = Cli::parse();
 
@@ -118,16 +115,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// This function initializes the Galvyn server with the provided database configuration
 /// and routes, then starts the server listening on the specified address and port.
 async fn start() -> Result<(), Box<dyn std::error::Error>> {
-    galvyn::Galvyn::new()
+    Galvyn::builder(GalvynSetup::default())
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
             DB.clone(),
         )))
-        .register_module::<WebsocketManager>(Default::default())
-        .register_module::<OpenIdConnect>(Default::default())
+        .register_module::<WebsocketManager>(())
+        .register_module::<OpenIdConnect>(())
         .init_modules()
         .await?
         .add_routes(server::initialize())
-        .start(SocketAddr::new(*SERVER_ADDRESS, *SERVER_PORT))
+        .start(SocketAddr::from((
+            *SERVER_ADDRESS.get(),
+            *SERVER_PORT.get(),
+        )))
         .await?;
 
     Ok(())

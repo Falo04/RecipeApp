@@ -1,6 +1,6 @@
-use rorm::fields::types::MaxStr;
-use rorm::prelude::ForeignModel;
-use rorm::Model;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::prelude::ForeignModel;
+use galvyn::rorm::Model;
 use uuid::Uuid;
 
 /// Represents an account in the system.

@@ -1,19 +1,20 @@
 //! Represents all recipe responses and requests.
 
-use rorm::fields::types::MaxStr;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
-use uuid::Uuid;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::core::stuff::schema::GetPageRequest;
+use galvyn::rorm::fields::types::MaxStr;
 
-use crate::http::common::schemas::GetPageRequest;
 use crate::models::tags::TagColors;
+use crate::models::tags::TagUuid;
 
 /// Represents a simple tag
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct SimpleTag {
     /// The UUID for the tag.
-    pub uuid: Uuid,
+    pub uuid: TagUuid,
 
     /// The name of the tag (string, maximum length 255).
     pub name: MaxStr<255>,

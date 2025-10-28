@@ -17,20 +17,19 @@ use std::net::IpAddr;
 use std::net::Ipv4Addr;
 use std::sync::LazyLock;
 
+use galvyn::core::stuff::env::EnvError;
+use galvyn::core::stuff::env::EnvVar;
+use galvyn::rorm::DatabaseDriver;
 use openidconnect::ClientId;
 use openidconnect::ClientSecret;
 use openidconnect::IssuerUrl;
 use openidconnect::RedirectUrl;
-use rorm::DatabaseDriver;
-
-use crate::config::env::EnvError;
-use crate::config::env::EnvVar;
 
 /// Initializes the application configuration.
 ///
 /// This function loads configuration values from shared variables
 /// and returns an error if any of them fail to load.
-pub fn init() -> Result<(), Vec<&'static EnvError>> {
+pub fn load_env() -> Result<(), Vec<&'static EnvError>> {
     let mut errors = Vec::new();
 
     for result in [
@@ -123,164 +122,3 @@ pub static OIDC_CLIENT_SECRET: EnvVar<ClientSecret> = EnvVar::required("OIDC_CLI
 ///
 /// This variable is required and specifies the URL to which the oidc client should return
 pub static OIDC_REDIRECT_URL: EnvVar<RedirectUrl> = EnvVar::required("OIDC_REDIRECT_URL");
-
-/// Represents an environment variable with a specified type.
-mod env {
-    use std::env;
-    use std::env::VarError;
-    use std::ops::Deref;
-    use std::sync::OnceLock;
-
-    use serde::de::DeserializeOwned;
-    use thiserror::Error;
-
-    /// Represents an environment variable with a default value.
-    ///
-    /// This struct provides a way to access environment variables, offering
-    /// a default value if the variable is not found. It uses `OnceLock`
-    /// for thread-safe access to the variable's value, preventing race
-    /// conditions when multiple parts of the application attempt to read
-    /// the same environment variable.
-    pub struct EnvVar<T = String> {
-        /// A `OnceLock` containing the resolved value of the environment variable.
-        ///
-        /// The `Result<T, EnvError>` type allows for handling potential
-        /// errors during the value retrieval process.
-        value: OnceLock<Result<T, EnvError>>,
-
-        /// A `&'static str` representing the name of the environment variable.
-        name: &'static str,
-
-        /// An `Option<fn() -> T>` that, if provided, will be called to
-        /// produce a default value if the environment variable is not found.
-        default: Option<fn() -> T>,
-    }
-
-    impl<T: DeserializeOwned> EnvVar<T> {
-        /// Creates a new `Required` instance with the given name.
-        ///
-        /// This function initializes a `Required` instance, storing the provided `name`
-        /// as a string, creating a new `OnceLock` for its value, and setting the
-        /// default value to `None`.
-        ///
-        pub const fn required(name: &'static str) -> Self {
-            Self {
-                name,
-                value: OnceLock::new(),
-                default: None,
-            }
-        }
-
-        /// Creates a new `Optional` value.
-        ///
-        /// This function initializes a new `Optional` instance with a given name and a default value function.
-        /// The default value function is used if the `Optional`'s internal value is not explicitly set.
-        ///
-        pub const fn optional(name: &'static str, default: fn() -> T) -> Self {
-            Self {
-                name,
-                value: OnceLock::new(),
-                default: Some(default),
-            }
-        }
-
-        /// Retrieves a reference of the value.
-        ///
-        /// This function attempts to retrieve a reference of the value.
-        /// If the value is `NONE`, it panics with the given error message.
-        pub fn get(&self) -> &T {
-            self.try_get().unwrap_or_else(|error| panic!("{error}"))
-        }
-        /// This function attempts to load the underlying data.
-        pub fn load(&self) -> Result<(), &EnvError> {
-            self.try_get().map(|_| ())
-        }
-
-        /// Attempts to retrieve the value associated with the given name.
-        ///
-        /// This method first tries to get the value from the environment.
-        ///
-        /// 1. If the value is not present, it attempts
-        ///    to provide a default value if one is specified.
-        /// 2. If the value is an empty string, and
-        ///    a default is provided, it returns the default.
-        /// 3. If the value is malformed, and
-        ///    a default is provided, it returns the default.
-        fn try_get(&self) -> Result<&T, &EnvError> {
-            self.value
-                .get_or_init(|| {
-                    let value = match env::var(self.name) {
-                        Ok(value) => value,
-                        Err(VarError::NotPresent) => {
-                            return match self.default {
-                                Some(default) => Ok(default()),
-                                None => {
-                                    return Err(EnvError {
-                                        name: self.name,
-                                        reason: EnvErrorReason::Missing,
-                                    })
-                                }
-                            }
-                        }
-                        Err(VarError::NotUnicode(_err)) => {
-                            return Err(EnvError {
-                                name: self.name,
-                                reason: EnvErrorReason::Missing,
-                            })
-                        }
-                    };
-
-                    let is_empty = value.is_empty();
-                    match serde_plain::from_str::<T>(&value) {
-                        Ok(value) => Ok(value),
-                        Err(err) => match self.default {
-                            Some(default) if is_empty => Ok(default()),
-                            _ => Err(EnvError {
-                                name: self.name,
-                                reason: EnvErrorReason::Malformed(err.to_string()),
-                            }),
-                        },
-                    }
-                })
-                .as_ref()
-        }
-    }
-
-    impl<T: DeserializeOwned> Deref for EnvVar<T> {
-        type Target = T;
-        /// This method provides a reference to the underlying target of this object.
-        ///
-        /// It is equivalent to calling the `get()` method.
-        fn deref(&self) -> &Self::Target {
-            self.get()
-        }
-    }
-
-    /// Represents an error related to environment variables.
-    ///
-    /// This struct encapsulates information about an environment variable error,
-    /// including the name of the variable that caused the error and the reason
-    /// for the error.
-    #[derive(Debug, Error, Clone)]
-    #[error("Environment variable '{name}' is {reason}")]
-    pub struct EnvError {
-        /// Representing the name of the environment variable that caused the error.
-        pub name: &'static str,
-
-        /// An enum representing the specific reason for the error.
-        pub reason: EnvErrorReason,
-    }
-
-    /// An enum representing the reasons for environment variable errors.
-    ///
-    /// This enum is used to provide more specific error messages when an
-    /// environment variable is missing or malformed.
-    #[derive(Debug, Error, Clone)]
-    pub enum EnvErrorReason {
-        #[error("not set")]
-        Missing,
-
-        #[error("malformed: {0}")]
-        Malformed(String),
-    }
-}

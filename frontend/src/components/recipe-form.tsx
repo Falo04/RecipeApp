@@ -31,6 +31,7 @@ import { type StepperSteps, StepperHorizontal, StepperVertical } from "@/compone
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import IngredientsGrid from "@/components/ingredients-grid.tsx";
 import ACCOUNT_CONTEXT from "@/context/account.tsx";
+import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
 
 /**
  * The properties for {@link RecipeForm}
@@ -63,6 +64,7 @@ export function RecipeForm(props: RecipeFormProps) {
 
     const tagContext = React.useContext(TAGS_CONTEXT);
     const accountContext = React.useContext(ACCOUNT_CONTEXT);
+    const recipeContext = React.useContext(SINGLE_RECIPE_CONTEXT);
 
     const initial = { x: 50, opacity: 0 };
     const animate = { x: 0, opacity: 1 };
@@ -94,6 +96,7 @@ export function RecipeForm(props: RecipeFormProps) {
                             return;
                         }
 
+                        recipeContext.reset();
                         props.navigate(props.formData!.uuid);
                         return t("toast.updated-success");
                     },

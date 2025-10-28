@@ -1,5 +1,5 @@
-use rorm::prelude::ForeignModel;
-use rorm::Model;
+use galvyn::rorm::prelude::ForeignModel;
+use galvyn::rorm::Model;
 use uuid::Uuid;
 
 use crate::models::ingredients::db::IngredientModel;
@@ -24,7 +24,7 @@ pub struct RecipeIngredientModel {
     pub ingredients: ForeignModel<IngredientModel>,
 
     /// The quantity of the ingredient.
-    pub amount: i32,
+    pub amount: i64,
 
     /// The unit of measurement for the ingredient.
     pub unit: Units,

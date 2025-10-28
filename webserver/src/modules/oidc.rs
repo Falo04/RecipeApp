@@ -3,6 +3,10 @@
 //! It manages the login flow, exchanging authorization codes for access tokens and ID tokens.
 use std::time::Duration;
 
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::core::stuff::api_error::ApiError;
+use galvyn::core::stuff::api_error::ApiResult;
 use galvyn::core::InitError;
 use galvyn::core::Module;
 use galvyn::core::PreInitError;
@@ -30,8 +34,6 @@ use openidconnect::RedirectUrl;
 use openidconnect::RequestTokenError;
 use openidconnect::Scope;
 use openidconnect::TokenResponse;
-use serde::Deserialize;
-use serde::Serialize;
 use tracing::error;
 use tracing::warn;
 use url::Url;
@@ -40,9 +42,6 @@ use crate::config::OIDC_CLIENT_ID;
 use crate::config::OIDC_CLIENT_SECRET;
 use crate::config::OIDC_DISCOVER_URL;
 use crate::config::OIDC_REDIRECT_URL;
-use crate::http::common::errors::ApiError;
-use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::ApiStatusCode;
 
 /// Represents an OpenID Connect client.
 ///
@@ -98,7 +97,7 @@ impl OpenIdConnect {
     ///
     /// This function constructs the authorization URL and returns the necessary
     /// session state information.
-    pub fn begin_login(&self) -> ApiResult<(Url, OidcSessionState)> {
+    pub fn begin_login(&self) -> anyhow::Result<(Url, OidcSessionState)> {
         let (pkce_code_challenge, pkce_code_verifier) = PkceCodeChallenge::new_random_sha256();
 
         let request = self
@@ -132,10 +131,7 @@ impl OpenIdConnect {
         request: OidcRequestState,
     ) -> ApiResult<CoreIdTokenClaims> {
         if request.state != session.csrf_token {
-            return Err(ApiError::new(
-                ApiStatusCode::Unauthenticated,
-                "Secret state is invalid",
-            ));
+            return Err(ApiError::unauthorized("Secret state is invalid"));
         }
 
         // Exchange the authorization code with a token.
@@ -145,12 +141,11 @@ impl OpenIdConnect {
             .set_pkce_verifier(session.pkce_code_verifier)
             .request_async(&self.http_client)
             .await
-            .map_err(|error| {
-                let code = match error {
-                    RequestTokenError::ServerResponse(_) => ApiStatusCode::InternalServerError,
-                    _ => ApiStatusCode::Unauthenticated,
-                };
-                ApiError::new(code, "Failed to exchange code").with_source(error)
+            .map_err(|error| match error {
+                RequestTokenError::ServerResponse(_) => {
+                    ApiError::server_error("server response invalid")
+                }
+                _ => ApiError::bad_request("bad request"),
             })?;
 
         let id_token = token_response.id_token().ok_or(ApiError::server_error(
@@ -160,8 +155,7 @@ impl OpenIdConnect {
         let claims = id_token
             .claims(&id_token_verifier, &session.nonce)
             .map_err(|error| {
-                ApiError::new(ApiStatusCode::Unauthenticated, "Failed to verify id token")
-                    .with_source(error)
+                ApiError::unauthorized("Failed to verify id token").with_source(error)
             })?;
 
         if let Some(expected_access_token_hash) = claims.access_token_hash() {
@@ -178,10 +172,7 @@ impl OpenIdConnect {
                 "Failed to recreate access token signature",
             ))?;
             if actual_access_token_hash != *expected_access_token_hash {
-                return Err(ApiError::new(
-                    ApiStatusCode::Unauthenticated,
-                    "Invalid access token",
-                ));
+                return Err(ApiError::unauthorized("Invalid access token"));
             }
         }
 

@@ -4,7 +4,7 @@ use crate::models::account::Account;
 impl From<Account> for SimpleAccount {
     fn from(value: Account) -> Self {
         Self {
-            uuid: value.uuid.0,
+            uuid: value.uuid,
             display_name: value.display_name,
             email: value.email,
         }

@@ -1,15 +1,19 @@
 //! Represents all recipe responses and requests.
 
-use rorm::fields::types::MaxStr;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
-use uuid::Uuid;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::core::stuff::schema::GetPageRequest;
+use galvyn::rorm::fields::types::MaxStr;
 
-use crate::http::common::schemas::GetPageRequest;
 use crate::http::handler::account::schema::SimpleAccount;
 use crate::http::handler::ingredients::schema::FullIngredient;
 use crate::http::handler::tags::schema::SimpleTag;
+use crate::models::account::AccountUuid;
+use crate::models::recipe_steps::RecipeStepUuid;
+use crate::models::recipes::RecipeUuid;
+use crate::models::tags::TagUuid;
 
 /// Represents a simple recipe.
 ///
@@ -17,7 +21,7 @@ use crate::http::handler::tags::schema::SimpleTag;
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct SimpleRecipe {
     /// The identifier for the recipe.
-    pub uuid: Uuid,
+    pub uuid: RecipeUuid,
 
     /// The name of the recipe (string, maximum length 255).
     pub name: MaxStr<255>,
@@ -33,7 +37,7 @@ pub struct SimpleRecipe {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct SimpleRecipeWithTags {
     /// The identifier for the recipe.
-    pub uuid: Uuid,
+    pub uuid: RecipeUuid,
 
     /// The name of the recipe (string, maximum length 255).
     pub name: MaxStr<255>,
@@ -52,7 +56,7 @@ pub struct SimpleRecipeWithTags {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct FullRecipe {
     /// The identifier for the recipe.
-    pub uuid: Uuid,
+    pub uuid: RecipeUuid,
 
     /// The name of the recipe (string, maximum length 255).
     pub name: MaxStr<255>,
@@ -86,7 +90,7 @@ pub struct Step {
     /// - if None, the mapping must be created
     ///
     /// In case of a response: The uuid must be set.
-    pub uuid: Option<Uuid>,
+    pub uuid: Option<RecipeStepUuid>,
 
     /// The actual value of the step (string, maximum length 255).
     pub step: MaxStr<255>,
@@ -108,10 +112,10 @@ pub struct CreateOrUpdateRecipe {
     ///
     /// Optional because if authentication is disabled, I don't know who created the recipe.
     /// If authentication is enabled, user must be set.
-    pub user: Option<Uuid>,
+    pub user: Option<AccountUuid>,
 
     /// Vector of tag Uuids.
-    pub tags: Vec<Uuid>,
+    pub tags: Vec<TagUuid>,
 
     /// Vector of all `RecipeIngredients`.
     pub ingredients: Vec<FullIngredient>,

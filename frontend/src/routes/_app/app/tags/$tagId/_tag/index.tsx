@@ -1,11 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Api } from "@/api/api.tsx";
 import { toast } from "sonner";
 import RecipeTable from "@/components/recipe-table.tsx";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import SINGLE_TAG_CONTEXT from "@/context/tag.tsx";
-import React from "react";
+import React, { Suspense } from "react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { MoreHorizontalIcon, PenBoxIcon, Trash2Icon } from "lucide-react";
+import type { SimpleTag } from "@/api/model/tag.interface.ts";
+import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
+import { DeleteTagDialog } from "@/components/dialogs/delete-tag.tsx";
 
 /**
  * The properties for {@link RecipeOverviewForTag}
@@ -19,8 +30,14 @@ const LIMIT = 50;
  */
 export default function RecipeOverviewForTag() {
     const [t] = useTranslation("tag");
+    const [tg] = useTranslation();
+
+    const navigate = useNavigate();
+    const router = useRouter();
 
     const { tag } = React.useContext(SINGLE_TAG_CONTEXT);
+    const [openEdit, setOpenEdit] = React.useState<SimpleTag>();
+    const [openDelete, setOpenDelete] = React.useState<string | undefined>(undefined);
 
     const { search, page } = Route.useSearch();
     const data = Route.useLoaderData();
@@ -32,6 +49,34 @@ export default function RecipeOverviewForTag() {
         <HeadingLayout
             heading={t("heading.tags-recipes-title", { object: tag.name })}
             description={t("heading.tags-recipes-description")}
+            headingChildren={
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={"ghost"} size={"icon"} data-nolink>
+                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                            <MoreHorizontalIcon className={"w-5"} />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align={"end"}>
+                        <DropdownMenuItem
+                            onClick={() =>
+                                setOpenEdit({
+                                    uuid: tag.uuid,
+                                    name: tag.name,
+                                    color: tag.color,
+                                })
+                            }
+                        >
+                            <PenBoxIcon className={"me-2.5 size-4"} />
+                            {t("button.edit")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOpenDelete(tag.uuid)}>
+                            <Trash2Icon className={"me-2.5 size-4"} />
+                            {t("button.delete")}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            }
         >
             <RecipeTable
                 search={search}
@@ -40,6 +85,29 @@ export default function RecipeOverviewForTag() {
                 data={data}
                 page={page}
             />
+
+            {openEdit && (
+                <Suspense>
+                    <EditTagDialog
+                        tag={openEdit}
+                        onClose={() => {
+                            setOpenEdit(undefined);
+                            router.invalidate();
+                        }}
+                    />
+                </Suspense>
+            )}
+            {openDelete && (
+                <Suspense>
+                    <DeleteTagDialog
+                        tag_uuid={openDelete}
+                        onClose={async () => {
+                            setOpenDelete(undefined);
+                            await navigate({ to: "/app/tags", search: { search: "", page: 0 } });
+                        }}
+                    />
+                </Suspense>
+            )}
         </HeadingLayout>
     );
 }

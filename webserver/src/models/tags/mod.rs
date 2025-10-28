@@ -1,22 +1,20 @@
 //! Tags domain model and helpers.
 
-use std::borrow::Cow;
-
 use futures_util::TryStreamExt;
-use rorm::and;
-use rorm::conditions;
-use rorm::db::Executor;
-use rorm::fields::types::MaxStr;
-use rorm::prelude::ForeignModelByField;
-use rorm::DbEnum;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
+use galvyn::core::re_exports::rorm;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::core::stuff::schema::GetPageRequest;
+use galvyn::rorm::and;
+use galvyn::rorm::db::Executor;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::prelude::ForeignModelByField;
+use galvyn::rorm::DbEnum;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::common::errors::ApiResult;
-use crate::http::common::schemas::GetPageRequest;
 use crate::models::recipes::RecipeUuid;
 use crate::models::tags::db::RecipeTagModel;
 use crate::models::tags::db::TagModel;
@@ -40,7 +38,7 @@ pub struct TagUuid(pub Uuid);
 impl Tag {
     /// Count all tags in the database.
     #[instrument(name = "Tag::query_total", skip(exe))]
-    pub async fn query_total(exe: impl Executor<'_>) -> ApiResult<i64> {
+    pub async fn query_total(exe: impl Executor<'_>) -> anyhow::Result<i64> {
         let total = rorm::query(exe, TagModel.uuid.count()).one().await?;
         Ok(total)
     }
@@ -50,7 +48,7 @@ impl Tag {
     pub async fn query_by_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
-    ) -> ApiResult<Vec<Self>> {
+    ) -> anyhow::Result<Vec<Self>> {
         let result: Vec<_> = rorm::query(exe, RecipeTagModel.tag.query_as(TagModel))
             .condition(RecipeTagModel.recipe.equals(recipe_uuid.0))
             .stream()
@@ -65,17 +63,8 @@ impl Tag {
         exe: impl Executor<'_>,
         page_request: &GetPageRequest,
         filter_name: Option<String>,
-    ) -> ApiResult<Vec<Self>> {
-        let condition = and![filter_name.map(|name| conditions::Binary {
-            operator: conditions::BinaryOperator::Like,
-            fst_arg: conditions::Column(TagModel.name),
-            snd_arg: conditions::Value::String(Cow::Owned(format!(
-                "%{}%",
-                name.replace('_', "\\_")
-                    .replace('%', "\\%")
-                    .replace('\\', "\\\\")
-            )))
-        })];
+    ) -> anyhow::Result<Vec<Self>> {
+        let condition = and![filter_name.map(|name| TagModel.name.contains_ignore_case(&name))];
 
         let result: Vec<_> = rorm::query(exe, TagModel)
             .condition(condition)
@@ -93,7 +82,7 @@ impl Tag {
     pub async fn query_by_uuid(
         exe: impl Executor<'_>,
         tag_uuid: &TagUuid,
-    ) -> ApiResult<Option<Self>> {
+    ) -> anyhow::Result<Option<Self>> {
         match rorm::query(exe, TagModel)
             .condition(TagModel.uuid.equals(tag_uuid.0))
             .optional()
@@ -105,7 +94,7 @@ impl Tag {
     }
 
     /// Find a tag by its unique name.
-    pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> ApiResult<Option<Self>> {
+    pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> anyhow::Result<Option<Self>> {
         match rorm::query(exe, TagModel)
             .condition(TagModel.name.equals(name))
             .optional()
@@ -122,7 +111,7 @@ impl Tag {
         exe: impl Executor<'_>,
         name: MaxStr<255>,
         color: TagColors,
-    ) -> ApiResult<Self> {
+    ) -> anyhow::Result<Self> {
         let model = rorm::insert(exe, TagModel)
             .single(&TagModel {
                 uuid: Uuid::new_v4(),
@@ -139,7 +128,7 @@ impl Tag {
         tag_uuid: &TagUuid,
         name: MaxStr<255>,
         color: TagColors,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::update(exe, TagModel)
             .set(TagModel.name, name)
             .set(TagModel.color, color)
@@ -149,7 +138,7 @@ impl Tag {
     }
 
     /// Delete a tag by its UUID.
-    pub async fn delete(exe: impl Executor<'_>, tag_uuid: &TagUuid) -> ApiResult<()> {
+    pub async fn delete(exe: impl Executor<'_>, tag_uuid: &TagUuid) -> anyhow::Result<()> {
         rorm::delete(exe, TagModel)
             .condition(TagModel.uuid.equals(tag_uuid.0))
             .await?;
@@ -162,7 +151,7 @@ impl Tag {
         exe: impl Executor<'_>,
         recipe_uuid: &RecipeUuid,
         tag_uuid: &TagUuid,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::insert(exe, RecipeTagModel)
             .return_nothing()
             .single(&RecipeTagModel {
@@ -179,7 +168,7 @@ impl Tag {
     pub async fn remove_from_recipe(
         exe: impl Executor<'_>,
         recipe_uuid: RecipeUuid,
-    ) -> ApiResult<()> {
+    ) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeTagModel)
             .condition(RecipeTagModel.recipe.equals(recipe_uuid.0))
             .await?;

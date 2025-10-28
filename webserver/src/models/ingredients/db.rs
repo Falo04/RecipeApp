@@ -1,5 +1,5 @@
-use rorm::fields::types::MaxStr;
-use rorm::Model;
+use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::Model;
 use uuid::Uuid;
 
 /// Represents an ingredient with a unique identifier and name.

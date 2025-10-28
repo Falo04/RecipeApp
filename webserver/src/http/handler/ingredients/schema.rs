@@ -1,20 +1,21 @@
 //! Represents all ingredients responses and requests.
 
-use rorm::fields::types::MaxStr;
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde::Serialize;
-use uuid::Uuid;
+use galvyn::core::re_exports::schemars;
+use galvyn::core::re_exports::schemars::JsonSchema;
+use galvyn::core::re_exports::serde::Deserialize;
+use galvyn::core::re_exports::serde::Serialize;
+use galvyn::core::stuff::schema::GetPageRequest;
+use galvyn::core::stuff::schema::List;
+use galvyn::rorm::fields::types::MaxStr;
 
-use crate::http::common::schemas::GetPageRequest;
-use crate::http::common::schemas::List;
+use crate::models::ingredients::IngredientUuid;
 use crate::models::ingredients::Units;
 
 /// Represent the request for all recipes with these ingredients
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct AllIngredientsRequest {
     /// List of ingredients uuids
-    pub uuids: List<Uuid>,
+    pub uuids: List<IngredientUuid>,
 }
 
 /// Represents the ingredients for a recipe.
@@ -29,7 +30,7 @@ pub struct FullIngredient {
     /// - if None, the mapping must be created.
     ///
     /// In case of a response: The uuid must be set.
-    pub uuid: Option<Uuid>,
+    pub uuid: Option<IngredientUuid>,
 
     /// The name of the ingredient,
     pub name: MaxStr<255>,
@@ -38,14 +39,14 @@ pub struct FullIngredient {
     pub unit: Units,
 
     /// The quantity of the ingredient.
-    pub amount: i32,
+    pub amount: i64,
 }
 
 /// Represents the response received after searching for ingredients.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct SimpleIngredient {
     /// The UUID for the ingredient.
-    pub uuid: Uuid,
+    pub uuid: IngredientUuid,
     /// The name of the ingredient.
     pub name: MaxStr<255>,
 }
@@ -58,5 +59,5 @@ pub struct GetAllRecipesByIngredientsRequest {
     /// Name of recipes to filter for
     pub filter_name: Option<String>,
     /// List of ingredients to filter for
-    pub filter_uuids: List<Uuid>,
+    pub filter_uuids: List<IngredientUuid>,
 }
