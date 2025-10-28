@@ -5,63 +5,34 @@ edition = "2021"
 publish = false
 
 [dependencies]
-# Error Handling
-thiserror = "~2"
-
-dotenv = "0.15.0"
-
-# Webframework
-axum = { version = "~0.8.0", features = ["ws"] }
-galvyn = { git = "https://github.com/myOmikron/galvyn.git" }
-tower = { version = "~0.5", features = ["full"] } # Base traits
-tower-http = { version = "~0.6", features = ["trace"] } # Common middlewares
-tower-sessions = { version = "~0.14.0" } # Cookie based sessions
-reqwest = "0.12.23"
-
-# Cli
-clap = { version = "~4", features = ["derive"] }
-
-# Logging
-tracing = { version = "~0.1" } # Base API
-tracing-subscriber = { version = "~0.3", features = [
-    "tracing-log",
-    "env-filter",
-] }
-tracing-opentelemetry = { version = "0.25" }
-opentelemetry = { version = "0.24" }
-opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.17" }
-
-# Datatypes
-uuid = { version = "~1", features = ["serde", "v4"] }
-time = { version = "~0.3" }
-
-# Database
-rorm = { version = "~0.7", default-features = false, features = ["postgres-only", "cli", "time", "uuid", "schemars"] }
 
 # Async
-tokio = { version = "~1", features = ["full"] }
-futures-lite = { version = "~2" }
-futures-util = "0.3.31"
+tokio = { version = ">=1.23.1", features = ["full"] }
+futures-util = { version = "~0.3" }
 
-# Json
+# CLI
+clap = { version = "~4", features = ["derive"] }
+
+# Datatypes
+url = { version = "~2", features = ["serde"] }
+time = { version = "~0.3" }
+
+# Error handling
+anyhow = { version = "~1" }
+
+# Serialization
 serde = { version = "~1", features = ["derive"] }
-serde_repr = { version = "~0.1" }
-serde_plain = "1.0.0"
-serde_json = "1.0.140"
-schemars = { version = "~0.8.0", features = ["uuid1", "raw_value"] }
+serde_json = { version = "~1" }
 
-# GRPC
-tonic = { version = "~0.12", default-features = false, features = [
-    "channel",
-    "codegen",
-    "prost",
-    "tls",
-    "tls-native-roots",
-] }
+# Tracing
+tracing = { version = "~0.1" }
+tracing-subscriber = { version = "~0.3", features = ["env-filter", "json"] }
+tracing-forest = { version = "~0.2", features = ["ansi", "tokio", "smallvec", "chrono"] }
 
-# Authentication
+# Web framework
+galvyn = { git = "https://github.com/myOmikron/galvyn.git", rev = "1a651aa11d75f3a6ed5d66118955d14726c0cb6b" }
+tower-http = { version = "~0.6", features = ["trace"] }
+
+# Account authentication
 openidconnect = { version = "~4", features = ["accept-rfc3339-timestamps", "timing-resistant-secret-traits"] }
-url = "2.5.4"
-
-[build-dependencies]
+uuid = { version = "~1", features = ["v4"] }

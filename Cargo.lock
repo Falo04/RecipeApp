@@ -48,6 +48,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ansi_term"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d52a9bb7ec0cf484c551830a7ce27bd20d67eac647e1befb56b0be4ee39a55d2"
+dependencies = [
+ "winapi",
+]
+
+[[package]]
 name = "anstream"
 version = "0.6.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -218,7 +227,6 @@ dependencies = [
  "tower 0.5.2",
  "tower-layer",
  "tower-service",
- "tracing",
 ]
 
 [[package]]
@@ -258,7 +266,6 @@ dependencies = [
  "sync_wrapper",
  "tower-layer",
  "tower-service",
- "tracing",
 ]
 
 [[package]]
@@ -471,16 +478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "core-foundation"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b55271e5c8c478ad3f38ad24ef34923091e0548492a266d19b3c0b4d82574c63"
-dependencies = [
- "core-foundation-sys",
- "libc",
-]
-
-[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -664,12 +661,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
 name = "dotenvy"
@@ -974,10 +965,7 @@ version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5edaec856126859abb19ed65f39e90fea3a9574b9707f13539acf4abf7eb532"
 dependencies = [
- "fastrand",
  "futures-core",
- "futures-io",
- "parking",
  "pin-project-lite",
 ]
 
@@ -1024,13 +1012,14 @@ dependencies = [
 [[package]]
 name = "galvyn"
 version = "0.1.0"
-source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=1a651aa11d75f3a6ed5d66118955d14726c0cb6b#1a651aa11d75f3a6ed5d66118955d14726c0cb6b"
 dependencies = [
  "axum 0.8.1",
  "futures-lite",
  "galvyn-core",
  "galvyn-macros",
  "openapiv3",
+ "reqwest",
  "rorm",
  "schemars 0.8.22",
  "serde_json",
@@ -1039,13 +1028,14 @@ dependencies = [
  "thiserror 2.0.12",
  "tokio",
  "tracing",
+ "tracing-forest",
  "tracing-subscriber",
 ]
 
 [[package]]
 name = "galvyn-core"
 version = "0.1.0"
-source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=1a651aa11d75f3a6ed5d66118955d14726c0cb6b#1a651aa11d75f3a6ed5d66118955d14726c0cb6b"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1056,25 +1046,28 @@ dependencies = [
  "futures-concurrency",
  "futures-lite",
  "mime",
+ "opentelemetry",
+ "opentelemetry-otlp",
+ "opentelemetry_sdk",
  "regex",
  "rorm",
  "schemars 0.8.22",
  "serde",
  "serde_json",
- "serde_repr",
  "thiserror 2.0.12",
  "time",
  "tokio",
  "tower 0.5.2",
  "tower-sessions",
  "tracing",
+ "tracing-opentelemetry",
  "uuid",
 ]
 
 [[package]]
 name = "galvyn-macros"
 version = "0.2.0"
-source = "git+https://github.com/myOmikron/galvyn.git#daf7d3da638cd38deee89e9587db29d67980c139"
+source = "git+https://github.com/myOmikron/galvyn.git?rev=1a651aa11d75f3a6ed5d66118955d14726c0cb6b#1a651aa11d75f3a6ed5d66118955d14726c0cb6b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1199,16 +1192,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7382cf6263419f2d8df38c55d7da83da5c18aef87fc7a7fc1fb1e344edfe14c1"
 dependencies = [
  "hashbrown 0.15.2",
-]
-
-[[package]]
-name = "hdrhistogram"
-version = "7.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "765c9198f173dd59ce26ff9f95ef0aafd0a0fe01fb9d72841bc5066a4c06511d"
-dependencies = [
- "byteorder",
- "num-traits",
 ]
 
 [[package]]
@@ -1843,7 +1826,7 @@ dependencies = [
  "openssl-probe",
  "openssl-sys",
  "schannel",
- "security-framework 2.11.1",
+ "security-framework",
  "security-framework-sys",
  "tempfile",
 ]
@@ -2587,9 +2570,9 @@ dependencies = [
 
 [[package]]
 name = "rorm"
-version = "0.7.1"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78d59f4555b60198f04a762c994aec4115d60d795728b3f62398141649e182a1"
+checksum = "dd18bc181d09c92d1ffd6be882fbf9f89d6b72f0eaca6d146f76b743fcf67c4b"
 dependencies = [
  "bit-vec",
  "futures-core",
@@ -2601,7 +2584,6 @@ dependencies = [
  "rorm-db",
  "rorm-declaration",
  "rorm-macro",
- "rustc_version",
  "schemars 0.8.22",
  "serde",
  "serde_json",
@@ -2613,9 +2595,9 @@ dependencies = [
 
 [[package]]
 name = "rorm-cli"
-version = "0.8.1"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b01f83d958f9d8679307cc9161a4e68647108815c7c55de9f178da0f3e812d20"
+checksum = "c20f0c9b04727cae9fc7334508c0792c0ad66558c4bc4f607094d424ef932157"
 dependencies = [
  "anyhow",
  "clap",
@@ -2623,26 +2605,23 @@ dependencies = [
  "regex",
  "rorm-db",
  "rorm-declaration",
- "rorm-sql",
  "rpassword",
  "serde",
  "serde_json",
- "strum",
  "tokio",
  "toml",
 ]
 
 [[package]]
 name = "rorm-db"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bcab70d581ad189286ae2041a7ae7fda47b248d09253572add19d159dcd1997"
+checksum = "12b826afa399b57500dcca822909c3c993002ed86f14bf1ff899cf1de00ce963"
 dependencies = [
  "futures-core",
  "pin-project",
  "rorm-declaration",
  "rorm-sql",
- "rustc_version",
  "serde",
  "sqlx",
  "tracing",
@@ -2662,9 +2641,9 @@ dependencies = [
 
 [[package]]
 name = "rorm-macro"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ade7fec12fcfc5fc81907fcc7d03d59f9cebc485468bca4f183e2bc883cc1510"
+checksum = "4895df5ad74d35a8b1791a0f360645f567be659df072c3507b7bb347bcabb8ef"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2674,9 +2653,9 @@ dependencies = [
 
 [[package]]
 name = "rorm-macro-impl"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a01219e6d1607bb7f9205a9d11afd8dc94585042d0d9ebe43c545776dbb2a59"
+checksum = "e783dad31701f627e124382089402d01b43e9b010a697a54e51eb45b9bf636eb"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -2686,17 +2665,15 @@ dependencies = [
 
 [[package]]
 name = "rorm-sql"
-version = "0.9.1"
+version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cdd5780b3d8cdb1d11d35e1d5b699d91a32d90d53cf9dff872b8271e20e6807"
+checksum = "09230f3f0b46efcca7f6f4459780f3a658705bbed45e06cc48b7479a51a9772a"
 dependencies = [
  "bit-vec",
  "chrono",
  "ipnetwork",
  "mac_address",
  "rorm-declaration",
- "rustc_version",
- "serde",
  "serde_json",
  "time",
  "uuid",
@@ -2783,34 +2760,12 @@ version = "0.23.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47796c98c480fce5406ef69d1c76378375492c3b0a0de587be0c1d9feb12f395"
 dependencies = [
- "log",
  "once_cell",
  "ring",
  "rustls-pki-types",
  "rustls-webpki",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "rustls-native-certs"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fcff2dd52b58a8d98a70243663a0d234c4e2b79235637849d15913394a247d3"
-dependencies = [
- "openssl-probe",
- "rustls-pki-types",
- "schannel",
- "security-framework 3.2.0",
-]
-
-[[package]]
-name = "rustls-pemfile"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dce314e5fee3f39953d46bb63bb8a46d40c2f8fb7cc5a3b6cab2bde9721d6e50"
-dependencies = [
- "rustls-pki-types",
 ]
 
 [[package]]
@@ -2937,20 +2892,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "897b2245f0b511c87893af39b033e5ca9cce68824c4d7e7630b5a1d339658d02"
 dependencies = [
  "bitflags",
- "core-foundation 0.9.4",
- "core-foundation-sys",
- "libc",
- "security-framework-sys",
-]
-
-[[package]]
-name = "security-framework"
-version = "3.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "271720403f46ca04f7ba6f55d438f8bd878d6b8ca0a1046e8228c4145bcbb316"
-dependencies = [
- "bitflags",
- "core-foundation 0.10.0",
+ "core-foundation",
  "core-foundation-sys",
  "libc",
  "security-framework-sys",
@@ -3042,17 +2984,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ce1fc6db65a611022b23a0dec6975d63fb80a302cb3388835ff02c097258d50"
 dependencies = [
  "serde",
-]
-
-[[package]]
-name = "serde_repr"
-version = "0.1.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "175ee3e80ae9982737ca543e96133087cbd9a485eecc3bc4de9c1a37b47ea59c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -3537,7 +3468,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c879d448e9d986b661742763247d3693ed13609438cf3d006f51f5368a5ba6b"
 dependencies = [
  "bitflags",
- "core-foundation 0.9.4",
+ "core-foundation",
  "system-configuration-sys",
 ]
 
@@ -3811,11 +3742,8 @@ dependencies = [
  "percent-encoding",
  "pin-project",
  "prost",
- "rustls-native-certs",
- "rustls-pemfile",
  "socket2 0.5.8",
  "tokio",
- "tokio-rustls",
  "tokio-stream",
  "tower 0.4.13",
  "tower-layer",
@@ -3851,16 +3779,11 @@ checksum = "d039ad9159c98b70ecfd540b2573b97f7f52c3e8d9f8ad57a24b916a536975f9"
 dependencies = [
  "futures-core",
  "futures-util",
- "hdrhistogram",
- "indexmap 2.7.1",
  "pin-project-lite",
- "slab",
  "sync_wrapper",
  "tokio",
- "tokio-util",
  "tower-layer",
  "tower-service",
- "tracing",
 ]
 
 [[package]]
@@ -3995,6 +3918,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "tracing-forest"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3298fe855716711a00474eceb89cc7dc254bbe67f6bc4afafdeec5f0c538771c"
+dependencies = [
+ "ansi_term",
+ "chrono",
+ "smallvec",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "tracing-log"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4024,6 +3962,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tracing-serde"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "704b1aeb7be0d0a84fc9828cae51dab5970fee5088f83d1dd7ee6f6246fc6ff1"
+dependencies = [
+ "serde",
+ "tracing-core",
+]
+
+[[package]]
 name = "tracing-subscriber"
 version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4033,12 +3981,15 @@ dependencies = [
  "nu-ansi-term",
  "once_cell",
  "regex",
+ "serde",
+ "serde_json",
  "sharded-slab",
  "smallvec",
  "thread_local",
  "tracing",
  "tracing-core",
  "tracing-log",
+ "tracing-serde",
 ]
 
 [[package]]
@@ -4301,32 +4252,18 @@ dependencies = [
 name = "webserver"
 version = "0.1.0"
 dependencies = [
- "axum 0.8.1",
+ "anyhow",
  "clap",
- "dotenv",
- "futures-lite",
  "futures-util",
  "galvyn",
  "openidconnect",
- "opentelemetry",
- "opentelemetry-otlp",
- "opentelemetry_sdk",
- "reqwest",
- "rorm",
- "schemars 0.8.22",
  "serde",
  "serde_json",
- "serde_plain",
- "serde_repr",
- "thiserror 2.0.12",
  "time",
  "tokio",
- "tonic",
- "tower 0.5.2",
  "tower-http",
- "tower-sessions",
  "tracing",
- "tracing-opentelemetry",
+ "tracing-forest",
  "tracing-subscriber",
  "url",
  "uuid",
