@@ -1,3 +1,7 @@
+//! Recipe App
+
+#![warn(missing_docs, clippy::unwrap_used, clippy::expect_used)]
+
 use std::fs;
 use std::net::SocketAddr;
 
@@ -32,6 +36,7 @@ mod modules;
 /// This struct holds the parsed command and any subcommands.
 #[derive(Parser)]
 pub struct Cli {
+    /// The command to execute.
     #[clap(subcommand)]
     pub command: Command,
 }
@@ -41,9 +46,18 @@ pub struct Cli {
 /// This enum defines the different commands available in the application.
 #[derive(Subcommand)]
 pub enum Command {
+    /// Start the application.
     Start,
-    Migrate { migrations_dir: String },
-    MakeMigrations { migrations_dir: String },
+    /// Apply migrations to the database.
+    Migrate {
+        /// The directory containing the migrations to apply.
+        migrations_dir: String,
+    },
+    /// Generate migrations for the database.
+    MakeMigrations {
+        /// The directory to write the migrations to.
+        migrations_dir: String,
+    },
 }
 
 /// Main function to start the application.

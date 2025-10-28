@@ -43,8 +43,6 @@ pub struct Recipe {
 
     /// An optional foreign key referencing a `User` model.
     pub user: AccountUuid,
-
-    pub created_at: OffsetDateTime,
 }
 
 /// Type‑safe new type around Uuid for recipe identifiers.
@@ -225,7 +223,6 @@ impl From<RecipeModel> for Recipe {
             uuid: RecipeUuid(model.uuid),
             name: model.name,
             description: model.description,
-            created_at: model.created_at,
             user: AccountUuid(model.user.0),
         }
     }

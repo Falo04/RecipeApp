@@ -15,21 +15,6 @@ use crate::models::recipe_steps::RecipeStepUuid;
 use crate::models::recipes::RecipeUuid;
 use crate::models::tags::TagUuid;
 
-/// Represents a simple recipe.
-///
-/// This struct contains the recipe's unique identifier (UUID), name, and description.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct SimpleRecipe {
-    /// The identifier for the recipe.
-    pub uuid: RecipeUuid,
-
-    /// The name of the recipe (string, maximum length 255).
-    pub name: MaxStr<255>,
-
-    /// The description of the recipe (string, maximum length 1024).
-    pub description: MaxStr<255>,
-}
-
 /// Represents a simple recipe with associated tags.
 ///
 /// This struct contains information about a recipe, including its unique identifier,

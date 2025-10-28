@@ -26,9 +26,6 @@ pub struct RecipeIngredient {
     /// Stable identifier for this recipe-ingredient association.
     pub uuid: RecipeIngredientUuid,
 
-    /// The recipe this ingredient entry belongs to.
-    pub recipe: RecipeUuid,
-
     /// The ingredient referenced by this entry.
     pub ingredients: IngredientUuid,
 
@@ -109,7 +106,6 @@ impl From<RecipeIngredientModel> for RecipeIngredient {
     fn from(model: RecipeIngredientModel) -> Self {
         Self {
             uuid: RecipeIngredientUuid(model.uuid),
-            recipe: RecipeUuid(model.recipe.0),
             ingredients: IngredientUuid(model.ingredients.0),
             unit: model.unit,
             amount: model.amount,

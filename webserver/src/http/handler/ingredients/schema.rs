@@ -11,13 +11,6 @@ use galvyn::rorm::fields::types::MaxStr;
 use crate::models::ingredients::IngredientUuid;
 use crate::models::ingredients::Units;
 
-/// Represent the request for all recipes with these ingredients
-#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
-pub struct AllIngredientsRequest {
-    /// List of ingredients uuids
-    pub uuids: List<IngredientUuid>,
-}
-
 /// Represents the ingredients for a recipe.
 ///
 /// This struct will be used for Response and Request.

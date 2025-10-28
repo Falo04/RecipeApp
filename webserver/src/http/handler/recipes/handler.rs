@@ -30,7 +30,6 @@ use crate::models::recipe_steps::RecipeStep;
 use crate::models::recipes::Recipe;
 use crate::models::recipes::RecipeUuid;
 use crate::models::tags::Tag;
-use crate::models::tags::TagUuid;
 use crate::modules::websockets::WebsocketManager;
 
 /// Retrieves all recipes with pagination support and associated tags.
