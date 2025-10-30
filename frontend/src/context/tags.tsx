@@ -1,17 +1,15 @@
 import { Api } from "@/api/api";
-import type { Page } from "@/api/model/global.interface";
-import type { SimpleTag } from "@/api/model/tag.interface";
 import React, { useEffect } from "react";
-import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import WS from "@/api/websockets.ts";
+import type { SimpleTag } from "@/api/generated";
 
 /**
  * Represents the context for managing and interacting with tags.
  * It contains the current list of tags and a function to reset the context.
  */
 export type TagsContext = {
-    tags: Page<SimpleTag>;
+    tags: Array<SimpleTag>;
 
     reset: () => void;
 };
@@ -24,12 +22,7 @@ export type TagsContext = {
  * It also includes a reset function for managing state.
  */
 const TAGS_CONTEXT = React.createContext<TagsContext>({
-    tags: {
-        items: [],
-        limit: 999,
-        offset: 0,
-        total: 0,
-    },
+    tags: [],
     reset: () => {},
 });
 /**
@@ -57,7 +50,7 @@ type TagsProviderProps = {
  * @param {TagsProviderProps} props Props passed to the provider.
  */
 export function TagsProvider(props: TagsProviderProps) {
-    const [tags, setTags] = React.useState<Page<SimpleTag> | "loading">("loading");
+    const [tags, setTags] = React.useState<Array<SimpleTag> | "loading">("loading");
     let fetching = false;
 
     const fetchTags = async () => {
@@ -69,14 +62,8 @@ export function TagsProvider(props: TagsProviderProps) {
             offset: 0,
             filter_name: "",
         });
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
 
-        if (res.data) {
-            setTags(res.data);
-        }
+        setTags(res.items);
 
         fetching = false;
     };

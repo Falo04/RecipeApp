@@ -1,17 +1,15 @@
 import { Api } from "@/api/api";
-import type { List } from "@/api/model/global.interface";
 import React, { useEffect } from "react";
-import { toast } from "sonner";
-import type { SimpleIngredient } from "@/api/model/ingredients.interface.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import WS from "@/api/websockets.ts";
+import type { SimpleIngredient } from "@/api/generated";
 
 /**
  * Represents the context for managing and interacting with ingredients.
  * It contains the current list of ingredients and a function to reset the context.
  */
 export type IngredientProvider = {
-    ingredients: List<SimpleIngredient>;
+    ingredients: Array<SimpleIngredient>;
 
     reset: () => void;
 };
@@ -24,7 +22,7 @@ export type IngredientProvider = {
  * It also includes a reset function for managing state.
  */
 const INGREDIENTS_CONTEXT = React.createContext<IngredientProvider>({
-    ingredients: { list: [] },
+    ingredients: [],
     reset: () => {},
 });
 /**
@@ -52,7 +50,7 @@ type IngredientProviderProps = {
  * @param {IngredientProviderProps} props Props passed to the provider.
  */
 export function IngredientProvider(props: IngredientProviderProps) {
-    const [ingredients, setIngredients] = React.useState<List<SimpleIngredient> | "loading">("loading");
+    const [ingredients, setIngredients] = React.useState<Array<SimpleIngredient> | "loading">("loading");
     let fetching = false;
 
     const fetchTags = async () => {
@@ -60,14 +58,7 @@ export function IngredientProvider(props: IngredientProviderProps) {
         fetching = true;
 
         const res = await Api.ingredients.getAll();
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        if (res.data) {
-            setIngredients(res.data);
-        }
+        setIngredients(res.list);
 
         fetching = false;
     };

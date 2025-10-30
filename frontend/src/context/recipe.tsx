@@ -1,8 +1,7 @@
 import { Api } from "@/api/api";
 import React, { useEffect } from "react";
-import { toast } from "sonner";
-import type { FullRecipe } from "@/api/model/recipe.interface.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import type { FullRecipe } from "@/api/generated";
 
 /**
  * Represents the context for managing and interacting with a single recipe.
@@ -28,7 +27,7 @@ const SINGLE_RECIPE_CONTEXT = React.createContext<SingleRecipesContext>({
         description: "",
         steps: [],
         tags: [],
-        user: undefined,
+        user: { uuid: "", display_name: "", email: "" },
         ingredients: [],
     },
     reset: () => {},
@@ -67,14 +66,7 @@ export function SingleRecipeProvider(props: SingleRecipeProviderProps) {
         fetching = true;
 
         const res = await Api.recipe.getById(props.uuid);
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        if (res.data) {
-            setRecipe(res.data);
-        }
+        setRecipe(res);
 
         fetching = false;
     };

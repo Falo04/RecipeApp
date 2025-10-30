@@ -1,6 +1,6 @@
 import React from "react";
-import { type SimpleTag, TagColors } from "@/api/model/tag.interface.ts";
 import TAGS_CONTEXT from "@/context/tags.tsx";
+import { type SimpleTag, TagColors } from "@/api/generated";
 
 /** Data provided by the {@link SINGLE_TAG_CONTEXT} */
 export type SingleTagContext = {
@@ -47,7 +47,7 @@ export function SingleTagProvider(props: SingleTagProviderProps) {
     const [tag, setTag] = React.useState<SimpleTag | undefined>(undefined);
 
     const tagsContext = React.useContext(TAGS_CONTEXT);
-    const setTagContext = () => setTag(tagsContext.tags.items.find((t) => t.uuid === props.uuid));
+    const setTagContext = () => setTag(tagsContext.tags.find((t) => t.uuid === props.uuid));
 
     if (!tag && tagsContext !== undefined) {
         setTagContext();
