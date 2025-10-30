@@ -1,1 +1,1 @@
-FROM postgres:latest AS final
+FROM postgres:17-alpine AS final
