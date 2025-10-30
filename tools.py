@@ -79,6 +79,7 @@ def main():
     # special subcommands
     subparser.add_parser("make-migrations")
     subparser.add_parser("create-user")
+    subparser.add_parser("gen-api")
 
     prod = subparser.add_parser("prod")
     prod_subparsers = prod.add_subparsers(dest="prod_command")
@@ -111,6 +112,8 @@ def main():
         )
         docker_compose_dev("down", ["webserver-dev"])
         docker_compose_dev("up", ["-d", "webserver-dev"])
+    elif args.command == "gen-api":
+        docker_compose_dev("exec", ["-it", "frontend-dev", "npm", "run", "gen-api"])
     elif args.command == "prod":
         docker_compose_prod(args.prod_command, unknown_args)
     else:
