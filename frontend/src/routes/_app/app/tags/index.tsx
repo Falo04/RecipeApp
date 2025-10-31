@@ -7,7 +7,6 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Text } from "@/components/ui/text.tsx";
 import { Api } from "@/api/api.tsx";
-import { toast } from "sonner";
 import { useForm } from "@tanstack/react-form";
 import { Form, Input } from "@/components/ui/form.tsx";
 import {
@@ -19,13 +18,13 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
 import TablePagination from "@/components/ui/table-pagination.tsx";
-import type { SimpleTag } from "@/api/model/tag.interface.ts";
 import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
 import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import WS from "@/api/websockets.ts";
+import type { SimpleTag } from "@/api/generated";
 
 /**
  * The properties for {@link TagsOverview}
@@ -231,18 +230,10 @@ export const Route = createFileRoute("/_app/app/tags/")({
         };
     },
     loaderDeps: ({ search: { page, search } }) => ({ page, search }),
-    loader: async ({ deps }) => {
-        const res = await Api.tags.getAll({
+    loader: async ({ deps }) =>
+        await Api.tags.getAll({
             limit: LIMIT,
             offset: (deps.page - 1) * LIMIT,
             filter_name: deps.search,
-        });
-
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        return res.data;
-    },
+        }),
 });

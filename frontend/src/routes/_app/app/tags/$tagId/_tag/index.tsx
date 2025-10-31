@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Api } from "@/api/api.tsx";
-import { toast } from "sonner";
 import RecipeTable from "@/components/recipe-table.tsx";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
@@ -14,9 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { MoreHorizontalIcon, PenBoxIcon, Trash2Icon } from "lucide-react";
-import type { SimpleTag } from "@/api/model/tag.interface.ts";
 import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
 import { DeleteTagDialog } from "@/components/dialogs/delete-tag.tsx";
+import type { SimpleTag } from "@/api/generated";
 
 /**
  * The properties for {@link RecipeOverviewForTag}
@@ -130,18 +129,10 @@ export const Route = createFileRoute("/_app/app/tags/$tagId/_tag/")({
         };
     },
     loaderDeps: ({ search: { page, search } }) => ({ page, search }),
-    loader: async ({ deps, params }) => {
-        const res = await Api.tags.getRecipesByTag(params.tagId, {
+    loader: async ({ deps, params }) =>
+        await Api.tags.getRecipesByTag(params.tagId, {
             limit: LIMIT,
             offset: (deps.page - 1) * LIMIT,
             filter_name: deps.search,
-        });
-
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        return res.data;
-    },
+        }),
 });

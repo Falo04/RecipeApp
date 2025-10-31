@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { Field } from "@/components/ui/field.tsx";
 
 /**
  * The properties for {@link DeleteRecipeDialog}
@@ -22,12 +23,7 @@ export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
     const [tg] = useTranslation();
 
     const deleteTag = async () => {
-        const res = await Api.recipe.delete(props.recipe_uuid);
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
+        await Api.recipe.delete(props.recipe_uuid);
         toast.success(t("toast.deleted-success"));
         props.onClose();
         return;
@@ -43,14 +39,14 @@ export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <div className="flex w-full justify-between">
+                    <Field orientation={"horizontal"}>
                         <Button variant="secondary" onClick={() => props.onClose()}>
                             {tg("button.close")}
                         </Button>
                         <Button variant="destructive" onClick={async () => await deleteTag()}>
                             {t("button.delete")}
                         </Button>
-                    </div>
+                    </Field>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

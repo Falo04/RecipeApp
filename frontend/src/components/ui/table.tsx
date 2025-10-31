@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 function Table({
     className,
@@ -13,11 +13,7 @@ function Table({
             data-slot="table-container"
             className={cn(wrapperClassName, "border-border relative w-full overflow-auto rounded-lg border")}
         >
-            <table
-                data-slot="table"
-                className={cn("w-full caption-bottom text-sm", className)}
-                {...props}
-            />
+            <table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
         </div>
     );
 }

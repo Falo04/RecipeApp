@@ -1,7 +1,7 @@
 import React from "react";
 import { Subheading } from "@/components/ui/heading.tsx";
 import { Text } from "@/components/ui/text.tsx";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils.ts";
 import { CheckIcon, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile.ts";

@@ -4,7 +4,6 @@ import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Api } from "@/api/api.tsx";
-import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import RecipeTable from "@/components/recipe-table.tsx";
 import { useEffect } from "react";
@@ -78,18 +77,10 @@ export const Route = createFileRoute("/_app/app/recipes/")({
         };
     },
     loaderDeps: ({ search: { page, search } }) => ({ page, search }),
-    loader: async ({ deps }) => {
-        const res = await Api.recipe.getAll({
+    loader: async ({ deps }) =>
+        await Api.recipe.getAll({
             limit: LIMIT,
             offset: (deps.page - 1) * LIMIT,
             filter_name: deps.search,
-        });
-
-        if (res.error) {
-            toast.error(res.error.message);
-            return;
-        }
-
-        return res.data;
-    },
+        }),
 });

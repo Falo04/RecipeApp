@@ -1,16 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { Subheading } from "@/components/ui/heading.tsx";
-import type { Ingredients } from "@/api/model/ingredients.interface.ts";
 import { MinusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils.ts";
+import type { FullIngredient } from "@/api/generated";
 
 /**
  * The properties for {@link IngredientsGrid}
  */
 export type IngredientsGridProps = {
     /** List of all ingredients to show */
-    ingredients: Array<Ingredients>;
+    ingredients: Array<FullIngredient>;
     /** Function to remove ingredients from list */
     onDelete?: (index: number) => void;
     /** Should the grid be scrollable? */

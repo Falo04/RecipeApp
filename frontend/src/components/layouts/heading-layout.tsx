@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils.ts";
 
 /**
  * The properties for {@link HeadingLayout}

@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils.ts";
 
 export function Text({ className, ...props }: React.ComponentPropsWithoutRef<"p">) {
     return (

@@ -1,6 +1,6 @@
 import { Link, useRouterState, type LinkProps, Outlet } from "@tanstack/react-router";
 import React from "react";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils.ts";
 import { motion } from "framer-motion";
 
 export type TabMenuProps = {

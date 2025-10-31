@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { Label } from "@/components/ui/label";
 
 /**
@@ -29,7 +29,7 @@ function Form(props: FormProps) {
                 e.preventDefault();
                 props.onSubmit();
             }}
-            className={cn(props.className, "w-full space-y-8 lg:max-w-lg")}
+            className={cn(props.className, "w-full space-y-8")}
         >
             {props.children}
         </form>

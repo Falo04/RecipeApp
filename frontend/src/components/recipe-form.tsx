@@ -1,8 +1,6 @@
 import { Api } from "@/api/api";
-import { Units } from "@/api/model/ingredients.interface";
-import type { CreateRecipeRequest, FullRecipe, UpdateRecipeRequest } from "@/api/model/recipe.interface";
 import { Button } from "@/components/ui/button";
-import { Form, FormLabel, Input } from "@/components/ui/form";
+import { Form, Input } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import TAGS_CONTEXT from "@/context/tags";
@@ -32,6 +30,9 @@ import { useIsMobile } from "@/hooks/use-mobile.ts";
 import IngredientsGrid from "@/components/ingredients-grid.tsx";
 import ACCOUNT_CONTEXT from "@/context/account.tsx";
 import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
+import { type CreateOrUpdateRecipe, type FullRecipe, Units } from "@/api/generated";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field.tsx";
+import { isFormError } from "@/utils/error.ts";
 
 /**
  * The properties for {@link RecipeForm}
@@ -78,55 +79,52 @@ export function RecipeForm(props: RecipeFormProps) {
             steps: props.formData ? props.formData.steps : [{ step: "" }],
             tags: props.formData ? props.formData.tags : [],
         },
-        onSubmit: async ({ value }) => {
-            if (props.formData) {
-                const payload: UpdateRecipeRequest = {
-                    user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
-                    tags: value.tags.map((tag) => tag.uuid),
-                    name: value.name,
-                    description: value.description,
-                    ingredients: value.ingredients,
-                    steps: value.steps.map((s, idx) => ({ index: idx, step: s.step })),
-                };
-                toast.promise(Api.recipe.update(props.formData.uuid, payload), {
-                    loading: tg("toast.loading"),
-                    success: (result) => {
-                        if (result.error) {
-                            toast.error(result.error.message);
-                            return;
-                        }
+        validators: {
+            onSubmitAsync: async ({ value }) => {
+                if (props.formData) {
+                    const payload: CreateOrUpdateRecipe = {
+                        user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
+                        tags: value.tags.map((tag) => tag.uuid),
+                        name: value.name,
+                        description: value.description,
+                        ingredients: value.ingredients,
+                        steps: value.steps.map((s, idx) => ({ index: idx, step: s.step })),
+                    };
+                    const res = await Api.recipe.update(props.formData.uuid, payload);
 
-                        recipeContext.reset();
-                        props.navigate(props.formData!.uuid);
-                        return t("toast.updated-success");
-                    },
-                    error: () => tg("toast.general-error"),
-                });
-            } else {
-                const payload: CreateRecipeRequest = {
-                    user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
-                    tags: value.tags.map((tag) => tag.uuid),
-                    name: value.name,
-                    description: value.description,
-                    ingredients: value.ingredients,
-                    steps: value.steps.map((s, idx) => ({ index: idx, step: s.step })),
-                };
-                toast.promise(Api.recipe.create(payload), {
-                    loading: tg("toast.loading"),
-                    success: (result) => {
-                        if (result.error) {
-                            toast.error(result.error.message);
-                            return;
-                        }
+                    if (isFormError(res)) {
+                        return {
+                            fields: {
+                                name: res.error.name_already_exists ? t("error.name-already-exists") : undefined,
+                            },
+                        };
+                    }
 
-                        if (result.data) {
-                            props.navigate(result.data.uuid);
-                            return t("toast.created-success");
-                        }
-                    },
-                    error: () => tg("toast.general-error"),
-                });
-            }
+                    toast.success(t("toast.updated-success"));
+                    recipeContext.reset();
+                    props.navigate(props.formData.uuid);
+                } else {
+                    const payload: CreateOrUpdateRecipe = {
+                        user: accountContext.account !== undefined ? accountContext.account.uuid : undefined,
+                        tags: value.tags.map((tag) => tag.uuid),
+                        name: value.name,
+                        description: value.description,
+                        ingredients: value.ingredients,
+                        steps: value.steps.map((s, idx) => ({ index: idx, step: s.step })),
+                    };
+                    const res = await Api.recipe.create(payload);
+
+                    if (isFormError(res)) {
+                        return {
+                            fields: {
+                                name: res.error.name_already_exists ? t("error.name-already-exists") : undefined,
+                            },
+                        };
+                    }
+                    toast.success(t("toast.created-success"));
+                    props.navigate(res.uuid);
+                }
+            },
         },
     });
 
@@ -169,130 +167,136 @@ export function RecipeForm(props: RecipeFormProps) {
     ];
 
     return (
-        <div className="flex h-full flex-col justify-center gap-4 md:grid md:max-h-[70vh] md:grid-cols-2">
+        <div className="flex h-full flex-col justify-center gap-4 md:grid md:grid-cols-2">
             {isMobile && <StepperVertical steps={steps} />}
-            <Form onSubmit={form.handleSubmit} className={"flex h-full flex-col justify-between"}>
+            <Form onSubmit={form.handleSubmit} className={"flex flex-col justify-between gap-4 lg:max-w-lg"}>
                 <AnimatePresence initial={false} mode={"popLayout"}>
                     {state === 0 && (
                         <motion.div key={"meta-data-recipes"} initial={initial} animate={animate} exit={exit}>
-                            <div className="flex flex-col gap-8 pb-4">
-                                <form.Field
-                                    name="name"
-                                    validators={{
-                                        onSubmit: ({ value }) =>
-                                            value.length === 0 ? t("error.name-required") : undefined,
-                                        onChange: ({ value }) => (value.length > 255 ? t("error.too-long") : undefined),
-                                    }}
-                                >
-                                    {(field) => (
-                                        <div>
-                                            <FormLabel htmlFor="name">{tg("label.name")}</FormLabel>
-                                            <Input
-                                                id="name"
-                                                value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
-                                                placeholder={t("placeholder.name")}
-                                            />
-                                            {field.state.meta.errors.map((err) => (
-                                                <ErrorMessage key={err}>{err}</ErrorMessage>
-                                            ))}
-                                        </div>
-                                    )}
-                                </form.Field>
-
-                                <form.Field
-                                    name="description"
-                                    validators={{
-                                        onSubmit: ({ value }) =>
-                                            value.length === 0 ? t("error.description-required") : undefined,
-                                        onChange: ({ value }) => (value.length > 255 ? t("error.too-long") : undefined),
-                                    }}
-                                >
-                                    {(field) => (
-                                        <div>
-                                            <FormLabel htmlFor="description">{tg("label.description")}</FormLabel>
-                                            <Textarea
-                                                id="description"
-                                                value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
-                                                placeholder={t("placeholder.description")}
-                                                className="h-[100px] resize-none"
-                                            />
-                                            {field.state.meta.errors.map((err) => (
-                                                <ErrorMessage key={err}>{err}</ErrorMessage>
-                                            ))}
-                                        </div>
-                                    )}
-                                </form.Field>
-                                <form.Field name={"tags"}>
-                                    {(field) => (
-                                        <div className={"flex gap-4"}>
-                                            <Popover open={open} onOpenChange={setOpen}>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        variant={"default"}
-                                                        role="combobox"
-                                                        aria-expanded={open}
-                                                        className="w-fit"
-                                                    >
-                                                        <PlusIcon /> {t("button.add-tags")}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent side={"bottom"}>
-                                                    <Command>
-                                                        <CommandInput placeholder={t("placeholder.select-tags")} />
-                                                        <CommandList>
-                                                            <CommandEmpty>{t("placeholder.tags-empty")}</CommandEmpty>
-                                                            <CommandGroup>
-                                                                {tagContext.tags.items.map((item) => (
-                                                                    <CommandItem
-                                                                        key={item.uuid}
-                                                                        value={item.name}
-                                                                        onSelect={() => {
-                                                                            field.pushValue(item);
-                                                                        }}
-                                                                    >
-                                                                        <Badge
-                                                                            variant={
-                                                                                item.color.toLowerCase() as VariantProps<
-                                                                                    typeof badgeVariants
-                                                                                >["variant"]
-                                                                            }
-                                                                        >
-                                                                            {item.name}
-                                                                        </Badge>
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </CommandList>
-                                                    </Command>
-                                                </PopoverContent>
-                                            </Popover>
-                                            <div className={"flex flex-wrap gap-4"}>
-                                                {field.state.value.map((item, index) => (
-                                                    <Badge
-                                                        variant={
-                                                            item.color.toLowerCase() as VariantProps<
-                                                                typeof badgeVariants
-                                                            >["variant"]
-                                                        }
-                                                        key={item.uuid}
-                                                    >
-                                                        {item.name}
-                                                        <button
-                                                            type={"button"}
-                                                            className={"hover:text-blue-200"}
-                                                            onClick={() => field.removeValue(index)}
-                                                        >
-                                                            <X className={"size-4"} />
-                                                        </button>
-                                                    </Badge>
+                            <FieldSet>
+                                <FieldGroup>
+                                    <form.Field
+                                        name="name"
+                                        validators={{
+                                            onSubmit: ({ value }) =>
+                                                value.length === 0 ? t("error.name-required") : undefined,
+                                            onChange: ({ value }) =>
+                                                value.length > 255 ? t("error.too-long") : undefined,
+                                        }}
+                                    >
+                                        {(field) => (
+                                            <Field>
+                                                <FieldLabel htmlFor="name">{tg("label.name")}</FieldLabel>
+                                                <Input
+                                                    id="name"
+                                                    value={field.state.value}
+                                                    onChange={(e) => field.handleChange(e.target.value)}
+                                                    placeholder={t("placeholder.name")}
+                                                />
+                                                {field.state.meta.errors.map((err) => (
+                                                    <ErrorMessage key={err}>{err}</ErrorMessage>
                                                 ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </form.Field>
-                            </div>
+                                            </Field>
+                                        )}
+                                    </form.Field>
+
+                                    <form.Field
+                                        name="description"
+                                        validators={{
+                                            onSubmit: ({ value }) =>
+                                                value.length === 0 ? t("error.description-required") : undefined,
+                                            onChange: ({ value }) =>
+                                                value.length > 255 ? t("error.too-long") : undefined,
+                                        }}
+                                    >
+                                        {(field) => (
+                                            <Field>
+                                                <FieldLabel htmlFor="description">{tg("label.description")}</FieldLabel>
+                                                <Textarea
+                                                    id="description"
+                                                    value={field.state.value}
+                                                    onChange={(e) => field.handleChange(e.target.value)}
+                                                    placeholder={t("placeholder.description")}
+                                                    className="h-[100px] resize-none"
+                                                />
+                                                {field.state.meta.errors.map((err) => (
+                                                    <ErrorMessage key={err}>{err}</ErrorMessage>
+                                                ))}
+                                            </Field>
+                                        )}
+                                    </form.Field>
+                                    <form.Field name={"tags"}>
+                                        {(field) => (
+                                            <Field>
+                                                <Popover open={open} onOpenChange={setOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant={"default"}
+                                                            role="combobox"
+                                                            aria-expanded={open}
+                                                            className="w-fit"
+                                                        >
+                                                            <PlusIcon /> {t("button.add-tags")}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent side={"bottom"}>
+                                                        <Command>
+                                                            <CommandInput placeholder={t("placeholder.select-tags")} />
+                                                            <CommandList>
+                                                                <CommandEmpty>
+                                                                    {t("placeholder.tags-empty")}
+                                                                </CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {tagContext.tags.map((item) => (
+                                                                        <CommandItem
+                                                                            key={item.uuid}
+                                                                            value={item.name}
+                                                                            onSelect={() => {
+                                                                                field.pushValue(item);
+                                                                            }}
+                                                                        >
+                                                                            <Badge
+                                                                                variant={
+                                                                                    item.color.toLowerCase() as VariantProps<
+                                                                                        typeof badgeVariants
+                                                                                    >["variant"]
+                                                                                }
+                                                                            >
+                                                                                {item.name}
+                                                                            </Badge>
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <div className={"flex flex-wrap gap-4"}>
+                                                    {field.state.value.map((item, index) => (
+                                                        <Badge
+                                                            variant={
+                                                                item.color.toLowerCase() as VariantProps<
+                                                                    typeof badgeVariants
+                                                                >["variant"]
+                                                            }
+                                                            key={item.uuid}
+                                                        >
+                                                            {item.name}
+                                                            <button
+                                                                type={"button"}
+                                                                className={"hover:text-blue-200"}
+                                                                onClick={() => field.removeValue(index)}
+                                                            >
+                                                                <X className={"size-4"} />
+                                                            </button>
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </Field>
+                                        )}
+                                    </form.Field>
+                                </FieldGroup>
+                            </FieldSet>
                         </motion.div>
                     )}
 
@@ -304,103 +308,113 @@ export function RecipeForm(props: RecipeFormProps) {
                             animate={animate}
                             exit={exit}
                         >
-                            <form.Field name="ingredients" mode="array">
-                                {(fieldArrayApi) => (
-                                    <div className={"flex h-full flex-col gap-6"}>
-                                        <div className={"flex justify-between"}>
-                                            <Subheading level={2}>{t("heading.ingredients-title")}</Subheading>
-                                            <Button
-                                                type="button"
-                                                onClick={() => {
-                                                    if (ingreName.length === 0) {
-                                                        setIngreNameError(t("error.ingre-name"));
-                                                    }
-                                                    if (ingreAmount === 0) {
-                                                        setIngreAmountError(t("error.ingre-amount"));
-                                                    }
-                                                    if (!ingreUnit) {
-                                                        setIngreUnitError(t("error.ingre-unit"));
-                                                    }
-                                                    if (ingreAmountError && ingreNameError && ingreUnitError) {
-                                                        return;
-                                                    }
-                                                    if (ingreName && ingreAmount && ingreUnit) {
-                                                        fieldArrayApi.pushValue({
-                                                            name: ingreName ?? "nothing",
-                                                            amount: ingreAmount ?? 0,
-                                                            unit: ingreUnit ?? Units.Teaspoon,
-                                                        });
-                                                        setIngreName("");
-                                                        setIngreAmount(0);
-                                                        setIngreUnit(Units.Gram);
-                                                    }
-                                                }}
-                                            >
-                                                <PlusIcon />
-                                            </Button>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <div className={"grid grid-cols-2 gap-4 lg:grid-cols-3"}>
-                                                <div
-                                                    className={"col-span-2 flex flex-col gap-0 lg:col-span-1 lg:gap-2"}
-                                                >
-                                                    <Input
-                                                        onChange={(e) => {
-                                                            setIngreName(e.target.value);
-                                                            setIngreNameError(undefined);
+                            <FieldSet>
+                                <FieldGroup>
+                                    <form.Field name="ingredients" mode="array">
+                                        {(fieldArrayApi) => (
+                                            <Field>
+                                                <div className={"flex justify-between"}>
+                                                    <Subheading level={2}>{t("heading.ingredients-title")}</Subheading>
+                                                    <Button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (ingreName.length === 0) {
+                                                                setIngreNameError(t("error.ingre-name"));
+                                                            }
+                                                            if (ingreAmount === 0) {
+                                                                setIngreAmountError(t("error.ingre-amount"));
+                                                            }
+                                                            if (!ingreUnit) {
+                                                                setIngreUnitError(t("error.ingre-unit"));
+                                                            }
+                                                            if (ingreAmountError && ingreNameError && ingreUnitError) {
+                                                                return;
+                                                            }
+                                                            if (ingreName && ingreAmount && ingreUnit) {
+                                                                fieldArrayApi.pushValue({
+                                                                    name: ingreName ?? "nothing",
+                                                                    amount: ingreAmount ?? 0,
+                                                                    unit: ingreUnit ?? Units.Teaspoon,
+                                                                });
+                                                                setIngreName("");
+                                                                setIngreAmount(0);
+                                                                setIngreUnit(Units.Gram);
+                                                            }
                                                         }}
-                                                        value={ingreName}
-                                                        placeholder={t("placeholder.name-ingredients")}
-                                                    />
-                                                    {ingreNameError && <ErrorMessage>{ingreNameError}</ErrorMessage>}
-                                                </div>
-                                                <div className={"flex flex-col gap-0 lg:gap-2"}>
-                                                    <Input
-                                                        type="number"
-                                                        onChange={(e) => {
-                                                            setIngreAmount(parseInt(e.target.value));
-                                                            setIngreAmountError(undefined);
-                                                        }}
-                                                        value={ingreAmount}
-                                                        placeholder={t("placeholder.amount")}
-                                                    />
-                                                    {ingreAmountError && (
-                                                        <ErrorMessage>{ingreAmountError}</ErrorMessage>
-                                                    )}
-                                                </div>
-                                                <div className={"flex flex-col gap-2"}>
-                                                    <Select
-                                                        onValueChange={(e) => {
-                                                            setIngreUnit(e as Units);
-                                                            setIngreUnitError(undefined);
-                                                        }}
-                                                        value={ingreUnit}
                                                     >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select unit" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {Object.values(Units).map((unit) => (
-                                                                <SelectItem key={unit} value={unit}>
-                                                                    {unit}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    {ingreUnitError && <ErrorMessage>{ingreUnitError}</ErrorMessage>}
+                                                        <PlusIcon />
+                                                    </Button>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div className={"h-full"}>
-                                            <IngredientsGrid
-                                                withScrolling={true}
-                                                ingredients={fieldArrayApi.state.value}
-                                                onDelete={(index) => fieldArrayApi.removeValue(index)}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </form.Field>
+                                                <div className="flex justify-between">
+                                                    <div className={"grid grid-cols-2 gap-4 lg:grid-cols-3"}>
+                                                        <div
+                                                            className={
+                                                                "col-span-2 flex flex-col gap-0 lg:col-span-1 lg:gap-2"
+                                                            }
+                                                        >
+                                                            <Input
+                                                                onChange={(e) => {
+                                                                    setIngreName(e.target.value);
+                                                                    setIngreNameError(undefined);
+                                                                }}
+                                                                value={ingreName}
+                                                                placeholder={t("placeholder.name-ingredients")}
+                                                            />
+                                                            {ingreNameError && (
+                                                                <ErrorMessage>{ingreNameError}</ErrorMessage>
+                                                            )}
+                                                        </div>
+                                                        <div className={"flex flex-col gap-0 lg:gap-2"}>
+                                                            <Input
+                                                                type="number"
+                                                                onChange={(e) => {
+                                                                    setIngreAmount(parseInt(e.target.value));
+                                                                    setIngreAmountError(undefined);
+                                                                }}
+                                                                value={ingreAmount}
+                                                                placeholder={t("placeholder.amount")}
+                                                            />
+                                                            {ingreAmountError && (
+                                                                <ErrorMessage>{ingreAmountError}</ErrorMessage>
+                                                            )}
+                                                        </div>
+                                                        <div className={"flex flex-col gap-2"}>
+                                                            <Select
+                                                                onValueChange={(e) => {
+                                                                    setIngreUnit(e as Units);
+                                                                    setIngreUnitError(undefined);
+                                                                }}
+                                                                value={ingreUnit}
+                                                            >
+                                                                <SelectTrigger className="w-full">
+                                                                    <SelectValue placeholder="Select unit" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {Object.values(Units).map((unit) => (
+                                                                        <SelectItem key={unit} value={unit}>
+                                                                            {unit}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            {ingreUnitError && (
+                                                                <ErrorMessage>{ingreUnitError}</ErrorMessage>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className={"h-full"}>
+                                                    <IngredientsGrid
+                                                        withScrolling={true}
+                                                        ingredients={fieldArrayApi.state.value}
+                                                        onDelete={(index) => fieldArrayApi.removeValue(index)}
+                                                    />
+                                                </div>
+                                            </Field>
+                                        )}
+                                    </form.Field>
+                                </FieldGroup>
+                            </FieldSet>
                         </motion.div>
                     )}
                     {state === 2 && (
@@ -411,64 +425,69 @@ export function RecipeForm(props: RecipeFormProps) {
                             animate={animate}
                             exit={exit}
                         >
-                            <div className={"flex h-full flex-col gap-4"}>
-                                <div className="flex justify-between">
-                                    <Subheading level={2}>{t("heading.step-title")}</Subheading>
-                                    <Button type="button" onClick={() => form.pushFieldValue("steps", { step: "" })}>
-                                        <PlusIcon />
-                                    </Button>
-                                </div>
-                                <form.Field name="steps">
-                                    {(fieldArray) => (
-                                        <div className="flex h-full max-h-[55vh] flex-col gap-4 overflow-y-auto">
-                                            {fieldArray.state.value.map((_, index) => (
-                                                <div className={"relative"} key={index}>
-                                                    <form.Field
-                                                        name={`steps[${index}].step`}
-                                                        validators={{
-                                                            onSubmit: ({ value }) =>
-                                                                value.length === 0
-                                                                    ? t("error.step-length-zero")
-                                                                    : undefined,
-                                                            onChange: ({ value }) =>
-                                                                value.length > 255
-                                                                    ? t("error.step-length-255")
-                                                                    : undefined,
-                                                        }}
-                                                    >
-                                                        {(f) => (
-                                                            <div>
-                                                                <FormLabel
-                                                                    htmlFor={"step" + index}
-                                                                >{`${tg("label.steps")} ${index + 1}`}</FormLabel>
-                                                                <Textarea
-                                                                    id={"step" + index}
-                                                                    value={f.state.value}
-                                                                    onChange={(e) => f.handleChange(e.target.value)}
-                                                                    placeholder={t("placeholder.step")}
-                                                                    className="h-[100px] resize-none"
-                                                                />
-                                                                {f.state.meta.errors.map((err) => (
-                                                                    <ErrorMessage key={err}>{err}</ErrorMessage>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </form.Field>
+                            <FieldSet>
+                                <FieldGroup>
+                                    <div className="flex justify-between">
+                                        <Subheading level={2}>{t("heading.step-title")}</Subheading>
+                                        <Button
+                                            type="button"
+                                            onClick={() => form.pushFieldValue("steps", { step: "" })}
+                                        >
+                                            <PlusIcon />
+                                        </Button>
+                                    </div>
+                                    <form.Field name="steps">
+                                        {(fieldArray) => (
+                                            <div className="flex h-full max-h-[55vh] flex-col gap-4 overflow-y-auto">
+                                                {fieldArray.state.value.map((_, index) => (
+                                                    <div className={"relative"} key={index}>
+                                                        <form.Field
+                                                            name={`steps[${index}].step`}
+                                                            validators={{
+                                                                onSubmit: ({ value }) =>
+                                                                    value.length === 0
+                                                                        ? t("error.step-length-zero")
+                                                                        : undefined,
+                                                                onChange: ({ value }) =>
+                                                                    value.length > 255
+                                                                        ? t("error.step-length-255")
+                                                                        : undefined,
+                                                            }}
+                                                        >
+                                                            {(f) => (
+                                                                <Field>
+                                                                    <FieldLabel
+                                                                        htmlFor={"step" + index}
+                                                                    >{`${tg("label.steps")} ${index + 1}`}</FieldLabel>
+                                                                    <Textarea
+                                                                        id={"step" + index}
+                                                                        value={f.state.value}
+                                                                        onChange={(e) => f.handleChange(e.target.value)}
+                                                                        placeholder={t("placeholder.step")}
+                                                                        className="h-[100px] resize-none"
+                                                                    />
+                                                                    {f.state.meta.errors.map((err) => (
+                                                                        <ErrorMessage key={err}>{err}</ErrorMessage>
+                                                                    ))}
+                                                                </Field>
+                                                            )}
+                                                        </form.Field>
 
-                                                    <Button
-                                                        type="button"
-                                                        className="absolute top-6 right-1"
-                                                        variant="ghost"
-                                                        onClick={() => form.removeFieldValue("steps", index)}
-                                                    >
-                                                        <MinusIcon />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </form.Field>
-                            </div>
+                                                        <Button
+                                                            type="button"
+                                                            className="absolute top-6 right-1"
+                                                            variant="ghost"
+                                                            onClick={() => form.removeFieldValue("steps", index)}
+                                                        >
+                                                            <MinusIcon />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </form.Field>
+                                </FieldGroup>
+                            </FieldSet>
                         </motion.div>
                     )}
                 </AnimatePresence>

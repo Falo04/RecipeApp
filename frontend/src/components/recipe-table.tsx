@@ -23,14 +23,14 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Table, TableRow, TableHead, TableHeader, TableBody, TableCell } from "./ui/table";
-import type { SimpleRecipeWithTags } from "@/api/model/recipe.interface.ts";
 import { BadgeButton, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import TablePagination from "./ui/table-pagination";
 import { DeleteRecipeDialog } from "@/components/dialogs/delete-recipe.tsx";
-import type { Page } from "@/api/model/global.interface";
 import { useForm } from "@tanstack/react-form";
 import { Text } from "@/components/ui/text.tsx";
+import { Field, FieldGroup, FieldSet } from "@/components/ui/field.tsx";
+import type { PageForSimpleRecipeWithTags } from "@/api/generated";
 
 /**
  * The properties for {@link RecipeTable}
@@ -43,7 +43,7 @@ export type RecipeTableProps = {
     /** Params for navigate */
     params?: LinkProps["params"];
     /** Search params for navigate */
-    data: Page<SimpleRecipeWithTags>;
+    data: PageForSimpleRecipeWithTags;
     /** Current page */
     page: number;
 };
@@ -71,30 +71,34 @@ export default function RecipeTable(props: RecipeTableProps) {
         <>
             <div className={"flex items-start justify-between gap-4 lg:items-end"}>
                 <Form onSubmit={form.handleSubmit}>
-                    <form.Field
-                        name={"search"}
-                        validators={{
-                            onChangeAsync: async ({ fieldApi }) => {
-                                await navigate({
-                                    to: props.href,
-                                    search: { page: props.page, search: fieldApi.state.value },
-                                    params: props.params,
-                                });
-                            },
-                            onChangeAsyncDebounceMs: 500,
-                        }}
-                    >
-                        {(fieldApi) => (
-                            <div>
-                                <Input
-                                    value={fieldApi.state.value}
-                                    onChange={(e) => fieldApi.handleChange(e.target.value)}
-                                    placeholder={t("label.placeholder")}
-                                    className={"w-44 lg:w-72"}
-                                />
-                            </div>
-                        )}
-                    </form.Field>
+                    <FieldGroup>
+                        <FieldSet>
+                            <form.Field
+                                name={"search"}
+                                validators={{
+                                    onChangeAsync: async ({ fieldApi }) => {
+                                        await navigate({
+                                            to: props.href,
+                                            search: { page: props.page, search: fieldApi.state.value },
+                                            params: props.params,
+                                        });
+                                    },
+                                    onChangeAsyncDebounceMs: 500,
+                                }}
+                            >
+                                {(fieldApi) => (
+                                    <Field>
+                                        <Input
+                                            value={fieldApi.state.value}
+                                            onChange={(e) => fieldApi.handleChange(e.target.value)}
+                                            placeholder={t("label.placeholder")}
+                                            className={"w-44 lg:w-72"}
+                                        />
+                                    </Field>
+                                )}
+                            </form.Field>
+                        </FieldSet>
+                    </FieldGroup>
                 </Form>
 
                 <DropdownMenu>
