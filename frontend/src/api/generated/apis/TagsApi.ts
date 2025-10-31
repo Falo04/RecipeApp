@@ -17,11 +17,12 @@ import * as runtime from '../runtime';
 import type {
   ApiErrorResponse,
   CreateOrUpdateTag,
+  CreateTag200Response,
+  FormErrorResponseForCreateOrUpdateTagErrors,
   GetAllRecipesRequest,
   GetAllTagsRequest,
   PageForSimpleRecipeWithTags,
   PageForSimpleTag,
-  SingleUuid,
 } from '../models/index';
 
 export interface CreateTagRequest {
@@ -55,7 +56,7 @@ export class TagsApi extends runtime.BaseAPI {
      * Creates a tag.
      * Creates a tag.
      */
-    async createTagRaw(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SingleUuid>> {
+    async createTagRaw(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateTag200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -80,7 +81,7 @@ export class TagsApi extends runtime.BaseAPI {
      * Creates a tag.
      * Creates a tag.
      */
-    async createTag(requestParameters: CreateTagRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SingleUuid> {
+    async createTag(requestParameters: CreateTagRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateTag200Response> {
         const response = await this.createTagRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -203,7 +204,7 @@ export class TagsApi extends runtime.BaseAPI {
      * Update a tag.
      * Update a tag.
      */
-    async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FormErrorResponseForCreateOrUpdateTagErrors>> {
         if (requestParameters['uuid'] == null) {
             throw new runtime.RequiredError(
                 'uuid',
@@ -229,15 +230,16 @@ export class TagsApi extends runtime.BaseAPI {
             body: requestParameters['CreateOrUpdateTag'],
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
      * Update a tag.
      * Update a tag.
      */
-    async updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateTagRaw(requestParameters, initOverrides);
+    async updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FormErrorResponseForCreateOrUpdateTagErrors> {
+        const response = await this.updateTagRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

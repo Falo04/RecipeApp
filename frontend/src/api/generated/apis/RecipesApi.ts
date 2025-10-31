@@ -17,10 +17,11 @@ import * as runtime from '../runtime';
 import type {
   ApiErrorResponse,
   CreateOrUpdateRecipe,
+  CreateRecipe200Response,
+  FormErrorResponseForCreateOrUpdateRecipeErrors,
   FullRecipe,
   GetAllRecipesRequest,
   PageForSimpleRecipeWithTags,
-  SingleUuid,
 } from '../models/index';
 
 export interface CreateRecipeRequest {
@@ -53,7 +54,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * Creates a new recipe.
      * Creates a new recipe.
      */
-    async createRecipeRaw(requestParameters: CreateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SingleUuid>> {
+    async createRecipeRaw(requestParameters: CreateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateRecipe200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -78,7 +79,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * Creates a new recipe.
      * Creates a new recipe.
      */
-    async createRecipe(requestParameters: CreateRecipeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SingleUuid> {
+    async createRecipe(requestParameters: CreateRecipeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateRecipe200Response> {
         const response = await this.createRecipeRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -198,7 +199,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * Updates an existing recipe based on its UUID.
      * Updates an existing recipe based on its UUID.
      */
-    async updateRecipeRaw(requestParameters: UpdateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateRecipeRaw(requestParameters: UpdateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FormErrorResponseForCreateOrUpdateRecipeErrors>> {
         if (requestParameters['uuid'] == null) {
             throw new runtime.RequiredError(
                 'uuid',
@@ -224,15 +225,16 @@ export class RecipesApi extends runtime.BaseAPI {
             body: requestParameters['CreateOrUpdateRecipe'],
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
      * Updates an existing recipe based on its UUID.
      * Updates an existing recipe based on its UUID.
      */
-    async updateRecipe(requestParameters: UpdateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateRecipeRaw(requestParameters, initOverrides);
+    async updateRecipe(requestParameters: UpdateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FormErrorResponseForCreateOrUpdateRecipeErrors> {
+        const response = await this.updateRecipeRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

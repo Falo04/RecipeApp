@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 ## createTag
 
-> SingleUuid createTag(CreateOrUpdateTag)
+> CreateTag200Response createTag(CreateOrUpdateTag)
 
 Creates a tag.
 
@@ -59,7 +59,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**SingleUuid**](SingleUuid.md)
+[**CreateTag200Response**](CreateTag200Response.md)
 
 ### Authorization
 
@@ -297,7 +297,7 @@ No authorization required
 
 ## updateTag
 
-> updateTag(uuid, CreateOrUpdateTag)
+> FormErrorResponseForCreateOrUpdateTagErrors updateTag(uuid, CreateOrUpdateTag)
 
 Update a tag.
 
@@ -345,7 +345,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**FormErrorResponseForCreateOrUpdateTagErrors**](FormErrorResponseForCreateOrUpdateTagErrors.md)
 
 ### Authorization
 

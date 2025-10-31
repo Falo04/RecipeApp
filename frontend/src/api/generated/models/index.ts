@@ -59,6 +59,19 @@ export interface CreateOrUpdateRecipe {
     user?: string | null;
 }
 /**
+ * Errors for create or update a recipe.
+ * @export
+ * @interface CreateOrUpdateRecipeErrors
+ */
+export interface CreateOrUpdateRecipeErrors {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateOrUpdateRecipeErrors
+     */
+    name_already_exists: boolean;
+}
+/**
  * Represents the structure for creating or updating a tag.
  * @export
  * @interface CreateOrUpdateTag
@@ -76,6 +89,83 @@ export interface CreateOrUpdateTag {
      * @memberof CreateOrUpdateTag
      */
     name: string;
+}
+
+
+/**
+ * Errors for creating or updating a tag.
+ * @export
+ * @interface CreateOrUpdateTagErrors
+ */
+export interface CreateOrUpdateTagErrors {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateOrUpdateTagErrors
+     */
+    name_already_exists: boolean;
+}
+/**
+ * @type CreateRecipe200Response
+ * 
+ * @export
+ */
+export type CreateRecipe200Response = FormErrorResponseForCreateOrUpdateRecipeErrors | SingleUuid;
+/**
+ * @type CreateTag200Response
+ * 
+ * @export
+ */
+export type CreateTag200Response = FormErrorResponseForCreateOrUpdateTagErrors | SingleUuid;
+
+/**
+ * Constant string `"Err"` which is documented by schemars
+ * @export
+ */
+export const ErrorConstant = {
+    Err: 'Err'
+} as const;
+export type ErrorConstant = typeof ErrorConstant[keyof typeof ErrorConstant];
+
+/**
+ * The response that is sent in a case of an error the caller should present his user
+ * @export
+ * @interface FormErrorResponseForCreateOrUpdateRecipeErrors
+ */
+export interface FormErrorResponseForCreateOrUpdateRecipeErrors {
+    /**
+     * The actual error struct
+     * @type {CreateOrUpdateRecipeErrors}
+     * @memberof FormErrorResponseForCreateOrUpdateRecipeErrors
+     */
+    error: CreateOrUpdateRecipeErrors;
+    /**
+     * A constant `"Err"` used to differentiate this schema from any other "Ok" schema
+     * @type {ErrorConstant}
+     * @memberof FormErrorResponseForCreateOrUpdateRecipeErrors
+     */
+    result: ErrorConstant;
+}
+
+
+/**
+ * The response that is sent in a case of an error the caller should present his user
+ * @export
+ * @interface FormErrorResponseForCreateOrUpdateTagErrors
+ */
+export interface FormErrorResponseForCreateOrUpdateTagErrors {
+    /**
+     * The actual error struct
+     * @type {CreateOrUpdateTagErrors}
+     * @memberof FormErrorResponseForCreateOrUpdateTagErrors
+     */
+    error: CreateOrUpdateTagErrors;
+    /**
+     * A constant `"Err"` used to differentiate this schema from any other "Ok" schema
+     * @type {ErrorConstant}
+     * @memberof FormErrorResponseForCreateOrUpdateTagErrors
+     */
+    result: ErrorConstant;
 }
 
 

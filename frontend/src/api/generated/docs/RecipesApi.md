@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 ## createRecipe
 
-> SingleUuid createRecipe(CreateOrUpdateRecipe)
+> CreateRecipe200Response createRecipe(CreateOrUpdateRecipe)
 
 Creates a new recipe.
 
@@ -59,7 +59,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**SingleUuid**](SingleUuid.md)
+[**CreateRecipe200Response**](CreateRecipe200Response.md)
 
 ### Authorization
 
@@ -294,7 +294,7 @@ No authorization required
 
 ## updateRecipe
 
-> updateRecipe(uuid, CreateOrUpdateRecipe)
+> FormErrorResponseForCreateOrUpdateRecipeErrors updateRecipe(uuid, CreateOrUpdateRecipe)
 
 Updates an existing recipe based on its UUID.
 
@@ -342,7 +342,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**FormErrorResponseForCreateOrUpdateRecipeErrors**](FormErrorResponseForCreateOrUpdateRecipeErrors.md)
 
 ### Authorization
 

@@ -1,4 +1,4 @@
-import EventEmitter from "@/lib/event-emitter.ts";
+import EventEmitter from "@/utils/event-emitter.ts";
 
 /**
  * Represents the events emitted by a WebSocket server.

@@ -8,8 +8,15 @@ apis/index.ts
 docs/AccountApi.md
 docs/ApiErrorResponse.md
 docs/CreateOrUpdateRecipe.md
+docs/CreateOrUpdateRecipeErrors.md
 docs/CreateOrUpdateTag.md
+docs/CreateOrUpdateTagErrors.md
+docs/CreateRecipe200Response.md
+docs/CreateTag200Response.md
 docs/DefaultApi.md
+docs/ErrorConstant.md
+docs/FormErrorResponseForCreateOrUpdateRecipeErrors.md
+docs/FormErrorResponseForCreateOrUpdateTagErrors.md
 docs/FullIngredient.md
 docs/FullRecipe.md
 docs/GetAllRecipesByIngredientsRequest.md
