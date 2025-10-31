@@ -79,12 +79,9 @@ impl RecipeIngredient {
 
     /// Removes a single ingredient entry from a recipe by its identifier.
     #[instrument(name = "RecipeIngredient::delete", skip(exe))]
-    pub async fn delete(
-        exe: impl Executor<'_>,
-        recipe_ingredient_uuid: IngredientUuid,
-    ) -> anyhow::Result<()> {
+    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeIngredientModel)
-            .condition(RecipeIngredientModel.uuid.equals(recipe_ingredient_uuid.0))
+            .condition(RecipeIngredientModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }

@@ -124,23 +124,23 @@ impl Tag {
 
     /// Update an existing tag's name and color.
     pub async fn update(
+        &self,
         exe: impl Executor<'_>,
-        tag_uuid: &TagUuid,
         name: MaxStr<255>,
         color: TagColors,
     ) -> anyhow::Result<()> {
         rorm::update(exe, TagModel)
             .set(TagModel.name, name)
             .set(TagModel.color, color)
-            .condition(TagModel.uuid.equals(tag_uuid.0))
+            .condition(TagModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }
 
     /// Delete a tag by its UUID.
-    pub async fn delete(exe: impl Executor<'_>, tag_uuid: &TagUuid) -> anyhow::Result<()> {
+    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
         rorm::delete(exe, TagModel)
-            .condition(TagModel.uuid.equals(tag_uuid.0))
+            .condition(TagModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }

@@ -194,24 +194,24 @@ impl Recipe {
     /// Update a recipe's name and description.
     #[instrument(name = "Recipe::update", skip(exe))]
     pub async fn update(
+        &self,
         exe: impl Executor<'_>,
-        recipe_uuid: &RecipeUuid,
         name: MaxStr<255>,
         description: MaxStr<255>,
     ) -> anyhow::Result<()> {
         rorm::update(exe, RecipeModel)
             .set(RecipeModel.name, name)
             .set(RecipeModel.description, description)
-            .condition(RecipeModel.uuid.equals(recipe_uuid.0))
+            .condition(RecipeModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }
 
     /// Delete a recipe by UUID.
     #[instrument(name = "Recipe::delete", skip(exe))]
-    pub async fn delete(exe: impl Executor<'_>, uuid: &RecipeUuid) -> anyhow::Result<()> {
+    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeModel)
-            .condition(RecipeModel.uuid.equals(uuid.0))
+            .condition(RecipeModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }

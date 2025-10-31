@@ -33,6 +33,12 @@ pub struct CreateOrUpdateTag {
     pub color: TagColors,
 }
 
+/// Errors for creating or updating a tag.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Default)]
+pub struct CreateOrUpdateTagErrors {
+    pub name_already_exists: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetAllTagsRequest {
     /// Page request

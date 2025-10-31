@@ -3,6 +3,7 @@ use std::ops::Deref;
 use galvyn::core::re_exports::axum::extract::Path;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
+use galvyn::core::stuff::api_error::FormErrors;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::stuff::schema::Page;
 use galvyn::core::stuff::schema::SingleUuid;
@@ -12,9 +13,10 @@ use galvyn::get;
 use galvyn::post;
 use galvyn::put;
 use galvyn::rorm::Database;
-use tracing::debug;
+use tracing::error;
 
 use super::schema::CreateOrUpdateRecipe;
+use super::schema::CreateOrUpdateRecipeErrors;
 use super::schema::GetAllRecipesRequest;
 use crate::http::handler::account::schema::SimpleAccount;
 use crate::http::handler::ingredients::schema::FullIngredient;
@@ -78,13 +80,14 @@ pub async fn get_recipe(
     };
 
     let recipe_ingredients = RecipeIngredient::query_by_recipe(&mut tx, &recipe.uuid).await?;
-    debug!(recipe_ingredients = ?recipe_ingredients, "recipe_ingredients");
+
     let mut full_ingredients = Vec::new();
     for recipe_ingredient in recipe_ingredients {
         let Some(ingredient) =
             Ingredient::query_by_uuid(&mut tx, &recipe_ingredient.ingredients).await?
         else {
-            return Err(ApiError::bad_request("Ingredient not found"));
+            error!(recipe_ingredient = ?recipe_ingredient.ingredients, "Ingredient not found");
+            continue;
         };
         full_ingredients.push(FullIngredient {
             uuid: Some(recipe_ingredient.ingredients),
@@ -121,15 +124,19 @@ pub async fn get_recipe(
 pub async fn create_recipe(
     user: Account,
     ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
-) -> ApiResult<ApiJson<SingleUuid>> {
+) -> ApiResult<ApiJson<SingleUuid>, CreateOrUpdateRecipeErrors> {
     let mut tx = Database::global().start_transaction().await?;
+
+    let mut errors = FormErrors::<CreateOrUpdateRecipeErrors>::new();
 
     if Recipe::query_by_name(&mut tx, request.name.deref())
         .await?
         .is_some()
     {
-        return Err(ApiError::bad_request("Recipe name already exists"));
+        errors.name_already_exists = true;
     }
+
+    errors.check()?;
 
     let recipe = Recipe::create(&mut tx, request.name, request.description, user.uuid).await?;
 
@@ -176,12 +183,24 @@ pub async fn create_recipe(
 pub async fn update_recipe(
     Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
     ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
-) -> ApiResult<()> {
+) -> ApiResult<(), CreateOrUpdateRecipeErrors> {
     let mut tx = Database::global().start_transaction().await?;
+
+    let mut errors = FormErrors::<CreateOrUpdateRecipeErrors>::new();
 
     let recipe = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid })
         .await?
         .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
+
+    if request.name != recipe.name
+        && Recipe::query_by_name(&mut tx, &request.name)
+            .await?
+            .is_some()
+    {
+        errors.name_already_exists = true;
+    }
+
+    errors.check()?;
 
     RecipeStep::delete_by_recipe(&mut tx, &recipe.uuid).await?;
     for step in request.steps {
@@ -206,8 +225,9 @@ pub async fn update_recipe(
         .await?;
     }
 
-    Recipe::update(&mut tx, &recipe.uuid, request.name, request.description).await?;
-
+    recipe
+        .update(&mut tx, request.name, request.description)
+        .await?;
     tx.commit().await?;
 
     WebsocketManager::global()
@@ -232,8 +252,7 @@ pub async fn delete_recipe(
         .await?
         .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
 
-    Recipe::delete(&mut tx, &recipe.uuid).await?;
-
+    recipe.delete(&mut tx).await?;
     tx.commit().await?;
 
     WebsocketManager::global()

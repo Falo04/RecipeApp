@@ -3,6 +3,7 @@ use std::ops::Deref;
 use galvyn::core::re_exports::axum::extract::Path;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
+use galvyn::core::stuff::api_error::FormErrors;
 use galvyn::core::stuff::api_json::ApiJson;
 use galvyn::core::stuff::schema::Page;
 use galvyn::core::stuff::schema::SingleUuid;
@@ -15,6 +16,7 @@ use galvyn::rorm::Database;
 use crate::http::handler::recipes::schema::GetAllRecipesRequest;
 use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
+use crate::http::handler::tags::schema::CreateOrUpdateTagErrors;
 use crate::http::handler::tags::schema::GetAllTagsRequest;
 use crate::http::handler::tags::schema::SimpleTag;
 use crate::http::handler::websockets::schema::WsServerMsg;
@@ -82,18 +84,21 @@ pub async fn get_recipes_by_tag(
 #[post("/")]
 pub async fn create_tag(
     ApiJson(request): ApiJson<CreateOrUpdateTag>,
-) -> ApiResult<ApiJson<SingleUuid>> {
+) -> ApiResult<ApiJson<SingleUuid>, CreateOrUpdateTagErrors> {
     let mut tx = Database::global().start_transaction().await?;
+
+    let mut errors = FormErrors::<CreateOrUpdateTagErrors>::new();
 
     if Tag::query_by_name(&mut tx, request.name.deref())
         .await?
         .is_some()
     {
-        return Err(ApiError::bad_request("Tag already exists"));
+        errors.name_already_exists = true;
     }
 
-    let tag = Tag::create(&mut tx, request.name, request.color).await?;
+    errors.check()?;
 
+    let tag = Tag::create(&mut tx, request.name, request.color).await?;
     tx.commit().await?;
 
     WebsocketManager::global()
@@ -108,30 +113,22 @@ pub async fn create_tag(
 pub async fn update_tag(
     Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
     ApiJson(request): ApiJson<CreateOrUpdateTag>,
-) -> ApiResult<()> {
+) -> ApiResult<(), CreateOrUpdateTagErrors> {
     let mut tx = Database::global().start_transaction().await?;
 
-    if Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid })
-        .await?
-        .is_none()
-    {
+    let mut errors = FormErrors::<CreateOrUpdateTagErrors>::new();
+
+    let Some(tag) = Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid }).await? else {
         return Err(ApiError::bad_request("Invalid tag uuid"));
+    };
+
+    if tag.name != request.name && Tag::query_by_name(&mut tx, &request.name).await?.is_some() {
+        errors.name_already_exists = true;
     }
 
-    if let Some(tag) = Tag::query_by_name(&mut tx, request.name.deref()).await? {
-        if tag.uuid.0 != tag_uuid {
-            return Err(ApiError::bad_request("Tag name already exists"));
-        }
-    }
+    errors.check()?;
 
-    Tag::update(
-        &mut tx,
-        &TagUuid { 0: tag_uuid },
-        request.name,
-        request.color,
-    )
-    .await?;
-
+    tag.update(&mut tx, request.name, request.color).await?;
     tx.commit().await?;
 
     WebsocketManager::global()
@@ -146,19 +143,16 @@ pub async fn update_tag(
 pub async fn delete_tag(Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    if Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid })
-        .await?
-        .is_none()
-    {
+    let Some(tag) = Tag::query_by_uuid(&mut tx, &TagUuid(tag_uuid)).await? else {
         return Err(ApiError::bad_request("Invalid tag uuid"));
-    }
+    };
 
-    Tag::delete(&mut tx, &TagUuid { 0: tag_uuid }).await?;
+    tag.delete(&mut tx).await?;
+    tx.commit().await?;
 
     WebsocketManager::global()
         .send_to_all(WsServerMsg::TagsChanged {})
         .await;
 
-    tx.commit().await?;
     Ok(())
 }

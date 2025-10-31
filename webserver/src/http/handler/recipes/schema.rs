@@ -109,6 +109,12 @@ pub struct CreateOrUpdateRecipe {
     pub steps: Vec<Step>,
 }
 
+/// Errors for create or update a recipe.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Default)]
+pub struct CreateOrUpdateRecipeErrors {
+    pub name_already_exists: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct GetAllRecipesRequest {
     /// Page request

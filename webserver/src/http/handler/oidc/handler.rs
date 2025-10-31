@@ -74,7 +74,7 @@ pub async fn finish_oidc_login(
 
     let existing_account = Account::query_after_oidc(&mut tx, &issuer, &subject).await?;
     let account = if let Some(account) = existing_account {
-        Account::update(&mut tx, &account.uuid, display_name).await?;
+        account.update(&mut tx, display_name).await?;
         Account::query_by_uuid(&mut tx, &account.uuid)
             .await?
             .ok_or(ApiError::bad_request("Account does not exist."))?

@@ -76,12 +76,9 @@ impl RecipeStep {
 
     /// Deletes a single step by its identifier.
     #[instrument(name = "RecipeStep::delete", skip(exe))]
-    pub async fn delete(
-        exe: impl Executor<'_>,
-        ingredient_uuid: IngredientUuid,
-    ) -> anyhow::Result<()> {
+    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
         rorm::delete(exe, RecipeStepModel)
-            .condition(RecipeStepModel.uuid.equals(ingredient_uuid.0))
+            .condition(RecipeStepModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }

@@ -143,22 +143,22 @@ impl Account {
     /// Updates an existing account record.
     #[instrument(name = "Account::update", skip(exe))]
     pub async fn update(
+        &self,
         exe: impl Executor<'_>,
-        account_uuid: &AccountUuid,
         display_name: MaxStr<255>,
     ) -> anyhow::Result<()> {
         rorm::update(exe, AccountModel)
             .set(AccountModel.display_name, display_name)
-            .condition(AccountModel.uuid.equals(account_uuid.0))
+            .condition(AccountModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }
 
     /// Deletes an account record.
     #[instrument(name = "Account::delete", skip(exe))]
-    pub async fn delete(exe: impl Executor<'_>, account_uuid: AccountUuid) -> anyhow::Result<()> {
+    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
         rorm::delete(exe, AccountModel)
-            .condition(AccountModel.uuid.equals(account_uuid.0))
+            .condition(AccountModel.uuid.equals(self.uuid.0))
             .await?;
         Ok(())
     }
