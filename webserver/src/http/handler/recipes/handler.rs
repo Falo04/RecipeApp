@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use galvyn::core::re_exports::axum::extract::Path;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
@@ -69,13 +67,11 @@ pub async fn get_all_recipes(
 }
 
 /// Retrieves a recipe by its UUID.
-#[get("/{uuid}")]
-pub async fn get_recipe(
-    Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
-) -> ApiResult<ApiJson<FullRecipe>> {
+#[get("/{recipe_uuid}")]
+pub async fn get_recipe(Path(recipe_uuid): Path<RecipeUuid>) -> ApiResult<ApiJson<FullRecipe>> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let Some(recipe) = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid }).await? else {
+    let Some(recipe) = Recipe::query_by_uuid(&mut tx, &recipe_uuid).await? else {
         return Err(ApiError::bad_request("Recipe not found"));
     };
 
@@ -129,7 +125,7 @@ pub async fn create_recipe(
 
     let mut errors = FormErrors::<CreateOrUpdateRecipeErrors>::new();
 
-    if Recipe::query_by_name(&mut tx, request.name.deref())
+    if Recipe::query_by_name(&mut tx, &*request.name)
         .await?
         .is_some()
     {
@@ -179,16 +175,16 @@ pub async fn create_recipe(
 }
 
 /// Updates an existing recipe based on its UUID.
-#[put("/{uuid}")]
+#[put("/{recipe_uuid}")]
 pub async fn update_recipe(
-    Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
+    Path(recipe_uuid): Path<RecipeUuid>,
     ApiJson(request): ApiJson<CreateOrUpdateRecipe>,
 ) -> ApiResult<(), CreateOrUpdateRecipeErrors> {
     let mut tx = Database::global().start_transaction().await?;
 
     let mut errors = FormErrors::<CreateOrUpdateRecipeErrors>::new();
 
-    let recipe = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid })
+    let recipe = Recipe::query_by_uuid(&mut tx, &recipe_uuid)
         .await?
         .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
 
@@ -242,13 +238,11 @@ pub async fn update_recipe(
 }
 
 /// Deletes a recipe by its UUID.
-#[delete("/{uuid}")]
-pub async fn delete_recipe(
-    Path(SingleUuid { uuid: recipe_uuid }): Path<SingleUuid>,
-) -> ApiResult<()> {
+#[delete("/{recipe_uuid}")]
+pub async fn delete_recipe(Path(recipe_uuid): Path<RecipeUuid>) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let recipe = Recipe::query_by_uuid(&mut tx, &RecipeUuid { 0: recipe_uuid })
+    let recipe = Recipe::query_by_uuid(&mut tx, &recipe_uuid)
         .await?
         .ok_or(ApiError::bad_request("Invalid recipe uuid"))?;
 

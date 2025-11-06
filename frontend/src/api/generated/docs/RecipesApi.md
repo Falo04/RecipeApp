@@ -5,10 +5,10 @@ All URIs are relative to *http://localhost*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**createRecipe**](RecipesApi.md#createrecipe) | **POST** /api/v1/recipes | Creates a new recipe. |
-| [**deleteRecipe**](RecipesApi.md#deleterecipe) | **DELETE** /api/v1/recipes/{uuid} | Deletes a recipe by its UUID. |
+| [**deleteRecipe**](RecipesApi.md#deleterecipe) | **DELETE** /api/v1/recipes/{recipe_uuid} | Deletes a recipe by its UUID. |
 | [**getAllRecipes**](RecipesApi.md#getallrecipesoperation) | **POST** /api/v1/recipes/all | Retrieves all recipes with pagination support and associated tags. |
-| [**getRecipe**](RecipesApi.md#getrecipe) | **GET** /api/v1/recipes/{uuid} | Retrieves a recipe by its UUID. |
-| [**updateRecipe**](RecipesApi.md#updaterecipe) | **PUT** /api/v1/recipes/{uuid} | Updates an existing recipe based on its UUID. |
+| [**getRecipe**](RecipesApi.md#getrecipe) | **GET** /api/v1/recipes/{recipe_uuid} | Retrieves a recipe by its UUID. |
+| [**updateRecipe**](RecipesApi.md#updaterecipe) | **PUT** /api/v1/recipes/{recipe_uuid} | Updates an existing recipe based on its UUID. |
 
 
 
@@ -84,7 +84,7 @@ No authorization required
 
 ## deleteRecipe
 
-> deleteRecipe(uuid)
+> deleteRecipe(recipe_uuid)
 
 Deletes a recipe by its UUID.
 
@@ -105,7 +105,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    recipe_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies DeleteRecipeRequest;
 
   try {
@@ -125,7 +125,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **recipe_uuid** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -224,7 +224,7 @@ No authorization required
 
 ## getRecipe
 
-> FullRecipe getRecipe(uuid)
+> FullRecipe getRecipe(recipe_uuid)
 
 Retrieves a recipe by its UUID.
 
@@ -245,7 +245,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    recipe_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies GetRecipeRequest;
 
   try {
@@ -265,7 +265,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **recipe_uuid** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -294,7 +294,7 @@ No authorization required
 
 ## updateRecipe
 
-> FormErrorResponseForCreateOrUpdateRecipeErrors updateRecipe(uuid, CreateOrUpdateRecipe)
+> FormErrorResponseForCreateOrUpdateRecipeErrors updateRecipe(recipe_uuid, CreateOrUpdateRecipe)
 
 Updates an existing recipe based on its UUID.
 
@@ -315,7 +315,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    recipe_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
     // CreateOrUpdateRecipe (optional)
     CreateOrUpdateRecipe: ...,
   } satisfies UpdateRecipeRequest;
@@ -337,7 +337,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **recipe_uuid** | `string` |  | [Defaults to `undefined`] |
 | **CreateOrUpdateRecipe** | [CreateOrUpdateRecipe](CreateOrUpdateRecipe.md) |  | [Optional] |
 
 ### Return type

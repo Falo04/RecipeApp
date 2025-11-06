@@ -141,7 +141,7 @@ impl Recipe {
         filter_name: Option<String>,
     ) -> anyhow::Result<Vec<Self>> {
         let condition = and![
-            filter_name.map(|name| RecipeModel.name.contains_ignore_case(&name)),
+            filter_name.map(|name| RecipeTagModel.recipe.name.contains_ignore_case(&name)),
             Some(RecipeTagModel.tag.equals(tag_uuid.0)),
         ];
 

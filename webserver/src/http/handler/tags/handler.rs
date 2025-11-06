@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use galvyn::core::re_exports::axum::extract::Path;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
@@ -44,17 +42,16 @@ pub async fn get_all_tags(
 }
 
 /// Retrieves a paginated list of recipes associated with a specific tag.
-#[post("/{uuid}/recipes")]
+#[post("/{tag_uuid}/recipes")]
 pub async fn get_recipes_by_tag(
-    Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
+    Path(tag_uuid): Path<TagUuid>,
     ApiJson(pagination): ApiJson<GetAllRecipesRequest>,
 ) -> ApiResult<ApiJson<Page<SimpleRecipeWithTags>>> {
     let GetAllRecipesRequest { page, filter_name } = pagination;
 
     let mut tx = Database::global().start_transaction().await?;
 
-    let recipes =
-        Recipe::query_by_tag(&mut tx, &TagUuid { 0: tag_uuid }, &page, filter_name).await?;
+    let recipes = Recipe::query_by_tag(&mut tx, &tag_uuid, &page, filter_name).await?;
 
     let mut result = Vec::new();
     for recipe in recipes {
@@ -89,10 +86,7 @@ pub async fn create_tag(
 
     let mut errors = FormErrors::<CreateOrUpdateTagErrors>::new();
 
-    if Tag::query_by_name(&mut tx, request.name.deref())
-        .await?
-        .is_some()
-    {
+    if Tag::query_by_name(&mut tx, &*request.name).await?.is_some() {
         errors.name_already_exists = true;
     }
 
@@ -109,20 +103,20 @@ pub async fn create_tag(
 }
 
 /// Update a tag.
-#[put("/{uuid}")]
+#[put("/{tag_uuid}")]
 pub async fn update_tag(
-    Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>,
+    Path(tag_uuid): Path<TagUuid>,
     ApiJson(request): ApiJson<CreateOrUpdateTag>,
 ) -> ApiResult<(), CreateOrUpdateTagErrors> {
     let mut tx = Database::global().start_transaction().await?;
 
     let mut errors = FormErrors::<CreateOrUpdateTagErrors>::new();
 
-    let Some(tag) = Tag::query_by_uuid(&mut tx, &TagUuid { 0: tag_uuid }).await? else {
+    let Some(tag) = Tag::query_by_uuid(&mut tx, &tag_uuid).await? else {
         return Err(ApiError::bad_request("Invalid tag uuid"));
     };
 
-    if tag.name != request.name && Tag::query_by_name(&mut tx, &request.name).await?.is_some() {
+    if tag.name != request.name && Tag::query_by_name(&mut tx, &*request.name).await?.is_some() {
         errors.name_already_exists = true;
     }
 
@@ -139,11 +133,11 @@ pub async fn update_tag(
 }
 
 /// Delete a tag.
-#[delete("/{uuid}")]
-pub async fn delete_tag(Path(SingleUuid { uuid: tag_uuid }): Path<SingleUuid>) -> ApiResult<()> {
+#[delete("/{tag_uuid}")]
+pub async fn delete_tag(Path(tag_uuid): Path<TagUuid>) -> ApiResult<()> {
     let mut tx = Database::global().start_transaction().await?;
 
-    let Some(tag) = Tag::query_by_uuid(&mut tx, &TagUuid(tag_uuid)).await? else {
+    let Some(tag) = Tag::query_by_uuid(&mut tx, &tag_uuid).await? else {
         return Err(ApiError::bad_request("Invalid tag uuid"));
     };
 

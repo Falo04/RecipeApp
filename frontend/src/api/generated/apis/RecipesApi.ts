@@ -29,7 +29,7 @@ export interface CreateRecipeRequest {
 }
 
 export interface DeleteRecipeRequest {
-    uuid: string;
+    recipe_uuid: string;
 }
 
 export interface GetAllRecipesOperationRequest {
@@ -37,11 +37,11 @@ export interface GetAllRecipesOperationRequest {
 }
 
 export interface GetRecipeRequest {
-    uuid: string;
+    recipe_uuid: string;
 }
 
 export interface UpdateRecipeRequest {
-    uuid: string;
+    recipe_uuid: string;
     CreateOrUpdateRecipe?: CreateOrUpdateRecipe;
 }
 
@@ -89,10 +89,10 @@ export class RecipesApi extends runtime.BaseAPI {
      * Deletes a recipe by its UUID.
      */
     async deleteRecipeRaw(requestParameters: DeleteRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['recipe_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling deleteRecipe().'
+                'recipe_uuid',
+                'Required parameter "recipe_uuid" was null or undefined when calling deleteRecipe().'
             );
         }
 
@@ -101,8 +101,8 @@ export class RecipesApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api/v1/recipes/{uuid}`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/recipes/{recipe_uuid}`;
+        urlPath = urlPath.replace(`{${"recipe_uuid"}}`, encodeURIComponent(String(requestParameters['recipe_uuid'])));
 
         const response = await this.request({
             path: urlPath,
@@ -161,10 +161,10 @@ export class RecipesApi extends runtime.BaseAPI {
      * Retrieves a recipe by its UUID.
      */
     async getRecipeRaw(requestParameters: GetRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FullRecipe>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['recipe_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling getRecipe().'
+                'recipe_uuid',
+                'Required parameter "recipe_uuid" was null or undefined when calling getRecipe().'
             );
         }
 
@@ -173,8 +173,8 @@ export class RecipesApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api/v1/recipes/{uuid}`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/recipes/{recipe_uuid}`;
+        urlPath = urlPath.replace(`{${"recipe_uuid"}}`, encodeURIComponent(String(requestParameters['recipe_uuid'])));
 
         const response = await this.request({
             path: urlPath,
@@ -200,10 +200,10 @@ export class RecipesApi extends runtime.BaseAPI {
      * Updates an existing recipe based on its UUID.
      */
     async updateRecipeRaw(requestParameters: UpdateRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FormErrorResponseForCreateOrUpdateRecipeErrors>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['recipe_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling updateRecipe().'
+                'recipe_uuid',
+                'Required parameter "recipe_uuid" was null or undefined when calling updateRecipe().'
             );
         }
 
@@ -214,8 +214,8 @@ export class RecipesApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/recipes/{uuid}`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/recipes/{recipe_uuid}`;
+        urlPath = urlPath.replace(`{${"recipe_uuid"}}`, encodeURIComponent(String(requestParameters['recipe_uuid'])));
 
         const response = await this.request({
             path: urlPath,

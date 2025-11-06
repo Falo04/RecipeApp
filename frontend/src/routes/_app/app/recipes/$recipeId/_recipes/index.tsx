@@ -68,8 +68,8 @@ export function RecipeDetail() {
                 </DropdownMenu>
             }
         >
-            <div className={"grid grid-cols-1 gap-8 md:grid-cols-3 lg:gap-8"}>
-                <div className={"col-span-3 flex flex-col gap-4"}>
+            <div className={"grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-8"}>
+                <div className={"col-span-1 flex flex-col gap-4 md:col-span-3"}>
                     {recipe.tags.length > 0 && (
                         <div className={"flex gap-2"}>
                             {recipe.tags.map((tag) => (
@@ -97,7 +97,7 @@ export function RecipeDetail() {
                         <IngredientsGrid withScrolling={false} ingredients={recipe.ingredients} />
                     </CardContent>
                 </Card>
-                <Card className={"bg-muted col-span-2 py-4"}>
+                <Card className={"bg-muted col-span-1 py-4 md:col-span-2"}>
                     <CardContent>
                         {recipe.steps.length > 0 && (
                             <div className={"flex flex-col gap-4"}>

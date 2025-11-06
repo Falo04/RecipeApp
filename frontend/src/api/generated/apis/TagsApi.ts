@@ -30,7 +30,7 @@ export interface CreateTagRequest {
 }
 
 export interface DeleteTagRequest {
-    uuid: string;
+    tag_uuid: string;
 }
 
 export interface GetAllTagsOperationRequest {
@@ -38,12 +38,12 @@ export interface GetAllTagsOperationRequest {
 }
 
 export interface GetRecipesByTagRequest {
-    uuid: string;
+    tag_uuid: string;
     GetAllRecipesRequest?: GetAllRecipesRequest;
 }
 
 export interface UpdateTagRequest {
-    uuid: string;
+    tag_uuid: string;
     CreateOrUpdateTag?: CreateOrUpdateTag;
 }
 
@@ -91,10 +91,10 @@ export class TagsApi extends runtime.BaseAPI {
      * Delete a tag.
      */
     async deleteTagRaw(requestParameters: DeleteTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['tag_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling deleteTag().'
+                'tag_uuid',
+                'Required parameter "tag_uuid" was null or undefined when calling deleteTag().'
             );
         }
 
@@ -103,8 +103,8 @@ export class TagsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api/v1/tags/{uuid}`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/tags/{tag_uuid}`;
+        urlPath = urlPath.replace(`{${"tag_uuid"}}`, encodeURIComponent(String(requestParameters['tag_uuid'])));
 
         const response = await this.request({
             path: urlPath,
@@ -163,10 +163,10 @@ export class TagsApi extends runtime.BaseAPI {
      * Retrieves a paginated list of recipes associated with a specific tag.
      */
     async getRecipesByTagRaw(requestParameters: GetRecipesByTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageForSimpleRecipeWithTags>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['tag_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling getRecipesByTag().'
+                'tag_uuid',
+                'Required parameter "tag_uuid" was null or undefined when calling getRecipesByTag().'
             );
         }
 
@@ -177,8 +177,8 @@ export class TagsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/tags/{uuid}/recipes`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/tags/{tag_uuid}/recipes`;
+        urlPath = urlPath.replace(`{${"tag_uuid"}}`, encodeURIComponent(String(requestParameters['tag_uuid'])));
 
         const response = await this.request({
             path: urlPath,
@@ -205,10 +205,10 @@ export class TagsApi extends runtime.BaseAPI {
      * Update a tag.
      */
     async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FormErrorResponseForCreateOrUpdateTagErrors>> {
-        if (requestParameters['uuid'] == null) {
+        if (requestParameters['tag_uuid'] == null) {
             throw new runtime.RequiredError(
-                'uuid',
-                'Required parameter "uuid" was null or undefined when calling updateTag().'
+                'tag_uuid',
+                'Required parameter "tag_uuid" was null or undefined when calling updateTag().'
             );
         }
 
@@ -219,8 +219,8 @@ export class TagsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/api/v1/tags/{uuid}`;
-        urlPath = urlPath.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid'])));
+        let urlPath = `/api/v1/tags/{tag_uuid}`;
+        urlPath = urlPath.replace(`{${"tag_uuid"}}`, encodeURIComponent(String(requestParameters['tag_uuid'])));
 
         const response = await this.request({
             path: urlPath,

@@ -40,21 +40,21 @@ export const Api = {
     recipe: {
         getAll: async (request: GetAllRecipesRequest) =>
             await callApi(recipeApi.getAllRecipes({ GetAllRecipesRequest: request })),
-        getById: async (uuid: string) => await callApi(recipeApi.getRecipe({ uuid })),
+        getById: async (uuid: string) => await callApi(recipeApi.getRecipe({ recipe_uuid: uuid })),
         create: async (payload: CreateOrUpdateRecipe) =>
             await callApi(recipeApi.createRecipe({ CreateOrUpdateRecipe: payload })),
         update: async (uuid: string, payload: CreateOrUpdateRecipe) =>
-            await callApi(recipeApi.updateRecipe({ uuid, CreateOrUpdateRecipe: payload })),
-        delete: async (uuid: string) => await callApi(recipeApi.deleteRecipe({ uuid })),
+            await callApi(recipeApi.updateRecipe({ recipe_uuid: uuid, CreateOrUpdateRecipe: payload })),
+        delete: async (uuid: string) => await callApi(recipeApi.deleteRecipe({ recipe_uuid: uuid })),
     },
     tags: {
         getAll: async (request: GetAllTagsRequest) => await callApi(tagsApi.getAllTags({ GetAllTagsRequest: request })),
         getRecipesByTag: async (uuid: string, request: GetAllRecipesRequest) =>
-            await callApi(tagsApi.getRecipesByTag({ uuid, GetAllRecipesRequest: request })),
+            await callApi(tagsApi.getRecipesByTag({ tag_uuid: uuid, GetAllRecipesRequest: request })),
         create: async (payload: CreateOrUpdateTag) => await callApi(tagsApi.createTag({ CreateOrUpdateTag: payload })),
         update: async (uuid: string, payload: CreateOrUpdateTag) =>
-            await callApi(tagsApi.updateTag({ uuid, CreateOrUpdateTag: payload })),
-        delete: async (uuid: string) => await callApi(tagsApi.deleteTag({ uuid })),
+            await callApi(tagsApi.updateTag({ tag_uuid: uuid, CreateOrUpdateTag: payload })),
+        delete: async (uuid: string) => await callApi(tagsApi.deleteTag({ tag_uuid: uuid })),
     },
     ingredients: {
         getAll: async () => await callApi(ingredientsApi.getAllIngredients()),

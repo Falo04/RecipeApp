@@ -5,10 +5,10 @@ All URIs are relative to *http://localhost*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**createTag**](TagsApi.md#createtag) | **POST** /api/v1/tags | Creates a tag. |
-| [**deleteTag**](TagsApi.md#deletetag) | **DELETE** /api/v1/tags/{uuid} | Delete a tag. |
+| [**deleteTag**](TagsApi.md#deletetag) | **DELETE** /api/v1/tags/{tag_uuid} | Delete a tag. |
 | [**getAllTags**](TagsApi.md#getalltagsoperation) | **POST** /api/v1/tags/all | Retrieves all tags with pagination support. |
-| [**getRecipesByTag**](TagsApi.md#getrecipesbytag) | **POST** /api/v1/tags/{uuid}/recipes | Retrieves a paginated list of recipes associated with a specific tag. |
-| [**updateTag**](TagsApi.md#updatetag) | **PUT** /api/v1/tags/{uuid} | Update a tag. |
+| [**getRecipesByTag**](TagsApi.md#getrecipesbytag) | **POST** /api/v1/tags/{tag_uuid}/recipes | Retrieves a paginated list of recipes associated with a specific tag. |
+| [**updateTag**](TagsApi.md#updatetag) | **PUT** /api/v1/tags/{tag_uuid} | Update a tag. |
 
 
 
@@ -84,7 +84,7 @@ No authorization required
 
 ## deleteTag
 
-> deleteTag(uuid)
+> deleteTag(tag_uuid)
 
 Delete a tag.
 
@@ -105,7 +105,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    tag_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies DeleteTagRequest;
 
   try {
@@ -125,7 +125,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **tag_uuid** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -224,7 +224,7 @@ No authorization required
 
 ## getRecipesByTag
 
-> PageForSimpleRecipeWithTags getRecipesByTag(uuid, GetAllRecipesRequest)
+> PageForSimpleRecipeWithTags getRecipesByTag(tag_uuid, GetAllRecipesRequest)
 
 Retrieves a paginated list of recipes associated with a specific tag.
 
@@ -245,7 +245,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    tag_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
     // GetAllRecipesRequest (optional)
     GetAllRecipesRequest: ...,
   } satisfies GetRecipesByTagRequest;
@@ -267,7 +267,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **tag_uuid** | `string` |  | [Defaults to `undefined`] |
 | **GetAllRecipesRequest** | [GetAllRecipesRequest](GetAllRecipesRequest.md) |  | [Optional] |
 
 ### Return type
@@ -297,7 +297,7 @@ No authorization required
 
 ## updateTag
 
-> FormErrorResponseForCreateOrUpdateTagErrors updateTag(uuid, CreateOrUpdateTag)
+> FormErrorResponseForCreateOrUpdateTagErrors updateTag(tag_uuid, CreateOrUpdateTag)
 
 Update a tag.
 
@@ -318,7 +318,7 @@ async function example() {
 
   const body = {
     // string
-    uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    tag_uuid: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
     // CreateOrUpdateTag (optional)
     CreateOrUpdateTag: ...,
   } satisfies UpdateTagRequest;
@@ -340,7 +340,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uuid** | `string` |  | [Defaults to `undefined`] |
+| **tag_uuid** | `string` |  | [Defaults to `undefined`] |
 | **CreateOrUpdateTag** | [CreateOrUpdateTag](CreateOrUpdateTag.md) |  | [Optional] |
 
 ### Return type
