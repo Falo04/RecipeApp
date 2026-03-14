@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[dependencies.galvyn]
+version = "0.2.0"
+features = ["contrib-settings", "rorm-postgres-only", "rorm-cli", "rorm-time", "rorm-uuid", "rorm-schemars"]
+
 [dependencies]
 
 # Async
@@ -14,6 +18,7 @@ futures-util = { version = "~0.3" }
 clap = { version = "~4", features = ["derive"] }
 
 # Datatypes
+uuid = { version = "~1", features = ["v4"] }
 url = { version = "~2", features = ["serde"] }
 time = { version = "~0.3" }
 
@@ -30,9 +35,7 @@ tracing-subscriber = { version = "~0.3", features = ["env-filter", "json"] }
 tracing-forest = { version = "~0.2", features = ["ansi", "tokio", "smallvec", "chrono"] }
 
 # Web framework
-galvyn = { git = "https://github.com/myOmikron/galvyn.git", rev = "1a651aa11d75f3a6ed5d66118955d14726c0cb6b" }
 tower-http = { version = "~0.6", features = ["trace"] }
 
 # Account authentication
 openidconnect = { version = "~4", features = ["accept-rfc3339-timestamps", "timing-resistant-secret-traits"] }
-uuid = { version = "~1", features = ["v4"] }
