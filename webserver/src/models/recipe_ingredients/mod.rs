@@ -24,7 +24,7 @@ pub(in crate::models) mod db;
 #[derive(Debug, Clone)]
 pub struct RecipeIngredient {
     /// Stable identifier for this recipe-ingredient association.
-    pub uuid: RecipeIngredientUuid,
+    pub _uuid: RecipeIngredientUuid,
 
     /// The ingredient referenced by this entry.
     pub ingredients: IngredientUuid,
@@ -37,7 +37,7 @@ pub struct RecipeIngredient {
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct RecipeIngredientUuid(pub Uuid);
+pub struct RecipeIngredientUuid(Uuid);
 
 impl RecipeIngredient {
     /// Lists all ingredient entries for a given recipe.
@@ -68,22 +68,13 @@ impl RecipeIngredient {
             .single(&RecipeIngredientModel {
                 uuid: Uuid::new_v4(),
                 recipe: ForeignModelByField(recipe_uuid.0),
-                ingredients: ForeignModelByField(ingredient_uuid.0),
+                ingredients: ForeignModelByField(ingredient_uuid.get_inner()),
                 amount,
                 unit,
             })
             .await?;
 
         Ok(RecipeIngredient::from(model))
-    }
-
-    /// Removes a single ingredient entry from a recipe by its identifier.
-    #[instrument(name = "RecipeIngredient::delete", skip(exe))]
-    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
-        rorm::delete(exe, RecipeIngredientModel)
-            .condition(RecipeIngredientModel.uuid.equals(self.uuid.0))
-            .await?;
-        Ok(())
     }
 
     /// Removes all ingredient entries associated with a recipe.
@@ -102,8 +93,8 @@ impl RecipeIngredient {
 impl From<RecipeIngredientModel> for RecipeIngredient {
     fn from(model: RecipeIngredientModel) -> Self {
         Self {
-            uuid: RecipeIngredientUuid(model.uuid),
-            ingredients: IngredientUuid(model.ingredients.0),
+            _uuid: RecipeIngredientUuid(model.uuid),
+            ingredients: IngredientUuid::from_model(model.ingredients),
             unit: model.unit,
             amount: model.amount,
         }

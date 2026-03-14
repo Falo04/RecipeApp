@@ -50,7 +50,7 @@ pub async fn get_recipes_by_ingredients(
             !filter_uuids
                 .list
                 .iter()
-                .any(|uuid| uuid.0 == ingredient.uuid.0)
+                .any(|uuid| uuid.get_inner() == ingredient.ingredients.get_inner())
         }) {
             continue;
         }

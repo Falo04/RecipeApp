@@ -8,6 +8,7 @@ use galvyn::core::re_exports::serde::Deserialize;
 use galvyn::core::re_exports::serde::Serialize;
 use galvyn::rorm::db::Executor;
 use galvyn::rorm::fields::types::MaxStr;
+use galvyn::rorm::prelude::ForeignModel;
 use galvyn::rorm::DbEnum;
 use tracing::instrument;
 use uuid::Uuid;
@@ -28,7 +29,18 @@ pub struct Ingredient {
 
 /// Strongly typed UUID for ingredients to avoid mixing IDs across domains.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct IngredientUuid(pub Uuid);
+pub struct IngredientUuid(Uuid);
+
+impl IngredientUuid {
+    /// Creates an instance of "*IngredientUuid*"
+    pub fn from_model(model: ForeignModel<IngredientModel>) -> Self {
+        Self(model.0)
+    }
+    /// Gets underlying UUID
+    pub fn get_inner(&self) -> Uuid {
+        self.0
+    }
+}
 
 impl Ingredient {
     /// Fetches all ingredients ordered by name.
@@ -52,14 +64,11 @@ impl Ingredient {
         exe: impl Executor<'_>,
         uuid: &IngredientUuid,
     ) -> anyhow::Result<Option<Self>> {
-        match rorm::query(exe, IngredientModel)
+        let ingredient = rorm::query(exe, IngredientModel)
             .condition(IngredientModel.uuid.equals(uuid.0))
             .optional()
-            .await?
-        {
-            Some(ingredient) => Ok(Some(Ingredient::from(ingredient))),
-            None => Ok(None),
-        }
+            .await?;
+        Ok(ingredient.map(Self::from))
     }
 
     /// Inserts a new ingredient into the database if one doesn't already exist.
@@ -73,21 +82,21 @@ impl Ingredient {
         name: MaxStr<255>,
     ) -> anyhow::Result<IngredientUuid> {
         let mut guard = exe.ensure_transaction().await?;
-        let ingredient = match rorm::query(guard.get_transaction(), IngredientModel)
-            .condition(IngredientModel.name.equals(&*name))
+        let ingredient = rorm::query(guard.get_transaction(), IngredientModel)
+            .condition(IngredientModel.name.equals(&name))
             .optional()
-            .await?
-        {
-            Some(ingredient) => ingredient,
-            None => {
-                rorm::insert(guard.get_transaction(), IngredientModel)
-                    .single(&IngredientModel {
-                        uuid: Uuid::new_v4(),
-                        name,
-                    })
-                    .await?
-            }
-        };
+            .await?;
+
+        if let Some(ingredient) = ingredient {
+            return Ok(IngredientUuid(ingredient.uuid));
+        }
+
+        let ingredient = rorm::insert(guard.get_transaction(), IngredientModel)
+            .single(&IngredientModel {
+                uuid: Uuid::new_v4(),
+                name,
+            })
+            .await?;
 
         Ok(IngredientUuid(ingredient.uuid))
     }

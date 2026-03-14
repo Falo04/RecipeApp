@@ -84,14 +84,11 @@ impl Recipe {
         exe: impl Executor<'_>,
         uuid: &RecipeUuid,
     ) -> anyhow::Result<Option<Self>> {
-        match rorm::query(exe, RecipeModel)
+        let model = rorm::query(exe, RecipeModel)
             .condition(RecipeModel.uuid.equals(uuid.0))
             .optional()
-            .await?
-        {
-            Some(model) => Ok(Some(Recipe::from(model))),
-            None => Ok(None),
-        }
+            .await?;
+        Ok(model.map(Recipe::from))
     }
 
     /// List recipes that use any of the given ingredients.
@@ -105,7 +102,7 @@ impl Recipe {
         let condition = DynamicCollection::or(
             ingredient_uuids
                 .iter()
-                .map(|uuid| RecipeIngredientModel.ingredients.equals(uuid.0))
+                .map(|uuid| RecipeIngredientModel.ingredients.equals(uuid.get_inner()))
                 .collect(),
         );
 
@@ -161,14 +158,11 @@ impl Recipe {
     /// Fetch a recipe by its unique name.
     #[instrument(name = "Recipe::query_by_name", skip(exe))]
     pub async fn query_by_name(exe: impl Executor<'_>, name: &str) -> anyhow::Result<Option<Self>> {
-        match rorm::query(exe, RecipeModel)
+        let model = rorm::query(exe, RecipeModel)
             .condition(RecipeModel.name.equals(name))
             .optional()
-            .await?
-        {
-            Some(model) => Ok(Some(Recipe::from(model))),
-            None => Ok(None),
-        }
+            .await?;
+        Ok(model.map(Recipe::from))
     }
 
     /// Create and return a new recipe.
@@ -182,7 +176,7 @@ impl Recipe {
         let model = rorm::insert(exe, RecipeModel)
             .single(&RecipeModelInsert {
                 uuid: Uuid::new_v4(),
-                user: ForeignModelByField(user.0),
+                user: ForeignModelByField(user.get_inner()),
                 name,
                 description,
                 created_at: OffsetDateTime::now_utc(),
@@ -223,7 +217,7 @@ impl From<RecipeModel> for Recipe {
             uuid: RecipeUuid(model.uuid),
             name: model.name,
             description: model.description,
-            user: AccountUuid(model.user.0),
+            user: AccountUuid::new_from_model(model.user),
         }
     }
 }

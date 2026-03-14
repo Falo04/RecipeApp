@@ -11,7 +11,6 @@ use galvyn::rorm::prelude::ForeignModelByField;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::models::ingredients::IngredientUuid;
 use crate::models::recipe_steps::db::RecipeStepModel;
 use crate::models::recipes::RecipeUuid;
 
@@ -35,7 +34,7 @@ pub struct RecipeStep {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
 /// Strongly typed UUID wrapper for recipe steps to prevent cross-domain ID mix-ups.
-pub struct RecipeStepUuid(pub Uuid);
+pub struct RecipeStepUuid(Uuid);
 
 impl RecipeStep {
     /// Lists all steps belonging to a recipe.
@@ -72,15 +71,6 @@ impl RecipeStep {
             .await?;
 
         Ok(RecipeStep::from(model))
-    }
-
-    /// Deletes a single step by its identifier.
-    #[instrument(name = "RecipeStep::delete", skip(exe))]
-    pub async fn delete(&self, exe: impl Executor<'_>) -> anyhow::Result<()> {
-        rorm::delete(exe, RecipeStepModel)
-            .condition(RecipeStepModel.uuid.equals(self.uuid.0))
-            .await?;
-        Ok(())
     }
 
     /// Deletes all steps associated with a recipe.

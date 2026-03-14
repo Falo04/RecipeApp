@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.85.0
+ARG RUST_VERSION=1.92.0
 
 FROM rust:${RUST_VERSION}-slim-bookworm AS buildrust
 
@@ -48,8 +48,7 @@ RUN adduser \
 # Allow appuser to execute update-ca-certificates
 COPY ./build/webserver/sudoers-appuser /etc/sudoers.d/appuser
 
-RUN mkdir -p /var/lib/webserver /migrations
-RUN chown ${UID} -R /var/lib/webserver
+RUN mkdir -p /migrations
 
 # Copy the executable from the "build" stage.
 COPY --from=buildrust /bin/server /bin/

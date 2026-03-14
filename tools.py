@@ -30,7 +30,7 @@ def check_return_code(code):
         sys.exit(code)
 
 
-def get_webserver_service() -> str | None:
+def get_webserver_service():
     command = shlex.split("docker compose -f docker-compose-dev.yml ps --format json")
     process = subprocess.run(
         command,
