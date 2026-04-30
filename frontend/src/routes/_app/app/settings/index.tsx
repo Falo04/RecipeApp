@@ -64,7 +64,10 @@ export function Settings() {
                             {(field) => (
                                 <Field className={"grid grid-cols-3 gap-3 sm:col-span-2"}>
                                     <FieldLabel htmlFor="language">{tg("label.language")}</FieldLabel>
-                                    <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
+                                    <Select
+                                        value={field.state.value}
+                                        onValueChange={(e) => (e ? field.handleChange(e) : undefined)}
+                                    >
                                         <SelectTrigger id={"language"} className={"col-span-2 w-full"}>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -84,7 +87,10 @@ export function Settings() {
                             {(field) => (
                                 <Field className={"grid grid-cols-3 gap-3 sm:col-span-2"}>
                                     <FieldLabel htmlFor="appearance">{tg("label.appearance")}</FieldLabel>
-                                    <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
+                                    <Select
+                                        value={field.state.value}
+                                        onValueChange={(e) => (e ? field.handleChange(e) : undefined)}
+                                    >
                                         <SelectTrigger id={"appearance"} className={"col-span-2 w-full"}>
                                             <SelectValue />
                                         </SelectTrigger>

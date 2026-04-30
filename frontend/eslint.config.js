@@ -9,7 +9,7 @@ export default defineConfig([
     pluginReact.configs.flat.recommended,
     jsdoc.configs["flat/recommended"],
     {
-        ignores: ["src/components/ui/**", "eslint.config.js", "src/index.css"],
+        ignores: ["src/api/generate/**", "src/components/ui/**", "eslint.config.js", "src/index.css"],
     },
     {
         files: ["**/*.{ts,tsx}"],

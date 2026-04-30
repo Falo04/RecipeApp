@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as LabelPrimitive from "@radix-ui/react-label";
 import { cn } from "@/utils/utils";
 import { Label } from "@/components/ui/label";
 
@@ -52,7 +51,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
     );
 }
 
-function FormLabel({ htmlFor, className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
+function FormLabel({ htmlFor, className, ...props }: React.ComponentProps<"label">) {
     return (
         <Label
             data-slot="form-label"
