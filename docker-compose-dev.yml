@@ -1,3 +1,5 @@
+name: "recipeapp-dev"
+
 services:
   nginx-dev:
     restart: unless-stopped
@@ -14,9 +16,12 @@ services:
       dockerfile: ./build/dockerfiles/nginx-dev.Dockerfile
 
   webserver-dev:
+    labels:
+      - webserver
     build:
       dockerfile: ./build/dockerfiles/webserver-dev.Dockerfile
     restart: unless-stopped
+    stop_signal: SIGTERM
     depends_on:
       - postgres-dev
     networks:
@@ -24,6 +29,8 @@ services:
     volumes:
       - ./webserver/migrations:/migrations
     env_file: [ .env ]
+    environment:
+      - RUST_LOG=${RUST_LOG-info,webserver=debug}
 
   postgres-dev:
     shm_size: 128mb
@@ -42,13 +49,22 @@ services:
   frontend-dev:
     restart: unless-stopped
     volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
+      - ./frontend:/app
+      - /app/node_modules
     env_file: [ .env ]
     networks: [ net-food-dev ]
     user: "${UID}:${GID}"
     build:
       dockerfile: ./build/dockerfiles/frontend-dev.Dockerfile
+
+  jaeger-dev:
+    restart: unless-stopped
+    env_file: [ .env ]
+    networks: [ net-food-dev ]
+    ports:
+      - "127.0.0.1:16686:16686"
+    build:
+      dockerfile: build/dockerfiles/jaeger-dev.Dockerfile
 
 networks:
   net-food-dev:

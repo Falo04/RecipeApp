@@ -30,7 +30,7 @@ export function Login() {
                             </div>
                         </CardHeader>
                         <CardContent className={"mt-4"}>
-                            <ButtonLink className={"w-full"} href={"/api/v1/oidc/begin-login"}>
+                            <ButtonLink className={"w-full"} href={"/api/frontend/v1/oidc/begin-login"}>
                                 {t("button.sign-in-with-sso")}
                             </ButtonLink>
                         </CardContent>

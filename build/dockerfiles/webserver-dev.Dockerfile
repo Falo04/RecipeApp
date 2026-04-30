@@ -1,6 +1,6 @@
-ARG RUST_VERSION=1.92.0
+ARG RUST_VERSION=1.93
 
-FROM rust:${RUST_VERSION}-slim-bookworm AS buildrust
+FROM rust:${RUST_VERSION}-slim-trixie AS buildrust
 
 WORKDIR /app
 
@@ -16,17 +16,18 @@ RUN --mount=type=bind,source=webserver/,target=webserver/ \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=cache,target=/app/target/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/ \
     <<EOF
 set -e
 cargo build --locked
 cp ./target/debug/webserver /bin/server
 EOF
 
-FROM debian:bookworm-slim AS final
+FROM debian:trixie-slim AS final
 
 RUN <<EOF
 apt-get update
-apt-get install -y libssl-dev libpq-dev ca-certificates sudo
+apt-get install -y libssl-dev ca-certificates
 EOF
 
 # Copy startup script
@@ -34,21 +35,17 @@ COPY ./build/webserver/startup.sh /
 RUN chmod +x /startup.sh
 
 # Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/   #user
+# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
 ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
+RUN useradd \
+    --home-dir "/nonexistent" \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
     appuser
 
-# Allow appuser to execute update-ca-certificates
-COPY ./build/webserver/sudoers-appuser /etc/sudoers.d/appuser
-
-RUN mkdir -p /migrations
+RUN mkdir /migrations
+RUN chown ${UID} /migrations
 
 # Copy the executable from the "build" stage.
 COPY --from=buildrust /bin/server /bin/

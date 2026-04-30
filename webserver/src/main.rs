@@ -1,74 +1,45 @@
 //! Recipe App
 
-#![warn(missing_docs, clippy::unwrap_used, clippy::expect_used)]
+#![deny(clippy::unwrap_used, clippy::expect_used, unsafe_code)]
+#![warn(missing_docs, clippy::missing_docs_in_private_items, clippy::todo)]
 
-use std::fs;
+use std::error::Error;
+use std::net::IpAddr;
+use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 
-use ::tracing::level_filters::LevelFilter;
 use clap::Parser;
-use clap::Subcommand;
-use galvyn::core::re_exports::rorm;
-use galvyn::core::DatabaseSetup;
-use galvyn::rorm::Database;
-use galvyn::rorm::DatabaseConfiguration;
 use galvyn::Galvyn;
 use galvyn::GalvynSetup;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
+use galvyn::core::DatabaseSetup;
+use galvyn::core::re_exports::rorm;
+use galvyn::rorm::Database;
+use galvyn::rorm::DatabaseConfiguration;
+use galvyn::tracing::opentelemetry::OpenTelemetrySetup;
+use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Layer;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 
+use crate::cli::Cli;
+use crate::cli::Command;
 use crate::config::DB;
-use crate::config::SERVER_ADDRESS;
-use crate::config::SERVER_PORT;
-use crate::http::server;
+use crate::config::OTEL_EXPORTER_OTLP_ENDPOINT;
 use crate::modules::oidc::OpenIdConnect;
 use crate::modules::websockets::WebsocketManager;
 
+pub mod cli;
 mod config;
 mod http;
 mod models;
 mod modules;
 
-/// Represents the command-line arguments parsed by the program.
-///
-/// This struct holds the parsed command and any subcommands.
-#[derive(Parser)]
-pub struct Cli {
-    /// The command to execute.
-    #[clap(subcommand)]
-    pub command: Command,
-}
-
-/// Represents a command with subcommands.
-///
-/// This enum defines the different commands available in the application.
-#[derive(Subcommand)]
-pub enum Command {
-    /// Start the application.
-    Start,
-    /// Apply migrations to the database.
-    Migrate {
-        /// The directory containing the migrations to apply.
-        migrations_dir: String,
-    },
-    /// Generate migrations for the database.
-    MakeMigrations {
-        /// The directory to write the migrations to.
-        migrations_dir: String,
-    },
-}
-
-/// Main function to start the application.
-///
-/// This function initializes the configuration, logging, and handles the application's main command-line interaction.
-/// It parses command-line arguments and executes the corresponding command.
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     if let Err(errors) = config::load_env() {
         for error in errors {
-            eprintln!("error: {error}");
+            eprintln!("{error}");
         }
         return Err("Failed to load configuration".into());
     }
@@ -76,7 +47,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::registry()
         .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("INFO")))
         .with(tracing_forest::ForestLayer::default().with_filter(LevelFilter::DEBUG))
+        .with(
+            OpenTelemetrySetup {
+                service_name: "recipe-app".to_string(),
+                exporter_otlp_endpoint: OTEL_EXPORTER_OTLP_ENDPOINT.clone(),
+            }
+            .opentelemetry_layer()?,
+        )
         .init();
+
+    galvyn::panic_hook::set_panic_hook();
 
     let cli = Cli::parse();
 
@@ -94,41 +74,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
             .await?
         }
-        Command::MakeMigrations { migrations_dir } => {
-            use std::io::Write;
-
-            /// Defines the path to the model JSON file.
-            ///
-            /// This constant specifies the location of the JSON file containing model definitions.
-            /// The file is expected to be located at "/tmp/.models.json".
-            const MODELS: &str = "/tmp/.models.json";
-
-            let mut file = fs::File::create(MODELS)?;
-            rorm::write_models(&mut file)?;
-            file.flush()?;
-
-            rorm::cli::make_migrations::run_make_migrations(
-                rorm::cli::make_migrations::MakeMigrationsOptions {
-                    models_file: MODELS.to_string(),
-                    migration_dir: migrations_dir,
-                    name: None,
-                    non_interactive: false,
-                    warnings_disabled: false,
-                },
-            )?;
-
-            fs::remove_file(MODELS)?;
-        }
+        #[cfg(debug_assertions)]
+        Command::MakeMigrations { migrations_dir } => make_migrations(migrations_dir)?,
     }
 
     Ok(())
 }
 
-/// Starts the Galvyn server.
-///
-/// This function initializes the Galvyn server with the provided database configuration
-/// and routes, then starts the server listening on the specified address and port.
-async fn start() -> Result<(), Box<dyn std::error::Error>> {
+async fn start() -> Result<(), Box<dyn Error>> {
+    #[expect(clippy::unit_arg)]
     Galvyn::builder(GalvynSetup::default())
         .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
             DB.clone(),
@@ -137,12 +91,33 @@ async fn start() -> Result<(), Box<dyn std::error::Error>> {
         .register_module::<OpenIdConnect>(())
         .init_modules()
         .await?
-        .add_routes(server::initialize())
-        .start(SocketAddr::from((
-            *SERVER_ADDRESS.get(),
-            *SERVER_PORT.get(),
-        )))
+        .add_routes(http::initialize())
+        .start(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 8080))
         .await?;
 
+    Ok(())
+}
+
+#[cfg(debug_assertions)]
+fn make_migrations(migrations_dir: String) -> Result<(), Box<dyn Error>> {
+    use std::io::Write;
+
+    const MODELS: &str = "/tmp/.models.json";
+
+    let mut file = std::fs::File::create(MODELS)?;
+    rorm::write_models(&mut file)?;
+    file.flush()?;
+
+    rorm::cli::make_migrations::run_make_migrations(
+        rorm::cli::make_migrations::MakeMigrationsOptions {
+            models_file: MODELS.to_string(),
+            migration_dir: migrations_dir,
+            name: None,
+            non_interactive: false,
+            warnings_disabled: false,
+        },
+    )?;
+
+    std::fs::remove_file(MODELS)?;
     Ok(())
 }

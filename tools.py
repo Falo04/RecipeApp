@@ -4,6 +4,7 @@ import sys
 import subprocess
 import shlex
 import json
+import os
 import signal
 
 DOCKER_COMMANDS = [
@@ -30,6 +31,12 @@ def check_return_code(code):
         sys.exit(code)
 
 
+def get_branch() -> str:
+    process = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], stdout=subprocess.PIPE)
+    check_return_code(process.returncode)
+    return process.stdout.decode("utf-8").strip()
+
+
 def get_webserver_service():
     command = shlex.split("docker compose -f docker-compose-dev.yml ps --format json")
     process = subprocess.run(
@@ -45,7 +52,7 @@ def get_webserver_service():
     for line in lines.split("\n"):
         info = json.loads(line)
 
-        if "webserver" in info["Name"]:
+        if "webserver" in [x.split("=")[0] for x in info["Labels"].split(",")]:
             return info["Service"]
 
 
@@ -77,6 +84,7 @@ def main():
         subparser.add_parser(c)
 
     # special subcommands
+    subparser.add_parser("db")
     subparser.add_parser("make-migrations")
     subparser.add_parser("create-user")
     subparser.add_parser("gen-api")
@@ -92,7 +100,15 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    if args.command == "make-migrations":
+    branch = get_branch()
+    os.environ["DEV_TAG"] = branch
+
+    if args.command == "db":
+        docker_compose_dev(
+            "exec",
+            ["-it", "postgres-dev", "su", "-c", "psql -U $POSTGRES_USER $DB_NAME"],
+        )
+    elif args.command == "make-migrations":
         webserver_name = get_webserver_service()
         if webserver_name is None:
             print("No service is running. Please run `up` first")

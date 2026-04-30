@@ -1,41 +1,39 @@
 [package]
 name = "webserver"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
-[dependencies.galvyn]
-version = "0.3.0"
-features = ["contrib-settings", "rorm-postgres-only", "rorm-cli", "rorm-time", "rorm-uuid", "rorm-schemars"]
-
 [dependencies]
+# Error handling
+thiserror = { version = "~2" }
+anyhow = { version = "~1" }
 
-# Async
-tokio = { version = ">=1.23.1", features = ["full"] }
-futures-util = { version = "~0.3" }
+# Webframework
+galvyn = { version = "0.3.0", features = ["contrib-settings", "rorm-postgres-only", "rorm-cli", "rorm-time", "rorm-uuid", "rorm-schemars"] }
+tower = { version = "~0.5", features = ["limit"] }
+tower-http = { version = "~0.6", features = ["trace"] }
 
 # CLI
 clap = { version = "~4", features = ["derive"] }
 
-# Datatypes
-uuid = { version = "~1", features = ["v4"] }
-url = { version = "~2", features = ["serde"] }
-time = { version = "~0.3" }
+# Async
+tokio = { version = "~1", features = ["full"] }
+futures-util = { version = "~0.3" }
 
-# Error handling
-anyhow = { version = "~1" }
+# Tracing
+tracing = { version = "~0.1" }
+tracing-subscriber = { version = "~0.3", features = ["env-filter"] }
+tracing-forest = { version = "~0.3" }
 
 # Serialization
 serde = { version = "~1", features = ["derive"] }
 serde_json = { version = "~1" }
 
-# Tracing
-tracing = { version = "~0.1" }
-tracing-subscriber = { version = "~0.3", features = ["env-filter", "json"] }
-tracing-forest = { version = "~0.3", features = ["ansi", "tokio", "smallvec", "chrono"] }
-
-# Web framework
-tower-http = { version = "~0.6", features = ["trace"] }
+# Datatypes
+uuid = { version = "~1", features = ["v4", "serde"] }
+url = { version = "~2", features = ["serde"] }
+time = { version = "~0.3" }
 
 # Account authentication
 openidconnect = { version = "~4", features = ["accept-rfc3339-timestamps", "timing-resistant-secret-traits"] }
