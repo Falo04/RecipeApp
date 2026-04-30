@@ -1,65 +1,60 @@
 import {
-    AccountApi,
-    Configuration,
     type CreateOrUpdateRecipe,
     type CreateOrUpdateTag,
-    DefaultApi,
     type GetAllRecipesByIngredientsRequest,
     type GetAllRecipesRequest,
     type GetAllTagsRequest,
-    IngredientsApi,
-    RecipesApi,
-    RequiredError,
-    ResponseError,
-    TagsApi,
+    getAllIngredients,
+    getAllRecipes,
+    getAllTags,
+    getMe,
+    getRecipe,
+    getRecipesByIngredients,
+    getRecipesByTag,
+    createRecipe,
+    createTag,
+    deleteRecipe,
+    deleteTag,
+    logout,
+    updateRecipe,
+    updateTag,
 } from "@/api/generated";
+import { ResponseError } from "@/api/custom-fetch";
 import { ERROR_STORE } from "@/context/error-context.tsx";
 
 export type UUID = string;
-
-const configuration = new Configuration({
-    basePath: window.location.origin,
-});
-
-const accountApi = new AccountApi(configuration);
-const oidcApi = new DefaultApi(configuration);
-const recipeApi = new RecipesApi(configuration);
-const tagsApi = new TagsApi(configuration);
-const ingredientsApi = new IngredientsApi(configuration);
 
 /**
  * Api wrapper containing various API endpoints.
  */
 export const Api = {
     account: {
-        getMe: async () => await callApi(accountApi.getMe()),
+        getMe: async () => await callApi(getMe()),
     },
     oidc: {
-        logout: async () => await callApi(oidcApi.logout()),
+        logout: async () => await callApi(logout()),
     },
     recipe: {
-        getAll: async (request: GetAllRecipesRequest) =>
-            await callApi(recipeApi.getAllRecipes({ GetAllRecipesRequest: request })),
-        getById: async (uuid: string) => await callApi(recipeApi.getRecipe({ recipe_uuid: uuid })),
-        create: async (payload: CreateOrUpdateRecipe) =>
-            await callApi(recipeApi.createRecipe({ CreateOrUpdateRecipe: payload })),
+        getAll: async (request: GetAllRecipesRequest) => await callApi(getAllRecipes(request)),
+        getById: async (uuid: string) => await callApi(getRecipe(uuid)),
+        create: async (payload: CreateOrUpdateRecipe) => await callApi(createRecipe(payload)),
         update: async (uuid: string, payload: CreateOrUpdateRecipe) =>
-            await callApi(recipeApi.updateRecipe({ recipe_uuid: uuid, CreateOrUpdateRecipe: payload })),
-        delete: async (uuid: string) => await callApi(recipeApi.deleteRecipe({ recipe_uuid: uuid })),
+            await callApi(updateRecipe(uuid, payload)),
+        delete: async (uuid: string) => await callApi(deleteRecipe(uuid)),
     },
     tags: {
-        getAll: async (request: GetAllTagsRequest) => await callApi(tagsApi.getAllTags({ GetAllTagsRequest: request })),
+        getAll: async (request: GetAllTagsRequest) => await callApi(getAllTags(request)),
         getRecipesByTag: async (uuid: string, request: GetAllRecipesRequest) =>
-            await callApi(tagsApi.getRecipesByTag({ tag_uuid: uuid, GetAllRecipesRequest: request })),
-        create: async (payload: CreateOrUpdateTag) => await callApi(tagsApi.createTag({ CreateOrUpdateTag: payload })),
+            await callApi(getRecipesByTag(uuid, request)),
+        create: async (payload: CreateOrUpdateTag) => await callApi(createTag(payload)),
         update: async (uuid: string, payload: CreateOrUpdateTag) =>
-            await callApi(tagsApi.updateTag({ tag_uuid: uuid, CreateOrUpdateTag: payload })),
-        delete: async (uuid: string) => await callApi(tagsApi.deleteTag({ tag_uuid: uuid })),
+            await callApi(updateTag(uuid, payload)),
+        delete: async (uuid: string) => await callApi(deleteTag(uuid)),
     },
     ingredients: {
-        getAll: async () => await callApi(ingredientsApi.getAllIngredients()),
+        getAll: async () => await callApi(getAllIngredients()),
         getRecipes: async (payload: GetAllRecipesByIngredientsRequest) =>
-            await callApi(ingredientsApi.getRecipesByIngredients({ GetAllRecipesByIngredientsRequest: payload })),
+            await callApi(getRecipesByIngredients(payload)),
     },
 };
 
@@ -77,10 +72,6 @@ export async function callApi<T>(promise: Promise<T>): Promise<T> {
         let msg;
         if (e instanceof ResponseError) {
             msg = e.response.statusText;
-        } else if (e instanceof RequiredError) {
-            // eslint-disable-next-line no-console
-            console.error(e);
-            msg = "The server's response didn't match the spec";
         } else {
             // eslint-disable-next-line no-console
             console.error("Unknown error occurred:", e);
