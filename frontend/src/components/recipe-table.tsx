@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Form, Input } from "./ui/form";
 import { useNavigate, type LinkProps } from "@tanstack/react-router";
@@ -18,6 +19,7 @@ import {
     LayoutListIcon,
     MoreHorizontalIcon,
     PenBoxIcon,
+    PlusIcon,
     Settings2Icon,
     Trash2Icon,
 } from "lucide-react";
@@ -102,11 +104,9 @@ export default function RecipeTable(props: RecipeTableProps) {
                 </Form>
 
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant={"outline"}>
-                            <Settings2Icon className={"me-1.5 size-4 opacity-80"} />
-                            {t("filter.view")}
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant={"outline"} />}>
+                        <Settings2Icon className={"me-1.5 size-4 opacity-80"} />
+                        {t("filter.view")}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenu>
@@ -141,6 +141,25 @@ export default function RecipeTable(props: RecipeTableProps) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
+                    {props.data.items.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={4}>
+                                <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
+                                    <p className="text-muted-foreground text-sm">
+                                        {props.search ? t("empty.no-results") : t("empty.no-recipes")}
+                                    </p>
+                                    {!props.search && (
+                                        <Link to="/app/recipes/create">
+                                            <Button>
+                                                <PlusIcon className="size-4" />
+                                                {t("button.create")}
+                                            </Button>
+                                        </Link>
+                                    )}
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
                     {props.data.items.map((recipe) => (
                         <TableRow
                             key={recipe.uuid}
@@ -184,16 +203,18 @@ export default function RecipeTable(props: RecipeTableProps) {
                             </TableCell>
                             <TableCell>
                                 <div className={"-ms-3 flex items-center justify-end"}>
-                                    <DropdownMenu modal={false}>
-                                        <DropdownMenuTrigger asChild data-nolink>
-                                            <Button variant={"ghost"} size={"icon"}>
-                                                <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                                                <MoreHorizontalIcon className={"w-5"} />
-                                            </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger
+                                            openOnHover
+                                            render={<Button variant={"ghost"} />}
+                                            data-nolink
+                                        >
+                                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                                            <MoreHorizontalIcon className={"w-5"} />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align={"end"}>
                                             <DropdownMenuItem
-                                                onSelect={async () => {
+                                                onClick={async () => {
                                                     await navigate({
                                                         to: "/app/recipes/$recipeId/update",
                                                         params: { recipeId: recipe.uuid },
@@ -208,7 +229,7 @@ export default function RecipeTable(props: RecipeTableProps) {
                                                 {t("button.copy")}
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onSelect={() => setOpenDelete(recipe.uuid)}>
+                                            <DropdownMenuItem onClick={() => setOpenDelete(recipe.uuid)}>
                                                 <Trash2Icon className={"me-2.5 size-4"} />
                                                 {t("button.delete")}
                                             </DropdownMenuItem>
@@ -220,12 +241,14 @@ export default function RecipeTable(props: RecipeTableProps) {
                     ))}
                 </TableBody>
             </Table>
-            <TablePagination
-                currentPage={props.page}
-                maxPages={props.data.total === 0 ? 1 : Math.ceil(props.data.total / LIMIT)}
-                href={"/app/recipes"}
-                getSearchParams={(newPage: number) => ({ page: newPage })}
-            />
+            <div className="flex w-full justify-center">
+                <TablePagination
+                    currentPage={props.page}
+                    maxPages={props.data.total === 0 ? 1 : Math.ceil(props.data.total / LIMIT)}
+                    href={"/app/recipes"}
+                    getSearchParams={(newPage: number) => ({ page: newPage })}
+                />
+            </div>
 
             {openDelete && (
                 <Suspense>

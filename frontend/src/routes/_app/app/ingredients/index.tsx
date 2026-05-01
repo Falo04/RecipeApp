@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
-import { ErrorMessage } from "@/components/ui/text.tsx";
+import { ErrorMessage, Text } from "@/components/ui/text.tsx";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { CarrotIcon, CheckIcon, SearchIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge.tsx";
+import { CarrotIcon, CheckIcon, SearchIcon, X } from "lucide-react";
 import {
     Command,
     CommandEmpty,
@@ -18,37 +19,23 @@ import {
 } from "@/components/ui/command.tsx";
 import INGREDIENTS_CONTEXT from "@/context/ingredients.tsx";
 import { Api } from "@/api/api.tsx";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 import RecipeTable from "@/components/recipe-table.tsx";
 import type { PageForSimpleRecipeWithTags, SimpleIngredient } from "@/api/generated";
-import { Field, FieldGroup, FieldSet } from "@/components/ui/field.tsx";
 import { Form } from "@/components/ui/form.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 
-/**
- * The properties for {@link IngredientsSearchOverview}
- */
 export type IngredientsSearchOverviewProps = object;
 
 const LIMIT = 50;
 
-/**
- * The overview for searching recipes by ingredients
- */
 export default function IngredientsSearchOverview() {
     const [t] = useTranslation("ingredients");
 
     const { page, search } = Route.useSearch();
-
     const { ingredients } = React.useContext(INGREDIENTS_CONTEXT);
 
-    const [recipes, setRecipes] = useState<PageForSimpleRecipeWithTags>({
-        items: [],
-        limit: LIMIT,
-        offset: 0,
-        total: 0,
-    });
+    const [recipes, setRecipes] = useState<PageForSimpleRecipeWithTags | null>(null);
     const [open, setOpen] = React.useState(false);
-    const [filteredIngredients, setFilteredIngredients] = React.useState(ingredients);
 
     const form = useForm({
         defaultValues: {
@@ -75,108 +62,121 @@ export default function IngredientsSearchOverview() {
     });
 
     return (
-        <HeadingLayout
-            classNameHeader={"md:flex-row flex-col"}
-            heading={t("heading.overview-title")}
-            description={t("heading.overview-description")}
-            headingChildren={
-                <Form onSubmit={form.handleSubmit} className={"flex w-full gap-2"}>
-                    <FieldGroup>
-                        <FieldSet>
-                            <form.Field name={"search"}>
-                                {(fieldApi) => (
-                                    <Field>
+        <HeadingLayout heading={t("heading.overview-title")} description={t("heading.overview-description")}>
+            <Form onSubmit={form.handleSubmit} className="flex flex-col gap-0">
+                <form.Field name="search">
+                    {(fieldApi) => {
+                        const selected = fieldApi.state.value;
+                        const available = ingredients.filter((i) => !selected.some((s) => s.uuid === i.uuid));
+
+                        return (
+                            <div className="flex flex-col gap-3">
+                                <div className="flex flex-wrap items-end gap-3">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium">{t("heading.all-ingredients")}</label>
                                         <Popover open={open} onOpenChange={setOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant={"default"}
-                                                    role="combobox"
-                                                    aria-expanded={open}
-                                                    className={"self-end"}
-                                                >
-                                                    <CarrotIcon /> {t("button.search")}
-                                                </Button>
+                                            <PopoverTrigger
+                                                render={
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        aria-expanded={open}
+                                                    />
+                                                }
+                                            >
+                                                <CarrotIcon className="size-4" />
+                                                {t("button.select")}
                                             </PopoverTrigger>
-                                            <PopoverContent side={"bottom"}>
+                                            <PopoverContent className="w-72 p-0">
                                                 <Command>
-                                                    <CommandInput placeholder={t("button.select")} className="h-9" />
+                                                    <CommandInput placeholder={t("button.select")} />
                                                     <CommandList>
                                                         <CommandEmpty>{t("label.ingredients-empty")}</CommandEmpty>
-                                                        <CommandGroup heading={t("heading.search-selected")}>
-                                                            {fieldApi.state.value.length !== 0 ? (
-                                                                fieldApi.state.value.map((item, index) => (
+                                                        {selected.length > 0 && (
+                                                            <CommandGroup heading={t("heading.search-selected")}>
+                                                                {selected.map((item, index) => (
+                                                                    <CommandItem
+                                                                        key={item.uuid}
+                                                                        value={item.name}
+                                                                        onSelect={() => fieldApi.removeValue(index)}
+                                                                    >
+                                                                        <CheckIcon className="size-4 shrink-0 text-green-500" />
+                                                                        {item.name}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )}
+                                                        {selected.length > 0 && available.length > 0 && (
+                                                            <CommandSeparator />
+                                                        )}
+                                                        {available.length > 0 && (
+                                                            <CommandGroup heading={t("heading.all-ingredients")}>
+                                                                {available.map((item) => (
                                                                     <CommandItem
                                                                         key={item.uuid}
                                                                         value={item.name}
                                                                         onSelect={() => {
-                                                                            fieldApi.removeValue(index);
-                                                                            setFilteredIngredients([
-                                                                                ...filteredIngredients,
-                                                                                item,
-                                                                            ]);
+                                                                            fieldApi.pushValue(item);
                                                                         }}
                                                                     >
-                                                                        <CheckIcon />
                                                                         {item.name}
                                                                     </CommandItem>
-                                                                ))
-                                                            ) : (
-                                                                <CommandItem>{t("command.empty")}</CommandItem>
-                                                            )}
-                                                        </CommandGroup>
-                                                        <CommandSeparator />
-                                                        <CommandGroup heading={t("heading.all-ingredients")}>
-                                                            {filteredIngredients.map((item) => (
-                                                                <CommandItem
-                                                                    key={item.uuid}
-                                                                    value={item.name}
-                                                                    onSelect={() => {
-                                                                        fieldApi.pushValue(item);
-                                                                        setFilteredIngredients(
-                                                                            filteredIngredients.filter(
-                                                                                (i) => i.uuid !== item.uuid,
-                                                                            ),
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    {item.name}
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )}
                                                     </CommandList>
                                                 </Command>
                                             </PopoverContent>
                                         </Popover>
-                                        {fieldApi.state.meta.errors.map((err) => (
-                                            <ErrorMessage key={err}>{err}</ErrorMessage>
+                                    </div>
+
+                                    <Button type="submit">
+                                        <SearchIcon className="size-4" />
+                                        {t("tooltip.filter")}
+                                    </Button>
+                                </div>
+
+                                {selected.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {selected.map((item, index) => (
+                                            <Badge key={item.uuid} variant="secondary">
+                                                {item.name}
+                                                <button
+                                                    type="button"
+                                                    className="hover:opacity-70"
+                                                    onClick={() => fieldApi.removeValue(index)}
+                                                >
+                                                    <X className="size-3" />
+                                                </button>
+                                            </Badge>
                                         ))}
-                                    </Field>
+                                    </div>
                                 )}
-                            </form.Field>
-                        </FieldSet>
-                    </FieldGroup>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button className={"self-start"} type={"submit"} variant={"outline"} size={"icon"}>
-                                <SearchIcon />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t("tooltip.filter")}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </Form>
-            }
-        >
-            <RecipeTable search={search} href={"/app/ingredients"} data={recipes} page={page} />
+
+                                {fieldApi.state.meta.errors.map((err) => (
+                                    <ErrorMessage key={err}>{err}</ErrorMessage>
+                                ))}
+                            </div>
+                        );
+                    }}
+                </form.Field>
+
+                {recipes ? (
+                    <RecipeTable search={search} href={"/app/ingredients"} data={recipes} page={page} />
+                ) : (
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border py-12 text-center">
+                        <CarrotIcon className="text-muted-foreground size-10" />
+                        <Text>{t("heading.overview-description")}</Text>
+                    </div>
+                )}
+            </Form>
         </HeadingLayout>
     );
 }
 
 type RecipeByIngredientsSearchProps = {
-    /** The current page number we're on */
     page: number;
-    /** The search term that should be used */
     search: string;
 };
 

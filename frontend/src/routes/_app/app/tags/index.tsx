@@ -120,6 +120,23 @@ export function TagsOverview() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
+                    {data.items.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={4}>
+                                <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
+                                    <p className="text-muted-foreground text-sm">
+                                        {search ? t("empty.no-results") : t("empty.no-tags")}
+                                    </p>
+                                    {!search && (
+                                        <Button onClick={() => setOpenCreate(true)}>
+                                            <PlusIcon className="size-4" />
+                                            {t("button.create")}
+                                        </Button>
+                                    )}
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )}
                     {data.items.map((tag) => (
                         <TableRow
                             key={tag.uuid}
@@ -146,12 +163,14 @@ export function TagsOverview() {
                             </TableCell>
                             <TableCell>
                                 <div className={"-ms-3 flex items-center justify-end"}>
-                                    <DropdownMenu modal={false}>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant={"ghost"} size={"icon"} data-nolink>
-                                                <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                                                <MoreHorizontalIcon className={"w-5"} />
-                                            </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger
+                                            openOnHover
+                                            render={<Button variant={"ghost"} size={"icon"} />}
+                                            data-nolink
+                                        >
+                                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                                            <MoreHorizontalIcon className={"w-5"} />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align={"end"}>
                                             <DropdownMenuItem

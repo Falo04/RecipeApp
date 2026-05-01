@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Api } from "@/api/api.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+
 import RecipeTable from "@/components/recipe-table.tsx";
 import { useEffect } from "react";
 import WS from "@/api/websockets.ts";
