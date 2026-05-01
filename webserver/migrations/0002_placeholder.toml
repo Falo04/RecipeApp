@@ -1,0 +1,73 @@
+[Migration]
+Hash = "4017581776596917429"
+Initial = false
+Dependency = 1
+Replaces = []
+
+[[Migration.Operations]]
+Type = "CreateModel"
+Name = "galvynsettings"
+
+[[Migration.Operations.Fields]]
+Name = "uuid"
+Type = "uuid"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "primary_key"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/galvyn-contrib-settings-0.3.0/src/model.rs"
+Line = 10
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "key"
+Type = "varchar"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "max_length"
+Value = 255
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "unique"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/galvyn-contrib-settings-0.3.0/src/model.rs"
+Line = 13
+Column = 9
+
+[[Migration.Operations.Fields]]
+Name = "value"
+Type = "binary"
+
+[[Migration.Operations.Fields.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Fields.SourceDefinedAt]
+File = "/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/galvyn-contrib-settings-0.3.0/src/model.rs"
+Line = 15
+Column = 9
+
+[[Migration.Operations]]
+Type = "DeleteField"
+Model = "recipe_ingredient"
+Name = "amount"
+
+[[Migration.Operations]]
+Type = "CreateField"
+Model = "recipe_ingredient"
+
+[Migration.Operations.Field]
+Name = "amount"
+Type = "int64"
+
+[[Migration.Operations.Field.Annotations]]
+Type = "not_null"
+
+[Migration.Operations.Field.SourceDefinedAt]
+File = "webserver/src/models/recipe_ingredients/db.rs"
+Line = 27
+Column = 9

@@ -121,12 +121,10 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
                                 )}
                             </form.Field>
                             <DialogFooter>
-                                <Field orientation={"horizontal"}>
-                                    <Button type="button" variant="secondary" onClick={() => props.onClose()}>
-                                        {tg("button.close")}
-                                    </Button>
-                                    <Button type="submit">{t("button.create")}</Button>
-                                </Field>
+                                <Button type="button" variant="secondary" onClick={() => props.onClose()}>
+                                    {tg("button.close")}
+                                </Button>
+                                <Button type="submit">{t("button.create")}</Button>
                             </DialogFooter>
                         </FieldGroup>
                     </FieldSet>

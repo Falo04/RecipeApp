@@ -124,12 +124,10 @@ export function EditTagDialog(props: EditTagDialogProps) {
                                 )}
                             </form.Field>
                             <DialogFooter>
-                                <Field orientation={"horizontal"}>
-                                    <Button type="button" variant="secondary" onClick={() => props.onClose()}>
-                                        {tg("button.close")}
-                                    </Button>
-                                    <Button type="submit">{t("button.update")}</Button>
-                                </Field>
+                                <Button type="button" variant="secondary" onClick={() => props.onClose()}>
+                                    {tg("button.close")}
+                                </Button>
+                                <Button type="submit">{t("button.update")}</Button>
                             </DialogFooter>
                         </FieldGroup>
                     </FieldSet>

@@ -6,7 +6,6 @@ import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import React, { Suspense } from "react";
 import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
-import IngredientsGrid from "@/components/ingredients-grid.tsx";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -16,17 +15,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
-import { MoreHorizontalIcon, PenBoxIcon, Trash2Icon } from "lucide-react";
+import { CookingPotIcon, LucideCarrot, MoreHorizontalIcon, PenBoxIcon, Trash2Icon } from "lucide-react";
 import { DeleteRecipeDialog } from "@/components/dialogs/delete-recipe.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 
-/**
- * The properties for {@link RecipeDetail}
- */
 export type RecipeDetailProps = object;
 
-/**
- * Displays detailed information about a recipe.
- */
 export function RecipeDetail() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
@@ -42,15 +36,13 @@ export function RecipeDetail() {
             description={recipe.description}
             headingChildren={
                 <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild data-nolink>
-                        <Button variant={"ghost"} size={"icon"}>
-                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                            <MoreHorizontalIcon className={"w-5"} />
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant={"ghost"} size={"icon"} />}>
+                        <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                        <MoreHorizontalIcon className={"w-5"} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={"end"}>
                         <DropdownMenuItem
-                            onSelect={async () => {
+                            onClick={async () => {
                                 await navigate({
                                     to: "/app/recipes/$recipeId/update",
                                     params: { recipeId: recipe.uuid },
@@ -60,7 +52,7 @@ export function RecipeDetail() {
                             <PenBoxIcon className={"me-2.5 size-4"} />
                             {t("button.edit")}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setOpenDelete(recipe.uuid)}>
+                        <DropdownMenuItem onClick={() => setOpenDelete(recipe.uuid)}>
                             <Trash2Icon className={"me-2.5 size-4"} />
                             {t("button.delete")}
                         </DropdownMenuItem>
@@ -68,44 +60,67 @@ export function RecipeDetail() {
                 </DropdownMenu>
             }
         >
-            <div className={"grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-8"}>
-                <div className={"col-span-1 flex flex-col gap-4 md:col-span-3"}>
-                    {recipe.tags.length > 0 && (
-                        <div className={"flex gap-2"}>
-                            {recipe.tags.map((tag) => (
-                                <Link
-                                    to="/app/tags/$tagId"
-                                    params={{ tagId: tag.uuid }}
-                                    search={{ page: 1, search: "" }}
-                                    key={tag.uuid}
-                                >
-                                    <Badge
-                                        variant={
-                                            tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
-                                        }
-                                        key={tag.uuid}
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+            {recipe.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {recipe.tags.map((tag) => (
+                        <Link
+                            to="/app/tags/$tagId"
+                            params={{ tagId: tag.uuid }}
+                            search={{ page: 1, search: "" }}
+                            key={tag.uuid}
+                        >
+                            <Badge variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}>
+                                {tag.name}
+                            </Badge>
+                        </Link>
+                    ))}
                 </div>
-                <Card className={"bg-muted py-4"}>
-                    <CardContent>
-                        <IngredientsGrid withScrolling={false} ingredients={recipe.ingredients} />
+            )}
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
+                {/* Ingredients */}
+                <Card className="bg-muted/40 py-4">
+                    <CardContent className="flex flex-col gap-4">
+                        <div className="flex items-center gap-2">
+                            <LucideCarrot className="text-muted-foreground size-4 shrink-0" />
+                            <Subheading level={2}>{t("heading.ingredients")}</Subheading>
+                        </div>
+                        <Separator />
+                        {recipe.ingredients.length === 0 ? (
+                            <Text className="text-center">{tg("empty.none")}</Text>
+                        ) : (
+                            <div className="flex flex-col divide-y">
+                                {recipe.ingredients.map((ingredient) => (
+                                    <div key={ingredient.uuid} className="flex items-center gap-3 py-2">
+                                        <span className="text-muted-foreground w-24 shrink-0 text-right text-sm">
+                                            {ingredient.amount} {ingredient.unit}
+                                        </span>
+                                        <span className="text-sm">{ingredient.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
-                <Card className={"bg-muted col-span-1 py-4 md:col-span-2"}>
-                    <CardContent>
-                        {recipe.steps.length > 0 && (
-                            <div className={"flex flex-col gap-4"}>
-                                <Subheading>{t("heading.steps")}</Subheading>
+
+                {/* Steps */}
+                <Card className="bg-muted/40 col-span-1 py-4 md:col-span-2">
+                    <CardContent className="flex flex-col gap-4">
+                        <div className="flex items-center gap-2">
+                            <CookingPotIcon className="text-muted-foreground size-4 shrink-0" />
+                            <Subheading level={2}>{t("heading.steps")}</Subheading>
+                        </div>
+                        <Separator />
+                        {recipe.steps.length === 0 ? (
+                            <Text className="text-center">{tg("empty.none")}</Text>
+                        ) : (
+                            <div className="flex flex-col gap-4">
                                 {recipe.steps.map((step) => (
-                                    <div key={step.uuid} className={"flex items-start gap-2"}>
-                                        <Subheading>{step.index + 1}</Subheading>
-                                        <Text className={"px-2"}>{step.step}</Text>
+                                    <div key={step.uuid} className="flex items-start gap-3">
+                                        <div className="bg-muted text-muted-foreground mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+                                            {step.index + 1}
+                                        </div>
+                                        <Text className="flex-1">{step.step}</Text>
                                     </div>
                                 ))}
                             </div>
@@ -113,6 +128,7 @@ export function RecipeDetail() {
                     </CardContent>
                 </Card>
             </div>
+
             {openDelete && (
                 <Suspense>
                     <DeleteRecipeDialog

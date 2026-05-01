@@ -39,14 +39,12 @@ export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Field orientation={"horizontal"}>
-                        <Button variant="secondary" onClick={() => props.onClose()}>
-                            {tg("button.close")}
-                        </Button>
-                        <Button variant="destructive" onClick={async () => await deleteTag()}>
-                            {t("button.delete")}
-                        </Button>
-                    </Field>
+                    <Button variant="secondary" onClick={() => props.onClose()}>
+                        {tg("button.close")}
+                    </Button>
+                    <Button variant="destructive" onClick={async () => await deleteTag()}>
+                        {t("button.delete")}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

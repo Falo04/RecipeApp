@@ -108,7 +108,7 @@ impl Recipe {
 
         let condition = and![
             condition,
-            filter_name.map(|name| RecipeModel.name.contains_ignore_case(&name)),
+            filter_name.map(|name| RecipeIngredientModel.recipe.name.contains_ignore_case(&name)),
         ];
 
         let result: Vec<_> = rorm::query(

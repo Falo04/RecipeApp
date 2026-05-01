@@ -1,7 +1,7 @@
 import { BaseLayout } from "@/components/layouts/base-layout";
 import { TagsProvider } from "@/context/tags";
-import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
-import { BookText, CarrotIcon, SettingsIcon, Soup, TagIcon } from "lucide-react";
+import { createLazyFileRoute, type LinkProps, Outlet } from "@tanstack/react-router";
+import { BookText, CarrotIcon, type LucideIcon, SettingsIcon, Soup, TagIcon } from "lucide-react";
 import { Suspense } from "react";
 import BreadcrumbMenuBar from "@/components/layouts/BreadcrumbMenuBar.tsx";
 import { IngredientProvider } from "@/context/ingredients.tsx";
@@ -16,7 +16,6 @@ import {
     SidebarItem,
     SidebarMenu,
     SidebarMenuItem,
-    type SidebarNavItem,
 } from "@/components/ui/sidebar";
 import { Heading, Subheading } from "@/components/ui/heading";
 import { AccountProvider } from "@/context/account.tsx";
@@ -25,6 +24,13 @@ import { AccountProvider } from "@/context/account.tsx";
  * The properties for {@link FoodMenu}
  */
 export type FoodMenuProps = object;
+
+export interface SidebarNavItem {
+    id: string;
+    title: string;
+    url: LinkProps["to"];
+    Icon: LucideIcon;
+}
 
 /**
  *
@@ -57,7 +63,7 @@ export function FoodMenu() {
         <BaseLayout
             sidebar={
                 <Sidebar variant={"inset"}>
-                    <SidebarHeader>
+                    <SidebarHeader className={"mt-4"}>
                         <SidebarMenu>
                             <SidebarMenuItem className={"flex items-center justify-center gap-2"}>
                                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">

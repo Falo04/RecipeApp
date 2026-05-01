@@ -1,4 +1,4 @@
-import { type SidebarNavItem, SidebarTrigger } from "@/components/ui/sidebar.tsx";
+import { SidebarTrigger } from "@/components/ui/sidebar.tsx";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
     Breadcrumb,
@@ -19,6 +19,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import React from "react";
 import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
 import SINGLE_TAG_CONTEXT from "@/context/tag.tsx";
+import type { SidebarNavItem } from "@/routes/_app.lazy.tsx";
 
 /**
  * The properties for {@link BreadcrumbMenuBar}
@@ -65,8 +66,8 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
                 <BreadcrumbList>
                     {!isMobile && (
                         <>
-                            <BreadcrumbLink asChild>
-                                <Link to="">{tg("menu.dashboard")}</Link>
+                            <BreadcrumbLink render={<Link to={"/app/recipes"} search={{ page: 1, search: "" }} />}>
+                                {tg("menu.dashboard")}
                             </BreadcrumbLink>
                             <BreadcrumbSeparator />
                         </>
@@ -91,15 +92,9 @@ export default function BreadcrumbMenuBar(props: SiteHeaderProps) {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     {path[0] === "settings" && (
-                        <BreadcrumbLink asChild>
-                            <Link to={"/app/settings"}>{tg("menu.settings")}</Link>
-                        </BreadcrumbLink>
+                        <BreadcrumbLink render={<Link to={"/app/settings"} />}>{tg("menu.settings")}</BreadcrumbLink>
                     )}
-                    {nav && (
-                        <BreadcrumbLink asChild>
-                            <Link to={nav.url}>{nav.title}</Link>
-                        </BreadcrumbLink>
-                    )}
+                    {nav && <BreadcrumbLink render={<Link to={nav.url} />}>{nav.title}</BreadcrumbLink>}
                     {entityName && (
                         <>
                             <BreadcrumbSeparator />

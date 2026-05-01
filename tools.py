@@ -106,7 +106,7 @@ def main():
     if args.command == "db":
         docker_compose_dev(
             "exec",
-            ["-it", "postgres-dev", "su", "-c", "psql -U $POSTGRES_USER $DB_NAME"],
+            ["-it", "postgres-dev", "su", "-c", "psql -U $DB_USER $DB_NAME"],
         )
     elif args.command == "make-migrations":
         webserver_name = get_webserver_service()
