@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS build
+FROM debian:trixie-slim AS build
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ tar xf v5.18.2.tar.gz
 mv swagger-ui-5.18.2/dist swagger-ui
 EOF
 
-FROM nginx:latest AS final
+FROM nginx:apline AS final
 
 COPY --from=build /app/swagger-ui /usr/share/nginx/html/swagger-ui
 COPY ./build/nginx/swagger-initializer.js /usr/share/nginx/html/swagger-ui/swagger-initializer.js

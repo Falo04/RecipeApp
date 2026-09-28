@@ -1,56 +1,29 @@
-ARG RUST_VERSION=1.93
-
-FROM rust:${RUST_VERSION}-slim-trixie AS buildrust
-
-WORKDIR /app
+FROM rust:1.95.0-slim-trixie@sha256:e14e87345b4d5964ddcc3491d27ee046a0f23820f340c3c1e24da6880141f7c0 AS builder
 
 RUN <<EOF
 apt-get update
-apt-get install openssl libssl-dev pkg-config mold -y
-apt-get install protobuf-compiler -y
+apt-get install -y --no-install-recommends musl-tools mold
 EOF
 
-COPY ./build/webserver/cargo-config.toml .cargo/config.toml
+ENV CC_aarch64_unknown_linux_musl=musl-gcc
 
-RUN --mount=type=bind,source=webserver/,target=webserver/ \
-    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
-    --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
-    --mount=type=cache,target=/app/target/ \
-    --mount=type=cache,target=/usr/local/cargo/registry/ \
-    <<EOF
+RUN rustup target add aarch64-unknown-linux-musl
+
+WORKDIR /build
+COPY . .
+
+RUN --mount=type=cache,target=/build/target/ \
+  --mount=type=cache,target=/usr/local/cargo/registry/ \
+  <<EOF
 set -e
-cargo build --locked
-cp ./target/debug/webserver /bin/server
+cargo build --target aarch64-unknown-linux-musl --locked --package webserver
+cp -v /build/target/aarch64-unknown-linux-musl/debug/webserver /build/service
 EOF
 
-FROM debian:trixie-slim AS final
 
-RUN <<EOF
-apt-get update
-apt-get install -y libssl-dev ca-certificates
-EOF
+FROM dhi.io/alpine-base:3.23@sha256:27d91b0ae2dbb1bbf89398f4ee4564a0c7a14a82c34c8cffd3b2687033a9d97a AS final
 
-# Copy startup script
-COPY ./build/webserver/startup.sh /
-RUN chmod +x /startup.sh
+COPY --from=builder /build/service /usr/local/bin/service
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN useradd \
-    --home-dir "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-
-RUN mkdir /migrations
-RUN chown ${UID} /migrations
-
-# Copy the executable from the "build" stage.
-COPY --from=buildrust /bin/server /bin/
-
-USER appuser
-
-# What the container should run when it is started.
-CMD ["/startup.sh"]
+ENTRYPOINT ["/usr/local/bin/service"]
+CMD ["start"]

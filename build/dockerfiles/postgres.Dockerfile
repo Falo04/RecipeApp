@@ -1,1 +1,1 @@
-FROM postgres:17-alpine AS final
+FROM postgres:18-alpine@sha256:96d56f7f57c6aacd1fcb908bc83b345ec5f83231ee486dd66a1baadce274db88 AS final
