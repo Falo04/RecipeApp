@@ -8,6 +8,5 @@ pub mod schema;
 pub fn initialize() -> GalvynRouter {
     GalvynRouter::new()
         .openapi_tag("Ingredients")
-        .handler(handler::get_recipes_by_ingredients)
         .handler(handler::get_all_ingredients)
 }

@@ -4,12 +4,10 @@ use galvyn::core::re_exports::schemars;
 use galvyn::core::re_exports::schemars::JsonSchema;
 use galvyn::core::re_exports::serde::Deserialize;
 use galvyn::core::re_exports::serde::Serialize;
-use galvyn::core::stuff::schema::GetPageRequest;
-use galvyn::core::stuff::schema::List;
 use galvyn::rorm::fields::types::MaxStr;
 
 use crate::models::ingredients::IngredientUuid;
-use crate::models::ingredients::Units;
+use crate::models::recipes::ingredients::Units;
 
 /// Represents the ingredients for a recipe.
 ///
@@ -42,15 +40,4 @@ pub struct SimpleIngredient {
     pub uuid: IngredientUuid,
     /// The name of the ingredient.
     pub name: MaxStr<255>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-pub struct GetAllRecipesByIngredientsRequest {
-    /// Page request
-    #[serde(flatten)]
-    pub page: GetPageRequest,
-    /// Name of recipes to filter for
-    pub filter_name: Option<String>,
-    /// List of ingredients to filter for
-    pub filter_uuids: List<IngredientUuid>,
 }

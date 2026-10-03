@@ -1,32 +1,32 @@
 use std::pin::pin;
 use std::time::Duration;
 
+use galvyn::core::Module;
 use galvyn::core::re_exports::axum::body::Bytes;
+use galvyn::core::re_exports::axum::extract::WebSocketUpgrade;
 use galvyn::core::re_exports::axum::extract::ws::Message;
 use galvyn::core::re_exports::axum::extract::ws::Utf8Bytes;
 use galvyn::core::re_exports::axum::extract::ws::WebSocket;
-use galvyn::core::re_exports::axum::extract::WebSocketUpgrade;
 use galvyn::core::re_exports::axum::response::IntoResponse;
 use galvyn::core::re_exports::axum::response::Response;
 use galvyn::core::re_exports::serde_json;
 use galvyn::core::session::Session;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
-use galvyn::core::Module;
 use galvyn::get;
 use tokio::select;
-use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
-use tokio::time::interval;
-use tokio::time::sleep;
+use tokio::sync::mpsc::channel;
 use tokio::time::Instant;
 use tokio::time::MissedTickBehavior;
+use tokio::time::interval;
+use tokio::time::sleep;
 use tracing::debug;
 use tracing::error;
 use tracing::trace;
 
 use crate::http::handler::websockets::schema::WsServerMsg;
-use crate::modules::websockets::WebsocketManager;
+use crate::modules::websocket::WebsocketManager;
 
 /// Open a websocket to the frontend.
 #[get("/")]
@@ -39,7 +39,7 @@ pub async fn open_websocket(ws: WebSocketUpgrade, session: Session) -> ApiResult
 
     let on_upgrade = move |ws| async move {
         let (server_tx, server_rx) = channel(1);
-        WebsocketManager::global().register(id, server_tx).await;
+        WebsocketManager::global().register(id, server_tx);
         handle_ws(ws, server_rx).await;
     };
 
