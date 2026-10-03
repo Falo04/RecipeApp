@@ -1,5 +1,7 @@
-use galvyn::rorm::fields::types::MaxStr;
+//! Database model for ingredients
+
 use galvyn::rorm::Model;
+use galvyn::rorm::fields::types::MaxStr;
 use uuid::Uuid;
 
 /// Represents an ingredient with a unique identifier and name.
@@ -8,6 +10,7 @@ use uuid::Uuid;
 #[derive(Model)]
 #[rorm(rename = "ingredient")]
 pub struct IngredientModel {
+    /// Primary key
     #[rorm(primary_key)]
     pub uuid: Uuid,
 
