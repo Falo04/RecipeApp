@@ -1,12 +1,9 @@
 //! Represents an ingredient in a recipe.
 
 use galvyn::core::re_exports::rorm;
-use galvyn::core::re_exports::schemars;
-use galvyn::core::re_exports::schemars::JsonSchema;
-use galvyn::core::re_exports::serde::Deserialize;
-use galvyn::core::re_exports::serde::Serialize;
 use galvyn::rorm::conditions;
 use galvyn::rorm::conditions::Condition;
+use galvyn::rorm::db::Executor;
 use galvyn::rorm::db::transaction::Transaction;
 use galvyn::rorm::fields::types::MaxStr;
 use tracing::instrument;
@@ -31,31 +28,11 @@ pub struct Ingredient {
 
 pub type IngredientUuid = TypedUuid<Ingredient>;
 
-/// Represents different units of measurement.
-///
-/// This enum defines various units for quantities, allowing for flexible and
-/// consistent handling of measurements.  Each variant corresponds to a specific
-/// unit of measurement.
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, JsonSchema)]
-pub enum Units {
-    Cup = 0,
-    Gram = 1,
-    Kilogram = 2,
-    Liter = 3,
-    Milliliter = 4,
-    Tablespoon = 5,
-    Teaspoon = 6,
-    /// if the user doesn't want to specific a unit
-    ///
-    /// e.g., 1 egg
-    None = 7,
-}
-
 impl Ingredient {
     /// Fetches all ingredients ordered by name.
-    #[instrument(name = "Ingredient::query_all", skip(tx))]
-    pub async fn query_all(tx: &mut Transaction) -> DatabaseResult<Vec<Self>> {
-        Self::query_by_condition(tx, |_| conditions::Value::Bool(true)).await
+    #[instrument(name = "Ingredient::query_all", skip(db))]
+    pub async fn query_all(db: impl Executor<'_>) -> DatabaseResult<Vec<Self>> {
+        Self::query_by_condition(db, |_| conditions::Value::Bool(true)).await
     }
 
     /// Inserts a new ingredient into the database if one doesn't already exist.
@@ -68,7 +45,7 @@ impl Ingredient {
         tx: &mut Transaction,
         name: MaxStr<255>,
     ) -> DatabaseResult<IngredientUuid> {
-        if let Some(ingredient) = Self::query_by_condition(tx, |m| m.name.equals(&name))
+        if let Some(ingredient) = Self::query_by_condition(&mut *tx, |m| m.name.equals(&name))
             .await?
             .into_iter()
             .next()
@@ -86,15 +63,15 @@ impl Ingredient {
         Ok(IngredientUuid::new(ingredient.uuid))
     }
 
-    /// Query ingredients by a condition
+    /// Query ingredients by a condition, ordered by name
     async fn query_by_condition<'cond, C>(
-        tx: &mut Transaction,
+        db: impl Executor<'_>,
         cond: impl FnOnce(__IngredientModel_ValueSpaceImpl) -> C,
     ) -> DatabaseResult<Vec<Self>>
     where
         C: Condition<'cond>,
     {
-        Ok(rorm::query(tx, IngredientModel)
+        Ok(rorm::query(db, IngredientModel)
             .order_asc(IngredientModel.name)
             .condition(cond(IngredientModel))
             .all()

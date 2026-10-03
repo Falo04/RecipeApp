@@ -1,4 +1,7 @@
 //! Tags domain model and helpers.
+use std::collections::HashMap;
+use std::ops::Deref;
+
 use galvyn::core::re_exports::rorm;
 use galvyn::core::re_exports::schemars;
 use galvyn::core::re_exports::schemars::JsonSchema;
@@ -6,9 +9,9 @@ use galvyn::core::re_exports::serde::Deserialize;
 use galvyn::core::re_exports::serde::Serialize;
 use galvyn::rorm::conditions;
 use galvyn::rorm::conditions::Condition;
+use galvyn::rorm::db::Executor;
 use galvyn::rorm::db::transaction::Transaction;
 use galvyn::rorm::fields::types::MaxStr;
-use galvyn::rorm::prelude::ForeignModelByField;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -25,28 +28,47 @@ pub(in crate::models) mod db;
 /// Domain representation of a tag used to label recipes.
 #[derive(Debug, Clone)]
 pub struct Tag {
+    /// Primary key
     pub uuid: TagUuid,
-
-    pub name: MaxStr<255>,
-
+    /// The name of the tag
+    pub name: TagName,
     /// An enum representing the color associated with the tag.
     pub color: TagColors,
 }
 
 pub type TagUuid = TypedUuid<Tag>;
 
+/// The unique name of a tag
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct TagName(MaxStr<255>);
 
 impl TagName {
     /// Claims `name` for a tag, returning `None` if another tag already uses it
+    ///
+    /// This is only a check for friendly errors, the unique constraint
+    /// in the database is the actual guarantee.
     pub async fn new(tx: &mut Transaction, name: MaxStr<255>) -> DatabaseResult<Option<Self>> {
-        let taken = Tag::query_by_condition(tx, |m| m.name.equals(&name))
+        let taken = rorm::query(&mut *tx, TagModel.uuid)
+            .condition(TagModel.name.equals(&name))
+            .optional()
             .await?
-            .into_iter()
-            .next()
             .is_some();
 
         Ok((!taken).then_some(Self(name)))
+    }
+}
+
+impl Deref for TagName {
+    type Target = MaxStr<255>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl From<TagName> for MaxStr<255> {
+    fn from(value: TagName) -> Self {
+        value.0
     }
 }
 
@@ -74,63 +96,73 @@ pub enum TagColors {
 }
 
 impl Tag {
-    /// Query all tags associated with a given recipe.
-    #[instrument(name = "Tag::query_by_recipe", skip(tx))]
-    pub async fn query_by_recipe(
-        tx: &mut Transaction,
-        recipe_uuid: &RecipeUuid,
-    ) -> DatabaseResult<Vec<Self>> {
-        let result: Vec<_> = rorm::query(tx, RecipeTagModel.tag.query_as(TagModel))
-            .condition(RecipeTagModel.recipe.equals(recipe_uuid.into_inner()))
-            .all()
-            .await?
-            .into_iter()
-            .map(Self::from)
-            .collect();
+    /// Query all tags associated with a given list of recipes.
+    ///
+    /// The tags are ordered by name.
+    #[instrument(name = "Tag::query_by_recipes", skip(db))]
+    pub async fn query_by_recipes(
+        db: impl Executor<'_>,
+        uuids: &[RecipeUuid],
+    ) -> DatabaseResult<HashMap<RecipeUuid, Vec<Self>>> {
+        if uuids.is_empty() {
+            return Ok(HashMap::new());
+        }
 
-        Ok(result)
+        let tags: Vec<_> = rorm::query(
+            db,
+            (RecipeTagModel.recipe, RecipeTagModel.tag.query_as(TagModel)),
+        )
+        .condition(
+            RecipeTagModel
+                .recipe
+                .r#in(uuids.iter().map(|r| r.into_inner()).collect::<Vec<_>>()),
+        )
+        .order_asc(RecipeTagModel.tag.name)
+        .all()
+        .await?
+        .into_iter()
+        .map(|(recipe, t)| (RecipeUuid::new(recipe.0), Tag::from(t)))
+        .collect();
+
+        let mut map: HashMap<RecipeUuid, Vec<Self>> = HashMap::new();
+        for (r, t) in tags {
+            map.entry(r).or_default().push(t);
+        }
+
+        Ok(map)
     }
 
-    /// List tags with optional name filter and pagination support.
-    pub async fn query_all(tx: &mut Transaction) -> DatabaseResult<Vec<Self>> {
-        Self::query_by_condition(tx, |_| conditions::Value::Bool(true)).await
+    /// List all tags ordered by name.
+    #[instrument(name = "Tag::query_all", skip(db))]
+    pub async fn query_all(db: impl Executor<'_>) -> DatabaseResult<Vec<Self>> {
+        Self::query_by_condition(db, |_| conditions::Value::Bool(true)).await
     }
 
     /// Fetch a tag by its UUID if it exists.
+    #[instrument(name = "Tag::query_by_uuid", skip(db))]
     pub async fn query_by_uuid(
-        tx: &mut Transaction,
-        tag_uuid: &TagUuid,
+        db: impl Executor<'_>,
+        tag_uuid: TagUuid,
     ) -> DatabaseResult<Option<Self>> {
         Ok(
-            Self::query_by_condition(tx, |m| m.uuid.equals(tag_uuid.into_inner()))
+            Self::query_by_condition(db, |m| m.uuid.equals(tag_uuid.into_inner()))
                 .await?
                 .into_iter()
                 .next(),
         )
     }
 
-    /// Find a tag by its unique name.
-    pub async fn query_by_name(tx: &mut Transaction, name: &str) -> DatabaseResult<Option<Self>> {
-        match rorm::query(tx, TagModel)
-            .condition(TagModel.name.equals(name))
-            .optional()
-            .await?
-        {
-            Some(model) => Ok(Some(Tag::from(model))),
-            None => Ok(None),
-        }
-    }
-
-    /// Query tags by a condition
-    pub async fn query_by_condition<'cond, C>(
-        tx: &mut Transaction,
+    /// Query tags by a condition, ordered by name
+    async fn query_by_condition<'cond, C>(
+        db: impl Executor<'_>,
         cond: impl FnOnce(__TagModel_ValueSpaceImpl) -> C,
     ) -> DatabaseResult<Vec<Self>>
     where
         C: Condition<'cond>,
     {
-        Ok(rorm::query(tx, TagModel)
+        Ok(rorm::query(db, TagModel)
             .condition(cond(TagModel))
+            .order_asc(TagModel.name)
             .all()
             .await?
             .into_iter()
@@ -144,7 +176,7 @@ impl Tag {
         let model = rorm::insert(tx, TagModel)
             .single(&TagModel {
                 uuid: Uuid::new_v4(),
-                name: params.name,
+                name: params.name.into(),
                 color: params.color,
             })
             .await?;
@@ -152,6 +184,7 @@ impl Tag {
     }
 
     /// Update an existing tag.
+    #[instrument(name = "Tag::update", skip(tx))]
     pub async fn update(
         &mut self,
         tx: &mut Transaction,
@@ -171,61 +204,38 @@ impl Tag {
     }
 
     /// Delete a tag by its UUID.
-    pub async fn delete(&self, tx: &mut Transaction) -> DatabaseResult<()> {
+    #[instrument(name = "Tag::delete", skip(tx))]
+    pub async fn delete(self, tx: &mut Transaction) -> DatabaseResult<()> {
         rorm::delete(tx, TagModel)
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
         Ok(())
     }
-
-    /// Attach a tag to a recipe.
-    #[instrument(name = "Tag::add_to_recipe", skip(tx))]
-    pub async fn add_to_recipe(
-        tx: &mut Transaction,
-        recipe_uuid: &RecipeUuid,
-        tag_uuid: &TagUuid,
-    ) -> DatabaseResult<()> {
-        rorm::insert(tx, RecipeTagModel)
-            .return_nothing()
-            .single(&RecipeTagModel {
-                uuid: Uuid::new_v4(),
-                recipe: ForeignModelByField(recipe_uuid.into_inner()),
-                tag: ForeignModelByField(tag_uuid.into_inner()),
-            })
-            .await?;
-        Ok(())
-    }
-
-    /// Remove all tag associations for a recipe.
-    #[instrument(name = "Tag::remove_from_recipe", skip(tx))]
-    pub async fn remove_from_recipe(
-        tx: &mut Transaction,
-        recipe_uuid: RecipeUuid,
-    ) -> DatabaseResult<()> {
-        rorm::delete(tx, RecipeTagModel)
-            .condition(RecipeTagModel.recipe.equals(recipe_uuid.into_inner()))
-            .await?;
-        Ok(())
-    }
 }
 
+/// The parameters required to create a new [`Tag`]
 #[derive(Debug, Clone)]
 pub struct TagInsertParams {
-    name: MaxStr<255>,
-    color: TagColors,
+    /// The unique name of the tag
+    pub name: TagName,
+    /// The color of the tag
+    pub color: TagColors,
 }
 
+/// The parameters to update a [`Tag`], `None` leaves a field unchanged
 #[derive(Debug, Clone, Default)]
 pub struct TagUpdateParams {
-    name: Option<MaxStr<255>>,
-    color: Option<TagColors>,
+    /// The new unique name of the tag
+    pub name: Option<TagName>,
+    /// The new color of the tag
+    pub color: Option<TagColors>,
 }
 
 impl From<TagModel> for Tag {
     fn from(model: TagModel) -> Self {
         Self {
             uuid: TagUuid::new(model.uuid),
-            name: model.name,
+            name: TagName(model.name),
             color: model.color,
         }
     }

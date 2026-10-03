@@ -1,10 +1,8 @@
 //! Domain model and data access helpers for recipe steps.
 
+use std::collections::HashMap;
+
 use galvyn::core::re_exports::rorm;
-use galvyn::core::re_exports::schemars;
-use galvyn::core::re_exports::schemars::JsonSchema;
-use galvyn::core::re_exports::serde::Deserialize;
-use galvyn::core::re_exports::serde::Serialize;
 use galvyn::rorm::db::transaction::Transaction;
 use galvyn::rorm::fields::types::ForeignModelByField;
 use galvyn::rorm::fields::types::MaxStr;
@@ -13,6 +11,7 @@ use uuid::Uuid;
 use crate::models::DatabaseResult;
 use crate::models::recipes::RecipeUuid;
 use crate::models::recipes::db::RecipeStepModel;
+use crate::utils::typed_uuid::TypedUuid;
 
 /// A single instruction step within a recipe.
 ///
@@ -20,7 +19,7 @@ use crate::models::recipes::db::RecipeStepModel;
 /// preparation process.
 #[derive(Debug, Clone)]
 pub struct RecipeStep {
-    /// Stable identifier for this recipe step.
+    /// Primary key
     pub uuid: RecipeStepUuid,
 
     /// The textual content of the step.
@@ -30,8 +29,39 @@ pub struct RecipeStep {
     pub index: i16,
 }
 
+pub type RecipeStepUuid = TypedUuid<RecipeStep>;
+
 impl RecipeStep {
-    /// Insert a bulk of [`RecipeStep`] for a [`Recipe`](crate::model::recipe::Recipe)
+    /// Query all steps of the given recipes, ordered by their index
+    pub(in crate::models::recipes) async fn query_by_recipes(
+        tx: &mut Transaction,
+        uuids: &[RecipeUuid],
+    ) -> DatabaseResult<HashMap<RecipeUuid, Vec<Self>>> {
+        if uuids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let result: Vec<_> = rorm::query(tx, RecipeStepModel)
+            .condition(
+                RecipeStepModel
+                    .recipe
+                    .r#in(uuids.iter().map(|r| r.into_inner()).collect::<Vec<_>>()),
+            )
+            .order_asc(RecipeStepModel.index)
+            .all()
+            .await?
+            .into_iter()
+            .map(|s| (RecipeUuid::new(s.recipe.0), Self::from(s)))
+            .collect();
+
+        let mut map: HashMap<RecipeUuid, Vec<Self>> = HashMap::new();
+        for (r, s) in result {
+            map.entry(r).or_default().push(s);
+        }
+        Ok(map)
+    }
+
+    /// Insert a bulk of [`RecipeStep`] for a [`Recipe`](crate::models::recipes::Recipe)
     pub(in crate::models::recipes) async fn create_bulk(
         tx: &mut Transaction,
         uuid: RecipeUuid,
@@ -47,6 +77,10 @@ impl RecipeStep {
             })
             .collect();
 
+        if models.is_empty() {
+            return Ok(());
+        }
+
         rorm::insert(tx, RecipeStepModel)
             .return_nothing()
             .bulk(&models)
@@ -56,20 +90,19 @@ impl RecipeStep {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema)]
-/// Strongly typed UUID wrapper for recipe steps to prevent cross-domain ID mix-ups.
-pub struct RecipeStepUuid(Uuid);
-
+/// The parameters required to insert a new [`RecipeStep`]
 #[derive(Debug, Clone)]
 pub struct RecipeStepInsertParams {
-    step: MaxStr<255>,
-    index: i16,
+    /// The textual content of the step.
+    pub step: MaxStr<255>,
+    /// The position of the step within the recipe flow.
+    pub index: i16,
 }
 
 impl From<RecipeStepModel> for RecipeStep {
     fn from(model: RecipeStepModel) -> Self {
         Self {
-            uuid: RecipeStepUuid(model.uuid),
+            uuid: RecipeStepUuid::new(model.uuid),
             index: model.index,
             step: model.step,
         }

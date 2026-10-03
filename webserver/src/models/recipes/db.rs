@@ -10,8 +10,8 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use crate::custom_db_enum;
-use crate::models::ingredients::Units;
 use crate::models::ingredients::db::IngredientModel;
+use crate::models::recipes::ingredients::Units;
 use crate::models::tags::db::TagModel;
 use crate::models::user::db::UserModel;
 
@@ -135,6 +135,6 @@ pub struct RecipeIngredientModel {
 
 custom_db_enum!(
     enum: Units,
-    variants: [Cup, Gram, Kilogram, Liter, Milliliter, Tablespoon, Teaspoon, None],
+    variants: [Cup, Gram, Kilogram, Liter, Milliliter, Tablespoon, Teaspoon, Piece],
     decoder: UnitsDecoder
 );
