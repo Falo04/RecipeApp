@@ -2,6 +2,6 @@ app.env
 target/
 .idea
 
-data/ca-certificates/ca-dev.crt
+data/certs/*
 data/nginx/recipe-dev.crt
 data/nginx/recipe-dev.key
