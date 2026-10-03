@@ -1,9 +1,8 @@
-use galvyn::rorm::fields::types::MaxStr;
-use galvyn::rorm::prelude::ForeignModel;
 use galvyn::rorm::Model;
+use galvyn::rorm::fields::types::MaxStr;
 use uuid::Uuid;
 
-use crate::models::recipes::db::RecipeModel;
+use crate::custom_db_enum;
 use crate::models::tags::TagColors;
 
 /// Represents a tag with a unique name and associated color.
@@ -21,20 +20,8 @@ pub struct TagModel {
     pub color: TagColors,
 }
 
-/// Represents a tag associated with a recipe.
-///
-/// This struct defines a relationship between a `Recipe` and a `Tag`.
-#[derive(Model)]
-#[rorm(rename = "recipe_tag")]
-pub struct RecipeTagModel {
-    #[rorm(primary_key)]
-    pub uuid: Uuid,
-
-    /// A foreign key referencing a `Recipe` object.
-    #[rorm(on_delete = "Cascade")]
-    pub recipe: ForeignModel<RecipeModel>,
-
-    /// A foreign key referencing a `Tag` object.
-    #[rorm(on_delete = "Cascade")]
-    pub tag: ForeignModel<TagModel>,
-}
+custom_db_enum!(
+    enum: TagColors,
+    variants: [Red, Orange, Amber, Yellow, Lime, Green, Emerald, Teal, Cyan, Sky, Blue, Indigo, Violet, Purple, Fuchsia, Pink, Rose, Zinc],
+    decoder: TagColorsDecoder
+);
