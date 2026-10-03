@@ -1,2 +1,2 @@
 pub mod oidc;
-pub mod websockets;
+pub mod websocket;
