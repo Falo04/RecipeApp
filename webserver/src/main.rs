@@ -1,7 +1,7 @@
-//! Recipe App
+//! Webserver
 
-#![deny(clippy::unwrap_used, clippy::expect_used, unsafe_code)]
-#![warn(missing_docs, clippy::missing_docs_in_private_items, clippy::todo)]
+#![deny(unsafe_code)]
+#![warn(clippy::todo, clippy::as_conversions)]
 
 use std::error::Error;
 use std::net::IpAddr;
@@ -11,113 +11,97 @@ use std::net::SocketAddr;
 use clap::Parser;
 use galvyn::Galvyn;
 use galvyn::GalvynSetup;
-use galvyn::core::DatabaseSetup;
-use galvyn::core::re_exports::rorm;
+use galvyn::core::modules::database::DatabaseSetup;
+use galvyn::error::GalvynError;
 use galvyn::rorm::Database;
 use galvyn::rorm::DatabaseConfiguration;
-use galvyn::tracing::opentelemetry::OpenTelemetrySetup;
-use tracing::level_filters::LevelFilter;
-use tracing_subscriber::EnvFilter;
-use tracing_subscriber::Layer;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 
-use crate::cli::Cli;
-use crate::cli::Command;
-use crate::config::DB;
-use crate::config::OTEL_EXPORTER_OTLP_ENDPOINT;
+use crate::config::Config;
 use crate::modules::oidc::OpenIdConnect;
-use crate::modules::websockets::WebsocketManager;
+use crate::modules::websocket::WebsocketManager;
+#[cfg(debug_assertions)]
+use crate::utils::rorm::make_migrations;
+use crate::utils::rorm::migrate;
 
 pub mod cli;
-mod config;
-mod http;
-mod models;
-mod modules;
+pub mod config;
+pub mod http;
+pub mod models;
+pub mod modules;
+pub mod tracing_init;
+pub mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    if let Err(errors) = config::load_env() {
-        for error in errors {
-            eprintln!("{error}");
-        }
-        return Err("Failed to load configuration".into());
-    }
-
-    tracing_subscriber::registry()
-        .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("INFO")))
-        .with(tracing_forest::ForestLayer::default().with_filter(LevelFilter::DEBUG))
-        .with(
-            OpenTelemetrySetup {
-                service_name: "recipe-app".to_string(),
-                exporter_otlp_endpoint: OTEL_EXPORTER_OTLP_ENDPOINT.clone(),
-            }
-            .opentelemetry_layer()?,
-        )
-        .init();
-
-    galvyn::panic_hook::set_panic_hook();
-
-    let cli = Cli::parse();
+    let cli = cli::Cli::parse();
 
     match cli.command {
-        Command::Start => start().await?,
-        Command::Migrate { migrations_dir } => {
-            rorm::cli::migrate::run_migrate_custom(
-                rorm::cli::config::DatabaseConfig {
-                    last_migration_table_name: None,
-                    driver: DB.clone(),
-                },
-                migrations_dir,
-                false,
-                None,
-            )
-            .await?
-        }
+        cli::Command::Start => start().await,
         #[cfg(debug_assertions)]
-        Command::MakeMigrations { migrations_dir } => make_migrations(migrations_dir)?,
+        cli::Command::MakeMigrations { migrations_dir } => make_migrations(migrations_dir)?,
     }
 
     Ok(())
 }
 
-async fn start() -> Result<(), Box<dyn Error>> {
-    #[expect(clippy::unit_arg)]
-    Galvyn::builder(GalvynSetup::default())
-        .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
-            DB.clone(),
-        )))
-        .register_module::<WebsocketManager>(())
-        .register_module::<OpenIdConnect>(())
-        .init_modules()
-        .await?
-        .add_routes(http::initialize())
-        .start(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 8080))
-        .await?;
+/// Starts the server with config loading and tracing/OTel init
+async fn start() -> ! {
+    let config = match Config::load() {
+        Ok(c) => c,
+        Err(err) => {
+            eprintln!("{err}");
+            std::process::exit(1);
+        }
+    };
 
-    Ok(())
+    let otel_provider = tracing_init::init(
+        &config.otel_exporter_name,
+        config.otel_exporter_endpoint.as_ref(),
+    );
+
+    if let Err(error) = migrate(&config.driver).await {
+        tracing::error!(error.debug = ?error, error.display = %error, "failed to apply migrations");
+        if let Some(otel_provider) = otel_provider
+            && let Err(err) = otel_provider.shutdown()
+        {
+            eprintln!("failed to shutdown otel provider: {err}");
+        }
+        std::process::exit(1);
+    }
+
+    let run_galvyn = build_galvyn(config);
+
+    let exit_code = match run_galvyn.await {
+        Ok(()) => 0,
+        Err(error) => {
+            tracing::error!(error.debug = ?error, error.display = %error, "fatal error");
+            1
+        }
+    };
+
+    if let Some(otel_provider) = otel_provider
+        && let Err(err) = otel_provider.shutdown()
+    {
+        eprintln!("failed to shutdown otel provider: {err}");
+    }
+
+    std::process::exit(exit_code);
 }
 
-#[cfg(debug_assertions)]
-fn make_migrations(migrations_dir: String) -> Result<(), Box<dyn Error>> {
-    use std::io::Write;
-
-    const MODELS: &str = "/tmp/.models.json";
-
-    let mut file = std::fs::File::create(MODELS)?;
-    rorm::write_models(&mut file)?;
-    file.flush()?;
-
-    rorm::cli::make_migrations::run_make_migrations(
-        rorm::cli::make_migrations::MakeMigrationsOptions {
-            models_file: MODELS.to_string(),
-            migration_dir: migrations_dir,
-            name: None,
-            non_interactive: false,
-            warnings_disabled: false,
-        },
-    )?;
-
-    std::fs::remove_file(MODELS)?;
-    Ok(())
+/// Builds galvyn
+async fn build_galvyn(config: Config) -> Result<(), GalvynError> {
+    Galvyn::builder(GalvynSetup::default())
+        .register_module::<Database>(DatabaseSetup::Custom(DatabaseConfiguration::new(
+            config.driver,
+        )))
+        .register_module::<OpenIdConnect>(Some(config.oidc))
+        .register_module::<WebsocketManager>(())
+        .init_modules()
+        .await?
+        .add_listener(
+            SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 8080),
+            http::initialize(),
+        )
+        .start()
+        .await
 }

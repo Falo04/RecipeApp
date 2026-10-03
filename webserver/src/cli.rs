@@ -3,6 +3,8 @@
 use clap::Parser;
 use clap::Subcommand;
 
+use crate::utils::rorm::MIGRATION_DIR;
+
 /// The cli
 #[derive(Parser)]
 pub struct Cli {
@@ -16,17 +18,11 @@ pub struct Cli {
 pub enum Command {
     /// Start the server
     Start,
-    /// Apply migrations to the database
-    Migrate {
-        /// The directory containing the migrations to apply
-        #[clap(default_value_t = String::from("/migrations"))]
-        migrations_dir: String,
-    },
-    /// Generate new migrations (debug builds only)
+    /// Create new migrations
     #[cfg(debug_assertions)]
     MakeMigrations {
-        /// The directory to write the migrations to
-        #[clap(default_value_t = String::from("/migrations"))]
+        /// The directory where the migration files are located in
+        #[clap(default_value_t = MIGRATION_DIR.to_string())]
         migrations_dir: String,
     },
 }
