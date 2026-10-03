@@ -1,4 +1,4 @@
-//! Account extrator which gets the account from the session
+//! User extractor which gets the user from the session
 use galvyn::core::Module;
 use galvyn::core::re_exports::axum::extract::FromRequestParts;
 use galvyn::core::re_exports::axum::http::request::Parts;

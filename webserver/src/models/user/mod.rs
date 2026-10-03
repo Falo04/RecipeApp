@@ -1,4 +1,4 @@
-//! Account domain model and session-backed authentication extractor.
+//! User domain model and session-backed authentication extractor.
 pub(in crate::models) mod db;
 mod extractor;
 
@@ -28,7 +28,7 @@ use crate::modules::websocket::WebsocketManager;
 use crate::utils::typed_uuid::TypedUuid;
 use crate::utils::update_builder::TrackedUpdateBuilder;
 
-/// Domain representation of an account used across handlers and services.
+/// Domain representation of a user used across handlers and services.
 #[derive(Clone, Debug)]
 pub struct User {
     /// Primary key of the user
@@ -51,15 +51,15 @@ pub type UserUuid = TypedUuid<User>;
 const SESSION_KEY: &str = "current_account";
 
 impl User {
-    /// Marks this account as logged in by storing its UUID in the session.
-    #[instrument(name = "Account::set_logged_in", skip(self))]
+    /// Marks this user as logged in by storing its UUID in the session.
+    #[instrument(name = "User::set_logged_in", skip(self))]
     pub async fn set_logged_in(&self, session: &Session) -> Result<(), session::Error> {
         session.insert(SESSION_KEY, self.uuid).await?;
         Ok(())
     }
 
-    /// Clears the login state by removing the account UUID from the session.
-    #[instrument(name = "Account::unset_logged_in")]
+    /// Clears the login state by removing the user UUID from the session.
+    #[instrument(name = "User::unset_logged_in")]
     pub async fn unset_logged_in(session: Session) -> Result<(), session::Error> {
         if let Some(_account_uuid) = session.remove::<Uuid>(SESSION_KEY).await? {
             if let Some(session_id) = session.id() {
@@ -73,8 +73,8 @@ impl User {
 }
 
 impl User {
-    /// Looks up an account linked to the given OIDC issuer and subject.
-    #[instrument(name = "Account::query_by_oidc", skip(db))]
+    /// Looks up a user linked to the given OIDC issuer and subject.
+    #[instrument(name = "User::query_by_oidc", skip(db))]
     pub async fn query_by_oidc(
         db: impl Executor<'_>,
         issuer: &str,
@@ -90,8 +90,8 @@ impl User {
         Ok(account.map(Self::from))
     }
 
-    /// Fetches an account by its UUID.
-    #[instrument(name = "Account::query_by_uuid", skip(db))]
+    /// Fetches a user by its UUID.
+    #[instrument(name = "User::query_by_uuid", skip(db))]
     pub async fn query_by_uuid(
         db: impl Executor<'_>,
         uuid: UserUuid,
@@ -103,14 +103,14 @@ impl User {
         Ok(account.map(Self::from))
     }
 
-    /// Creates a new account record.
-    #[instrument(name = "Account::create", skip(tx))]
+    /// Creates a new user record.
+    #[instrument(name = "User::create", skip(tx))]
     pub async fn create(tx: &mut Transaction, params: UserInsertParams) -> DatabaseResult<Self> {
         let account_model = rorm::insert(tx, UserModel)
             .single(&UserModel {
                 uuid: Uuid::new_v4(),
-                name: *params.name,
-                email: *params.email,
+                name: params.name.into(),
+                email: params.email.into(),
                 subject: params.subject,
                 issuer: params.issuer,
                 created_at: OffsetDateTime::now_utc(),
@@ -120,8 +120,8 @@ impl User {
         Ok(User::from(account_model))
     }
 
-    /// Updates an existing account record.
-    #[instrument(name = "Account::update", skip(tx))]
+    /// Updates an existing user record.
+    #[instrument(name = "User::update", skip(tx))]
     pub async fn update(
         &mut self,
         tx: &mut Transaction,
@@ -150,6 +150,9 @@ pub struct UserName(
 
 impl UserName {
     /// Claims `name` for a user, returning `None` if another user already uses it
+    ///
+    /// This is only a check for friendly errors, the unique constraint
+    /// in the database is the actual guarantee.
     pub async fn new(tx: &mut Transaction, name: MaxStr<255>) -> DatabaseResult<Option<Self>> {
         let taken = rorm::query(&mut *tx, UserModel.uuid)
             .condition(UserModel.name.equals(&name))
@@ -184,6 +187,9 @@ pub struct UserEmail(
 
 impl UserEmail {
     /// Claims `email` for a user, returning `None` if another user already uses it
+    ///
+    /// This is only a check for friendly errors, the unique constraint
+    /// in the database is the actual guarantee.
     pub async fn new(tx: &mut Transaction, email: MaxStr<255>) -> DatabaseResult<Option<Self>> {
         let taken = rorm::query(&mut *tx, UserModel.uuid)
             .condition(UserModel.email.equals(&email))

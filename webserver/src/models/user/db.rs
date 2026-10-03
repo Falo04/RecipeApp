@@ -1,10 +1,10 @@
-//! Database model for accounts
+//! Database model for users
 use galvyn::rorm::Model;
 use galvyn::rorm::fields::types::MaxStr;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-/// Represents an account in the system.
+/// Represents a user in the system.
 #[derive(Model, Clone, Debug)]
 #[rorm(rename = "user")]
 pub struct UserModel {

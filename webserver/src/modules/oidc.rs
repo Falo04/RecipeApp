@@ -1,20 +1,16 @@
 //! This module provides functionality for interacting with an OpenID Connect provider.
 //!
 //! It manages the login flow, exchanging authorization codes for access tokens and ID tokens.
+
 use std::time::Duration;
 
+use galvyn::core::InitError;
+use galvyn::core::Module;
+use galvyn::core::PreInitError;
 use galvyn::core::re_exports::serde::Deserialize;
 use galvyn::core::re_exports::serde::Serialize;
 use galvyn::core::stuff::api_error::ApiError;
 use galvyn::core::stuff::api_error::ApiResult;
-use galvyn::core::InitError;
-use galvyn::core::Module;
-use galvyn::core::PreInitError;
-use openidconnect::core::CoreAuthenticationFlow;
-use openidconnect::core::CoreClient;
-use openidconnect::core::CoreIdTokenClaims;
-use openidconnect::core::CoreProviderMetadata;
-use openidconnect::reqwest;
 use openidconnect::AccessTokenHash;
 use openidconnect::AuthorizationCode;
 use openidconnect::ClientId;
@@ -34,14 +30,14 @@ use openidconnect::RedirectUrl;
 use openidconnect::RequestTokenError;
 use openidconnect::Scope;
 use openidconnect::TokenResponse;
+use openidconnect::core::CoreAuthenticationFlow;
+use openidconnect::core::CoreClient;
+use openidconnect::core::CoreIdTokenClaims;
+use openidconnect::core::CoreProviderMetadata;
+use openidconnect::reqwest;
 use tracing::error;
 use tracing::warn;
 use url::Url;
-
-use crate::config::OIDC_CLIENT_ID;
-use crate::config::OIDC_CLIENT_SECRET;
-use crate::config::OIDC_DISCOVER_URL;
-use crate::config::OIDC_REDIRECT_URL;
 
 /// Represents an OpenID Connect client.
 ///
@@ -56,6 +52,7 @@ pub struct OpenIdConnect {
     oidc_client: OidcClient,
 }
 
+/// Wrapper arround a configured `CoreClient`
 type OidcClient = CoreClient<
     EndpointSet, // Auth URL
     EndpointNotSet,
@@ -93,10 +90,10 @@ pub struct OidcRequestState {
 }
 
 impl OpenIdConnect {
-    /// Initiates the OIDC authorization flow for a given side.
+    /// Initiates the OIDC authorization flow.
     ///
-    /// This function constructs the authorization URL and returns the necessary
-    /// session state information.
+    /// Returns the authorization URL to redirect the user to, and the session state
+    /// that must be stored and passed to [`finish_login`](Self::finish_login).
     pub fn begin_login(&self) -> anyhow::Result<(Url, OidcSessionState)> {
         let (pkce_code_challenge, pkce_code_verifier) = PkceCodeChallenge::new_random_sha256();
 
@@ -124,13 +121,13 @@ impl OpenIdConnect {
     }
 
     /// Finishes the login process by exchanging the authorization code for an ID token,
-    /// verifying the ID token, and optionally validating the access token signature
+    /// verifying the ID token, and optionally validating the access token signature.
     pub async fn finish_login(
         &self,
         session: OidcSessionState,
         request: OidcRequestState,
     ) -> ApiResult<CoreIdTokenClaims> {
-        if request.state != session.csrf_token {
+        if request.state.secret() != session.csrf_token.secret() {
             return Err(ApiError::unauthorized("Secret state is invalid"));
         }
 
@@ -181,16 +178,17 @@ impl OpenIdConnect {
 }
 
 impl Module for OpenIdConnect {
-    type Setup = ();
+    type Setup = Option<OidcConfig>;
     type PreInit = Self;
 
-    async fn pre_init(_setup: Self::Setup) -> Result<Self::PreInit, PreInitError> {
+    async fn pre_init(setup: Self::Setup) -> Result<Self::PreInit, PreInitError> {
         let http_client = reqwest::Client::builder()
             .timeout(Duration::from_secs(60))
             .build()
             .expect("Should create a http client");
 
-        let oidc_client = OidcConfig::from_env()
+        let oidc_client = setup
+            .expect("OidcConfig has to be set, when not is a progammer fault")
             .discover_retry::<3>(&http_client)
             .await?;
 
@@ -213,30 +211,19 @@ impl Module for OpenIdConnect {
 /// Represents the configuration for an OpenID Connect (OIDC) flow.
 ///
 /// This struct holds the necessary parameters for establishing a connection with an OIDC provider.
-struct OidcConfig {
+#[derive(Debug, Clone)]
+pub struct OidcConfig {
     /// The URL of the OIDC issuer.
-    url: IssuerUrl,
+    pub url: IssuerUrl,
     /// The client ID for the application.
-    client_id: ClientId,
+    pub client_id: ClientId,
     /// The client secret for the application.
-    client_secret: ClientSecret,
+    pub client_secret: ClientSecret,
     /// The URL where the OIDC provider will redirect the user after authentication.
-    redirect_url: RedirectUrl,
+    pub redirect_url: RedirectUrl,
 }
 
 impl OidcConfig {
-    /// Creates a new `OidcConfig` instance.
-    ///
-    /// This function initializes the configuration with the provided values.
-    fn from_env() -> Self {
-        OidcConfig {
-            url: OIDC_DISCOVER_URL.clone(),
-            client_id: OIDC_CLIENT_ID.clone(),
-            client_secret: OIDC_CLIENT_SECRET.clone(),
-            redirect_url: OIDC_REDIRECT_URL.clone(),
-        }
-    }
-
     /// Attempts to discover an OIDC client with retries.
     ///
     /// This function retries the `discover` function `N` times, handling potential
@@ -248,11 +235,11 @@ impl OidcConfig {
         let mut result = Err(DiscoveryError::Other(String::new()));
         for _ in 0..N {
             result = self.discover(http_client).await;
-            if let Err(DiscoveryError::Request(HttpClientError::Reqwest(error))) = &result {
-                if error.is_timeout() {
-                    warn!("Timed out fetching oidc discovery, trying again...");
-                    continue;
-                }
+            if let Err(DiscoveryError::Request(HttpClientError::Reqwest(error))) = &result
+                && error.is_timeout()
+            {
+                warn!("Timed out fetching oidc discovery, trying again...");
+                continue;
             }
             return result;
         }
