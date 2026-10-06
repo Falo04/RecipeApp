@@ -3,28 +3,31 @@ import { defineConfig } from "orval";
 export default defineConfig({
     api: {
         input: {
-            target: "http://webserver-dev:8080/docs/openapi.json",
-            unsafeDisableValidation: true,
+            target: "http://webserver:8080/docs/frontend.json",
+            filters: {
+                mode: "exclude",
+                tags: ["Websocket"],
+            },
         },
         output: {
-            mode: "single",
-            workspace: "./src/api/generated",
-            target: "./index.ts",
+            target: "./src/api/generated/endpoints.ts",
+            schemas: "./src/api/generated/model",
+            mode: "tags-split",
+            client: "react-query",
+            httpClient: "fetch",
             clean: true,
-            client: "fetch",
-            prettier: true,
             override: {
+                mutator: {
+                    path: "./src/api/http.ts",
+                    name: "customFetch",
+                },
                 fetch: {
                     includeHttpResponseReturnType: false,
                 },
-                mutator: {
-                    path: "../custom-fetch.ts",
-                    name: "customFetch",
+                query: {
+                    signal: true,
                 },
             },
-        },
-        hooks: {
-            afterAllFilesWrite: "prettier --write",
         },
     },
 });

@@ -8,12 +8,16 @@ import { routeTree } from "./routeTree.gen";
 import "./i18n";
 import "./styles.css";
 import "./styles.css";
-import reportWebVitals from "./reportWebVitals.ts";
 import { Toaster } from "sonner";
+import { createQueryClient } from "./api/query-client.ts";
+
+const queryClient = createQueryClient();
 
 // Create a new router instance
 const router = createRouter({
     routeTree,
+    context: { queryClient },
+
     defaultPreload: "intent",
     scrollRestoration: true,
     defaultStructuralSharing: true,
@@ -37,8 +41,3 @@ if (rootElement && !rootElement.innerHTML) {
         </StrictMode>,
     );
 }
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
