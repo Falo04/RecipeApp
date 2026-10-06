@@ -16,14 +16,12 @@ use crate::http::handler::recipes::schema::SimpleRecipeWithTags;
 use crate::http::handler::tags::schema::CreateOrUpdateTag;
 use crate::http::handler::tags::schema::CreateOrUpdateTagErrors;
 use crate::http::handler::tags::schema::SimpleTag;
-use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::recipes::Recipe;
 use crate::models::tags::Tag;
 use crate::models::tags::TagInsertParams;
 use crate::models::tags::TagName;
 use crate::models::tags::TagUpdateParams;
 use crate::models::tags::TagUuid;
-use crate::modules::websocket::WebsocketManager;
 
 /// Retrieves all tags with pagination support.
 #[get("/all")]
@@ -77,7 +75,6 @@ pub async fn create_tag(
     .await?;
 
     tx.commit().await?;
-    WebsocketManager::global().send_to_all(WsServerMsg::TagsChanged {});
     Ok(ApiJson(SingleUuid {
         uuid: tag.uuid.into_inner(),
     }))
@@ -112,7 +109,6 @@ pub async fn update_tag(
     .await?;
 
     tx.commit().await?;
-    WebsocketManager::global().send_to_all(WsServerMsg::TagsChanged {});
     Ok(())
 }
 
@@ -127,7 +123,5 @@ pub async fn delete_tag(Path(tag_uuid): Path<TagUuid>) -> ApiResult<()> {
 
     tag.delete(&mut tx).await?;
     tx.commit().await?;
-
-    WebsocketManager::global().send_to_all(WsServerMsg::TagsChanged {});
     Ok(())
 }

@@ -15,6 +15,7 @@ use serde::Serialize;
 use tracing::instrument;
 use uuid::Uuid;
 
+use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::DatabaseResult;
 use crate::models::ingredients::IngredientUuid;
 use crate::models::recipes::db::__RecipeModel_ValueSpaceImpl;
@@ -30,6 +31,7 @@ use crate::models::recipes::steps::RecipeStepInsertParams;
 use crate::models::tags::Tag;
 use crate::models::tags::TagUuid;
 use crate::models::user::UserUuid;
+use crate::modules::websocket::broadcast_on_commit::BroadcastOnCommit;
 use crate::utils::typed_uuid::TypedUuid;
 use crate::utils::update_builder::TrackedUpdateBuilder;
 
@@ -217,6 +219,7 @@ impl Recipe {
         RecipeIngredient::create_bulk(&mut *tx, recipe.uuid, params.ingredients).await?;
         recipe.replace_tags(tx, &params.tags).await?;
 
+        tx.broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(recipe)
     }
 
@@ -262,6 +265,7 @@ impl Recipe {
             self.replace_tags(tx, &tags).await?;
         }
 
+        tx.broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
     }
 
@@ -297,9 +301,10 @@ impl Recipe {
     /// Delete a recipe by UUID.
     #[instrument(name = "Recipe::delete", skip(tx))]
     pub async fn delete(self, tx: &mut Transaction) -> DatabaseResult<()> {
-        rorm::delete(tx, RecipeModel)
+        rorm::delete(&mut *tx, RecipeModel)
             .condition(RecipeModel.uuid.equals(self.uuid.into_inner()))
             .await?;
+        tx.broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
     }
 }

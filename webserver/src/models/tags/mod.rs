@@ -15,11 +15,13 @@ use galvyn::rorm::fields::types::MaxStr;
 use tracing::instrument;
 use uuid::Uuid;
 
+use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::DatabaseResult;
 use crate::models::recipes::RecipeUuid;
 use crate::models::recipes::db::RecipeTagModel;
 use crate::models::tags::db::__TagModel_ValueSpaceImpl;
 use crate::models::tags::db::TagModel;
+use crate::modules::websocket::broadcast_on_commit::BroadcastOnCommit;
 use crate::utils::typed_uuid::TypedUuid;
 use crate::utils::update_builder::TrackedUpdateBuilder;
 
@@ -173,13 +175,14 @@ impl Tag {
     /// Create a new tag.
     #[instrument(name = "Tag::create", skip(tx))]
     pub async fn create(tx: &mut Transaction, params: TagInsertParams) -> DatabaseResult<Self> {
-        let model = rorm::insert(tx, TagModel)
+        let model = rorm::insert(&mut *tx, TagModel)
             .single(&TagModel {
                 uuid: Uuid::new_v4(),
                 name: params.name.into(),
                 color: params.color,
             })
             .await?;
+        tx.broadcast_on_commit(WsServerMsg::TagsChanged);
         Ok(Tag::from(model))
     }
 
@@ -190,7 +193,7 @@ impl Tag {
         tx: &mut Transaction,
         params: TagUpdateParams,
     ) -> DatabaseResult<()> {
-        let Some(builder) = TrackedUpdateBuilder::new(tx)
+        let Some(builder) = TrackedUpdateBuilder::new(&mut *tx)
             .set_if_some(TagModel.name, &mut self.name, params.name)
             .set_if_some(TagModel.color, &mut self.color, params.color)
             .finish()
@@ -200,15 +203,17 @@ impl Tag {
         builder
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
+        tx.broadcast_on_commit(WsServerMsg::TagsChanged);
         Ok(())
     }
 
     /// Delete a tag by its UUID.
     #[instrument(name = "Tag::delete", skip(tx))]
     pub async fn delete(self, tx: &mut Transaction) -> DatabaseResult<()> {
-        rorm::delete(tx, TagModel)
+        rorm::delete(&mut *tx, TagModel)
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
+        tx.broadcast_on_commit(WsServerMsg::TagsChanged);
         Ok(())
     }
 }
