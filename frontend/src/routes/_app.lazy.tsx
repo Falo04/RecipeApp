@@ -1,10 +1,7 @@
 import { BaseLayout } from "@/components/layouts/base-layout";
-import { TagsProvider } from "@/context/tags";
 import { createLazyFileRoute, type LinkProps, Outlet } from "@tanstack/react-router";
 import { BookText, CarrotIcon, type LucideIcon, SettingsIcon, Soup, TagIcon } from "lucide-react";
-import { Suspense } from "react";
-import BreadcrumbMenuBar from "@/components/layouts/BreadcrumbMenuBar.tsx";
-import { IngredientProvider } from "@/context/ingredients.tsx";
+import { Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
     Sidebar,
@@ -18,7 +15,9 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Heading, Subheading } from "@/components/ui/heading";
-import { AccountProvider } from "@/context/account.tsx";
+import { useGetMe } from "@/api/generated";
+import WS from "@/api/websockets";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 /**
  * The properties for {@link FoodMenu}
@@ -62,7 +61,7 @@ export function FoodMenu() {
     return (
         <BaseLayout
             sidebar={
-                <Sidebar variant={"inset"}>
+                <Sidebar>
                     <SidebarHeader className={"mt-4"}>
                         <SidebarMenu>
                             <SidebarMenuItem className={"flex items-center justify-center gap-2"}>
@@ -101,7 +100,6 @@ export function FoodMenu() {
                     </SidebarContent>
                 </Sidebar>
             }
-            header={<BreadcrumbMenuBar navItems={navMain} />}
         >
             <Suspense>
                 <Outlet />
@@ -110,14 +108,30 @@ export function FoodMenu() {
     );
 }
 
+/**
+ * Waits for the logged-in account and keeps the websocket open while it is there
+ */
+function AppLayout() {
+    const { data: account } = useGetMe();
+
+    useEffect(() => {
+        if (!account) return;
+
+        WS.connect();
+        return () => WS.disconnect();
+    }, [account?.uuid]);
+
+    if (!account) {
+        return (
+            <div className={"flex h-screen items-center justify-center"}>
+                <Spinner />
+            </div>
+        );
+    }
+
+    return <FoodMenu />;
+}
+
 export const Route = createLazyFileRoute("/_app")({
-    component: () => (
-        <AccountProvider>
-            <TagsProvider>
-                <IngredientProvider>
-                    <FoodMenu />
-                </IngredientProvider>
-            </TagsProvider>
-        </AccountProvider>
-    ),
+    component: AppLayout,
 });

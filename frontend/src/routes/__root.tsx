@@ -1,15 +1,26 @@
-import { createRootRoute, type ErrorComponentProps, Outlet } from "@tanstack/react-router";
+import type { QueryClient } from "@tanstack/react-query";
+import {
+    createRootRouteWithContext,
+    type ErrorComponentProps,
+    isRedirect,
+    Navigate,
+    Outlet,
+} from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Heading } from "@/components/ui/heading.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Text } from "@/components/ui/text.tsx";
-import { ErrorContext } from "@/context/error-context.tsx";
 
 /**
  * The root error component
  */
 function ErrorComponent(props: ErrorComponentProps) {
     const [t] = useTranslation("error-component");
+
+    // A query whose session ran out redirects to the login
+    if (isRedirect(props.error)) {
+        return <Navigate {...props.error.options} />;
+    }
 
     return (
         <div className={"flex h-screen w-full items-center justify-center"}>
@@ -21,7 +32,7 @@ function ErrorComponent(props: ErrorComponentProps) {
                 <Heading>{props.error.toString()}</Heading>
                 <Text>{t("error.description")}</Text>
 
-                <Button color={"blue"} className={"w-full"} onClick={() => props.reset()}>
+                <Button className={"w-full"} onClick={() => props.reset()}>
                     Try again
                 </Button>
 
@@ -31,12 +42,13 @@ function ErrorComponent(props: ErrorComponentProps) {
     );
 }
 
-export const Route = createRootRoute({
-    component: () => (
-        <>
-            <ErrorContext />
-            <Outlet />
-        </>
-    ),
+/** What every route gets in its context */
+export type RouterContext = {
+    /** The client caching every api request */
+    queryClient: QueryClient;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+    component: Outlet,
     errorComponent: (err) => <ErrorComponent {...err} />,
 });
