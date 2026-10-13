@@ -15,11 +15,16 @@ export type CreateRecipeProps = object;
  */
 export function CreateRecipe() {
     const [t] = useTranslation("recipe");
+    const [tg] = useTranslation();
 
     const navigate = useNavigate();
 
     return (
         <HeadingLayout
+            breadcrumbs={[
+                { label: tg("menu.recipes"), href: "/app/recipes", search: { page: 1, search: "" } },
+                { label: t("heading.create") },
+            ]}
             heading={t("heading.create")}
             description={t("heading.create-description")}
             headingChildren={
