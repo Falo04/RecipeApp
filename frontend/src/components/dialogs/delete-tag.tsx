@@ -1,9 +1,8 @@
-import { Api } from "@/api/api";
+import { useDeleteTag } from "@/api/generated";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { Field } from "@/components/ui/field.tsx";
 
 /**
  * The properties for {@link DeleteTagDialog}
@@ -21,9 +20,10 @@ export type DeleteTagDialogProps = {
 export function DeleteTagDialog(props: DeleteTagDialogProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
+    const deleteTagMutation = useDeleteTag();
 
     const deleteTag = async () => {
-        await Api.tags.delete(props.tag_uuid);
+        await deleteTagMutation.mutateAsync({ tagUuid: props.tag_uuid });
         toast.success(t("toast.deleted-success"));
         props.onClose();
         return;

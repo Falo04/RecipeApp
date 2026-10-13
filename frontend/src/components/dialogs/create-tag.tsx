@@ -1,4 +1,4 @@
-import { Api } from "@/api/api";
+import { useCreateTag } from "@/api/generated";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -9,9 +9,9 @@ import { useForm } from "@tanstack/react-form";
 import { Badge, badgeVariants } from "../ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import { ErrorMessage } from "@/components/ui/text.tsx";
-import { TagColors } from "@/api/generated";
+import { TagColors } from "@/api/generated/model";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field.tsx";
-import { isFormError } from "@/utils/error.ts";
+import { isFormError } from "@/api/form.ts";
 
 /**
  * The properties for {@link CreateTagDialog}
@@ -27,6 +27,7 @@ export type CreateTagDialogProps = {
 export function CreateTagDialog(props: CreateTagDialogProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
+    const createTag = useCreateTag();
 
     const form = useForm({
         defaultValues: {
@@ -35,7 +36,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
         },
         validators: {
             onSubmitAsync: async ({ value }) => {
-                const res = await Api.tags.create({ name: value.name, color: value.color });
+                const res = await createTag.mutateAsync({ data: { name: value.name, color: value.color } });
 
                 if (isFormError(res)) {
                     return {
@@ -47,7 +48,7 @@ export function CreateTagDialog(props: CreateTagDialogProps) {
             },
         },
         onSubmit: async () => {
-            toast.success("toast.created-success");
+            toast.success(t("toast.created-success"));
             props.onClose();
         },
     });

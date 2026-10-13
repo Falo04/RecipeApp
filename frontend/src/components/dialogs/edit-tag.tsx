@@ -1,4 +1,4 @@
-import { Api } from "@/api/api";
+import { useUpdateTag } from "@/api/generated";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -9,9 +9,9 @@ import { useForm } from "@tanstack/react-form";
 import { Badge, badgeVariants } from "../ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import { ErrorMessage } from "@/components/ui/text.tsx";
-import { type SimpleTag, TagColors } from "@/api/generated";
+import { type SimpleTag, TagColors } from "@/api/generated/model";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field.tsx";
-import { isFormError } from "@/utils/error.ts";
+import { isFormError } from "@/api/form.ts";
 
 /**
  * The properties for {@link EditTagDialog}
@@ -29,6 +29,7 @@ export type EditTagDialogProps = {
 export function EditTagDialog(props: EditTagDialogProps) {
     const [t] = useTranslation("tag");
     const [tg] = useTranslation();
+    const updateTag = useUpdateTag();
 
     const form = useForm({
         defaultValues: {
@@ -38,7 +39,10 @@ export function EditTagDialog(props: EditTagDialogProps) {
 
         validators: {
             onSubmitAsync: async ({ value }) => {
-                const res = await Api.tags.update(props.tag.uuid, { name: value.name, color: value.color });
+                const res = await updateTag.mutateAsync({
+                    tagUuid: props.tag.uuid,
+                    data: { name: value.name, color: value.color },
+                });
 
                 if (isFormError(res)) {
                     return {

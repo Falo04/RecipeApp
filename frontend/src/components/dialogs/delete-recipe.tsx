@@ -1,9 +1,8 @@
-import { Api } from "@/api/api";
+import { useDeleteRecipe } from "@/api/generated";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { Field } from "@/components/ui/field.tsx";
 
 /**
  * The properties for {@link DeleteRecipeDialog}
@@ -21,9 +20,10 @@ export type DeleteRecipeDialogProps = {
 export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
+    const deleteRecipeMutation = useDeleteRecipe();
 
-    const deleteTag = async () => {
-        await Api.recipe.delete(props.recipe_uuid);
+    const deleteRecipe = async () => {
+        await deleteRecipeMutation.mutateAsync({ recipeUuid: props.recipe_uuid });
         toast.success(t("toast.deleted-success"));
         props.onClose();
         return;
@@ -42,7 +42,7 @@ export function DeleteRecipeDialog(props: DeleteRecipeDialogProps) {
                     <Button variant="secondary" onClick={() => props.onClose()}>
                         {tg("button.close")}
                     </Button>
-                    <Button variant="destructive" onClick={async () => await deleteTag()}>
+                    <Button variant="destructive" onClick={async () => await deleteRecipe()}>
                         {t("button.delete")}
                     </Button>
                 </DialogFooter>
