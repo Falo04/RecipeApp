@@ -1,14 +1,12 @@
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { CreateTagDialog } from "@/components/dialogs/create-tag";
 import { Button } from "@/components/ui/button";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, TagIcon, Trash2Icon } from "lucide-react";
 import { Text } from "@/components/ui/text.tsx";
-import { Api } from "@/api/api.tsx";
-import { useForm } from "@tanstack/react-form";
-import { Form, Input } from "@/components/ui/form.tsx";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,15 +14,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
-import TablePagination from "@/components/ui/table-pagination.tsx";
+import { TableHead } from "@/components/ui/table.tsx";
+import { DataTable, useDataTabel } from "@/components/ui/data-table.tsx";
+import { FilterBar } from "@/components/ui/filter-bar.tsx";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty.tsx";
 import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
 import { DeleteTagDialog } from "@/components/dialogs/delete-tag";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
-import WS from "@/api/websockets.ts";
-import type { SimpleTag } from "@/api/generated";
+import { useGetAllTags } from "@/api/generated";
+import type { SimpleTag } from "@/api/generated/model";
 
 /**
  * The properties for {@link TagsOverview}
@@ -41,35 +41,102 @@ export function TagsOverview() {
     const [tg] = useTranslation();
 
     const navigate = useNavigate();
-    const router = useRouter();
     const isMobile = useIsMobile();
 
     const { search, page } = Route.useSearch();
-    const data = Route.useLoaderData();
-    if (!data) {
-        return;
-    }
+    const { data: tags = [] } = useGetAllTags({ query: { select: (res) => res.list } });
 
     const [openCreate, setOpenCreate] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState<SimpleTag>();
     const [openDelete, setOpenDelete] = React.useState<string | undefined>(undefined);
 
-    const form = useForm({
-        defaultValues: {
-            search: search,
+    const columns = React.useMemo<Array<ColumnDef<SimpleTag, string>>>(
+        () => [
+            {
+                id: "name",
+                accessorKey: "name",
+                header: ({ column }) => (
+                    <TableHead sorted={column.getIsSorted()} onSorting={column.getToggleSortingHandler()}>
+                        {tg("table.name")}
+                    </TableHead>
+                ),
+                cell: ({ row }) => <Text>{row.original.name}</Text>,
+            },
+            {
+                id: "color",
+                accessorKey: "color",
+                header: ({ column }) => (
+                    <TableHead sorted={column.getIsSorted()} onSorting={column.getToggleSortingHandler()}>
+                        {tg("table.color")}
+                    </TableHead>
+                ),
+                cell: ({ row }) => (
+                    <Badge variant={row.original.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}>
+                        {row.original.color}
+                    </Badge>
+                ),
+            },
+            {
+                id: "actions",
+                enableSorting: false,
+                header: () => (
+                    <TableHead className={"w-0"}>
+                        <span className={"sr-only"}>{tg("accessibility.actions")}</span>
+                    </TableHead>
+                ),
+                cell: ({ row }) => (
+                    <div className={"-ms-3 flex items-center justify-end"}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger
+                                openOnHover
+                                render={<Button variant={"ghost"} size={"icon"} />}
+                                data-nolink
+                            >
+                                <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                                <MoreHorizontalIcon className={"w-5"} />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align={"end"}>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setOpenEdit({
+                                            uuid: row.original.uuid,
+                                            name: row.original.name,
+                                            color: row.original.color,
+                                        })
+                                    }
+                                >
+                                    <PenBoxIcon className={"me-2.5 size-4"} />
+                                    {t("button.edit")}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setOpenDelete(row.original.uuid)}>
+                                    <Trash2Icon className={"me-2.5 size-4"} />
+                                    {t("button.delete")}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                ),
+            },
+        ],
+        [t, tg],
+    );
+
+    const { table } = useDataTabel({
+        data: tags,
+        columns,
+        initialSorting: [{ id: "name", desc: false }],
+        globalFilter: search,
+        pageIndex: page - 1,
+        pageSize: LIMIT,
+        onPageChange: async (pageIndex) => {
+            await navigate({ to: "/app/tags", search: { page: pageIndex + 1, search } });
         },
     });
 
-    useEffect(() => {
-        const listener = WS.addEventListener("message.TagsChanged", () => {
-            router.invalidate({ sync: true });
-        });
-
-        return () => WS.removeEventListener(listener);
-    }, []);
-
     return (
         <HeadingLayout
+            breadcrumbs={[{ label: tg("menu.tags") }]}
             heading={t("heading.overview-title")}
             description={t("heading.overview-description")}
             headingChildren={
@@ -81,129 +148,37 @@ export function TagsOverview() {
                 </Button>
             }
         >
-            <Form onSubmit={form.handleSubmit}>
-                <form.Field
-                    name={"search"}
-                    validators={{
-                        onChangeAsync: async ({ fieldApi }) => {
-                            await navigate({
-                                to: `/app/tags`,
-                                search: {
-                                    page: 1,
-                                    search: fieldApi.state.value,
-                                },
-                            });
-                        },
-                        onChangeAsyncDebounceMs: 500,
-                    }}
-                >
-                    {(fieldApi) => (
-                        <div>
-                            <Input
-                                value={fieldApi.state.value}
-                                onChange={(e) => fieldApi.handleChange(e.target.value)}
-                                placeholder={t("label.placeholder")}
-                                className={"w-44 lg:w-72"}
-                            />
-                        </div>
-                    )}
-                </form.Field>
-            </Form>
-            <Table>
-                <TableHeader className={"sticky top-0"}>
-                    <TableRow>
-                        <TableHead>{tg("table.name")}</TableHead>
-                        <TableHead>{tg("table.color")}</TableHead>
-                        <TableHead className={"w-0"}>
-                            <span className={"sr-only"}>{tg("accessibility.actions")}</span>
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.items.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={4}>
-                                <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-                                    <p className="text-muted-foreground text-sm">
-                                        {search ? t("empty.no-results") : t("empty.no-tags")}
-                                    </p>
-                                    {!search && (
-                                        <Button onClick={() => setOpenCreate(true)}>
-                                            <PlusIcon className="size-4" />
-                                            {t("button.create")}
-                                        </Button>
-                                    )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    )}
-                    {data.items.map((tag) => (
-                        <TableRow
-                            key={tag.uuid}
-                            onClick={async (e) => {
-                                const target = e.target as HTMLElement;
-                                if (!target.closest("[data-nolink]") && e.currentTarget.contains(target)) {
-                                    await navigate({
-                                        to: "/app/tags/$tagId",
-                                        params: { tagId: tag.uuid },
-                                        search: { page: 1, search: "" },
-                                    });
-                                }
-                            }}
-                        >
-                            <TableCell>
-                                <Text>{tag.name}</Text>
-                            </TableCell>
-                            <TableCell>
-                                <Badge
-                                    variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
-                                >
-                                    {tag.color}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                <div className={"-ms-3 flex items-center justify-end"}>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger
-                                            openOnHover
-                                            render={<Button variant={"ghost"} size={"icon"} />}
-                                            data-nolink
-                                        >
-                                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                                            <MoreHorizontalIcon className={"w-5"} />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align={"end"}>
-                                            <DropdownMenuItem
-                                                onClick={() =>
-                                                    setOpenEdit({
-                                                        uuid: tag.uuid,
-                                                        name: tag.name,
-                                                        color: tag.color,
-                                                    })
-                                                }
-                                            >
-                                                <PenBoxIcon className={"me-2.5 size-4"} />
-                                                {t("button.edit")}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => setOpenDelete(tag.uuid)}>
-                                                <Trash2Icon className={"me-2.5 size-4"} />
-                                                {t("button.delete")}
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <TablePagination
-                currentPage={page}
-                maxPages={data.total === 0 ? 1 : Math.ceil(data.total / LIMIT)}
-                href={"/app/recipes"}
-                getSearchParams={(newPage: number) => ({ page: newPage })}
+            <FilterBar
+                search={search}
+                placeholder={t("label.placeholder")}
+                onChange={async (search) => {
+                    await navigate({ to: "/app/tags", search: { page: 1, search } });
+                }}
             />
+            {tags.length === 0 ? (
+                <Empty className={"border"}>
+                    <EmptyHeader>
+                        <EmptyMedia variant={"icon"}>
+                            <TagIcon />
+                        </EmptyMedia>
+                        <EmptyTitle>{t("empty.no-tags")}</EmptyTitle>
+                        <EmptyDescription>{t("empty.no-tags-description")}</EmptyDescription>
+                    </EmptyHeader>
+                    <EmptyContent>
+                        <Button onClick={() => setOpenCreate(true)}>
+                            <PlusIcon />
+                            {t("button.create")}
+                        </Button>
+                    </EmptyContent>
+                </Empty>
+            ) : (
+                <DataTable
+                    table={table}
+                    rowHref={"/app/tags/$tagId"}
+                    rowParams={(tag) => ({ tagId: tag.uuid })}
+                    rowSearch={() => ({ page: 1, search: "" })}
+                />
+            )}
 
             {openCreate && (
                 <Suspense>
@@ -248,11 +223,4 @@ export const Route = createFileRoute("/_app/app/tags/")({
             search: (search.search as string) || "",
         };
     },
-    loaderDeps: ({ search: { page, search } }) => ({ page, search }),
-    loader: async ({ deps }) =>
-        await Api.tags.getAll({
-            limit: LIMIT,
-            offset: (deps.page - 1) * LIMIT,
-            filter_name: deps.search,
-        }),
 });

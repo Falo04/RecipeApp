@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Badge, badgeVariants } from "@/components/ui/badge.tsx";
 import type { VariantProps } from "class-variance-authority";
 import React, { Suspense } from "react";
-import SINGLE_RECIPE_CONTEXT from "@/context/recipe.tsx";
+import { useGetRecipe } from "@/api/generated";
+import { Spinner } from "@/components/ui/spinner.tsx";
 import HeadingLayout from "@/components/layouts/heading-layout.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -28,10 +29,23 @@ export function RecipeDetail() {
     const [openDelete, setOpenDelete] = React.useState<string | undefined>();
 
     const navigate = useNavigate();
-    const { recipe } = React.useContext(SINGLE_RECIPE_CONTEXT);
+    const { recipeId } = Route.useParams();
+    const { data: recipe } = useGetRecipe(recipeId);
+
+    if (!recipe) {
+        return (
+            <div className={"flex h-full items-center justify-center"}>
+                <Spinner />
+            </div>
+        );
+    }
 
     return (
         <HeadingLayout
+            breadcrumbs={[
+                { label: tg("menu.recipes"), href: "/app/recipes", search: { page: 1, search: "" } },
+                { label: recipe.name },
+            ]}
             heading={recipe.name}
             description={recipe.description}
             headingChildren={

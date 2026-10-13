@@ -1,8 +1,7 @@
 import React, { Suspense } from "react";
-import { Link } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { Form, Input } from "./ui/form";
-import { useNavigate, type LinkProps } from "@tanstack/react-router";
+import { Link, useNavigate, type LinkProps } from "@tanstack/react-router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,6 +13,7 @@ import {
     DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import {
+    CookingPotIcon,
     CopyIcon,
     LayoutGridIcon,
     LayoutListIcon,
@@ -23,16 +23,16 @@ import {
     Settings2Icon,
     Trash2Icon,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Table, TableRow, TableHead, TableHeader, TableBody, TableCell } from "./ui/table";
+import { Button, buttonVariants } from "./ui/button";
+import { TableHead } from "./ui/table";
+import { DataTable, useDataTabel } from "./ui/data-table";
 import { BadgeButton, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
-import TablePagination from "./ui/table-pagination";
 import { DeleteRecipeDialog } from "@/components/dialogs/delete-recipe.tsx";
-import { useForm } from "@tanstack/react-form";
 import { Text } from "@/components/ui/text.tsx";
-import { Field, FieldGroup, FieldSet } from "@/components/ui/field.tsx";
-import type { PageForSimpleRecipeWithTags } from "@/api/generated";
+import { FilterBar } from "@/components/ui/filter-bar.tsx";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty.tsx";
+import type { SimpleRecipeWithTags } from "@/api/generated/model";
 
 /**
  * The properties for {@link RecipeTable}
@@ -44,8 +44,8 @@ export type RecipeTableProps = {
     href: LinkProps["to"];
     /** Params for navigate */
     params?: LinkProps["params"];
-    /** Search params for navigate */
-    data: PageForSimpleRecipeWithTags;
+    /** All recipes to show, the table filters, sorts and pages them */
+    recipes: Array<SimpleRecipeWithTags>;
     /** Current page */
     page: number;
 };
@@ -63,46 +63,120 @@ export default function RecipeTable(props: RecipeTableProps) {
 
     const [openDelete, setOpenDelete] = React.useState<string | undefined>();
 
-    const form = useForm({
-        defaultValues: {
-            search: props.search,
+    const columns = React.useMemo<Array<ColumnDef<SimpleRecipeWithTags, string>>>(
+        () => [
+            {
+                id: "name",
+                accessorKey: "name",
+                header: ({ column }) => (
+                    <TableHead sorted={column.getIsSorted()} onSorting={column.getToggleSortingHandler()}>
+                        {tg("table.name")}
+                    </TableHead>
+                ),
+                cell: ({ row }) => <Text>{row.original.name}</Text>,
+            },
+            {
+                id: "description",
+                accessorKey: "description",
+                enableSorting: false,
+                header: () => <TableHead>{tg("table.description")}</TableHead>,
+                cell: ({ row }) => <Text>{row.original.description}</Text>,
+            },
+            {
+                id: "tags",
+                accessorFn: (recipe) => recipe.tags.map((tag) => tag.name).join(" "),
+                enableSorting: false,
+                header: () => <TableHead>{tg("table.tags")}</TableHead>,
+                cell: ({ row }) => (
+                    <div className="flex flex-wrap gap-1">
+                        {row.original.tags.map((tag) => (
+                            <BadgeButton
+                                key={tag.uuid}
+                                data-nolink
+                                variant={tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]}
+                                onClick={async () => {
+                                    await navigate({
+                                        to: "/app/tags/$tagId",
+                                        params: { tagId: tag.uuid },
+                                        search: { page: 1, search: "" },
+                                    });
+                                }}
+                            >
+                                {tag.name}
+                            </BadgeButton>
+                        ))}
+                    </div>
+                ),
+            },
+            {
+                id: "actions",
+                enableSorting: false,
+                header: () => (
+                    <TableHead className={"w-0"}>
+                        <span className={"sr-only"}>{tg("accessibility.actions")}</span>
+                    </TableHead>
+                ),
+                cell: ({ row }) => (
+                    <div className={"-ms-3 flex items-center justify-end"}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger openOnHover render={<Button variant={"ghost"} />} data-nolink>
+                                <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                                <MoreHorizontalIcon className={"w-5"} />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align={"end"}>
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        await navigate({
+                                            to: "/app/recipes/$recipeId/update",
+                                            params: { recipeId: row.original.uuid },
+                                        });
+                                    }}
+                                >
+                                    <PenBoxIcon className={"me-2.5 size-4"} />
+                                    {t("button.edit")}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {}}>
+                                    <CopyIcon className={"me-2.5 size-4"} />
+                                    {t("button.copy")}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setOpenDelete(row.original.uuid)}>
+                                    <Trash2Icon className={"me-2.5 size-4"} />
+                                    {t("button.delete")}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                ),
+            },
+        ],
+        [t, tg, navigate],
+    );
+
+    const { table } = useDataTabel({
+        data: props.recipes,
+        columns,
+        globalFilter: props.search,
+        pageIndex: props.page - 1,
+        pageSize: LIMIT,
+        onPageChange: async (pageIndex) => {
+            await navigate({
+                to: props.href,
+                params: props.params,
+                search: { page: pageIndex + 1, search: props.search },
+            });
         },
     });
 
     return (
         <>
-            <div className={"flex items-start justify-between gap-4 lg:items-end"}>
-                <Form onSubmit={form.handleSubmit}>
-                    <FieldGroup>
-                        <FieldSet>
-                            <form.Field
-                                name={"search"}
-                                validators={{
-                                    onChangeAsync: async ({ fieldApi }) => {
-                                        await navigate({
-                                            to: props.href,
-                                            search: { page: props.page, search: fieldApi.state.value },
-                                            params: props.params,
-                                        });
-                                    },
-                                    onChangeAsyncDebounceMs: 500,
-                                }}
-                            >
-                                {(fieldApi) => (
-                                    <Field>
-                                        <Input
-                                            value={fieldApi.state.value}
-                                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                                            placeholder={t("label.placeholder")}
-                                            className={"w-44 lg:w-72"}
-                                        />
-                                    </Field>
-                                )}
-                            </form.Field>
-                        </FieldSet>
-                    </FieldGroup>
-                </Form>
-
+            <FilterBar
+                search={props.search}
+                placeholder={t("label.placeholder")}
+                onChange={async (search) => {
+                    await navigate({ to: props.href, search: { page: 1, search }, params: props.params });
+                }}
+            >
                 <DropdownMenu>
                     <DropdownMenuTrigger render={<Button variant={"outline"} />}>
                         <Settings2Icon className={"me-1.5 size-4 opacity-80"} />
@@ -128,127 +202,30 @@ export default function RecipeTable(props: RecipeTableProps) {
                         </DropdownMenu>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            </div>
-            <Table>
-                <TableHeader className={"sticky top-0"}>
-                    <TableRow>
-                        <TableHead>{tg("table.name")}</TableHead>
-                        <TableHead>{tg("table.description")}</TableHead>
-                        <TableHead>{tg("table.tags")}</TableHead>
-                        <TableHead className={"w-0"}>
-                            <span className={"sr-only"}>{tg("accessibility.actions")}</span>
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {props.data.items.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={4}>
-                                <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-                                    <p className="text-muted-foreground text-sm">
-                                        {props.search ? t("empty.no-results") : t("empty.no-recipes")}
-                                    </p>
-                                    {!props.search && (
-                                        <Link to="/app/recipes/create">
-                                            <Button>
-                                                <PlusIcon className="size-4" />
-                                                {t("button.create")}
-                                            </Button>
-                                        </Link>
-                                    )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    )}
-                    {props.data.items.map((recipe) => (
-                        <TableRow
-                            key={recipe.uuid}
-                            onClick={async (e) => {
-                                const target = e.target as HTMLElement;
-                                if (!target.closest("[data-nolink]") && e.currentTarget.contains(target)) {
-                                    await navigate({
-                                        to: "/app/recipes/$recipeId",
-                                        params: { recipeId: recipe.uuid },
-                                    });
-                                }
-                            }}
-                        >
-                            <TableCell>
-                                <Text>{recipe.name}</Text>
-                            </TableCell>
-                            <TableCell>
-                                <Text>{recipe.description}</Text>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex flex-wrap gap-1">
-                                    {recipe.tags.map((tag) => (
-                                        <BadgeButton
-                                            key={tag.uuid}
-                                            data-nolink
-                                            variant={
-                                                tag.color.toLowerCase() as VariantProps<typeof badgeVariants>["variant"]
-                                            }
-                                            onClick={async () => {
-                                                await navigate({
-                                                    to: "/app/tags/$tagId",
-                                                    params: { tagId: tag.uuid },
-                                                    search: { page: 1, search: "" },
-                                                });
-                                            }}
-                                        >
-                                            {tag.name}
-                                        </BadgeButton>
-                                    ))}
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className={"-ms-3 flex items-center justify-end"}>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger
-                                            openOnHover
-                                            render={<Button variant={"ghost"} />}
-                                            data-nolink
-                                        >
-                                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                                            <MoreHorizontalIcon className={"w-5"} />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align={"end"}>
-                                            <DropdownMenuItem
-                                                onClick={async () => {
-                                                    await navigate({
-                                                        to: "/app/recipes/$recipeId/update",
-                                                        params: { recipeId: recipe.uuid },
-                                                    });
-                                                }}
-                                            >
-                                                <PenBoxIcon className={"me-2.5 size-4"} />
-                                                {t("button.edit")}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => {}}>
-                                                <CopyIcon className={"me-2.5 size-4"} />
-                                                {t("button.copy")}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => setOpenDelete(recipe.uuid)}>
-                                                <Trash2Icon className={"me-2.5 size-4"} />
-                                                {t("button.delete")}
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <div className="flex w-full justify-center">
-                <TablePagination
-                    currentPage={props.page}
-                    maxPages={props.data.total === 0 ? 1 : Math.ceil(props.data.total / LIMIT)}
-                    href={"/app/recipes"}
-                    getSearchParams={(newPage: number) => ({ page: newPage })}
+            </FilterBar>
+            {props.recipes.length === 0 ? (
+                <Empty className={"border"}>
+                    <EmptyHeader>
+                        <EmptyMedia variant={"icon"}>
+                            <CookingPotIcon />
+                        </EmptyMedia>
+                        <EmptyTitle>{t("empty.no-recipes")}</EmptyTitle>
+                        <EmptyDescription>{t("empty.no-recipes-description")}</EmptyDescription>
+                    </EmptyHeader>
+                    <EmptyContent>
+                        <Link to={"/app/recipes/create"} className={buttonVariants()}>
+                            <PlusIcon />
+                            {t("button.create")}
+                        </Link>
+                    </EmptyContent>
+                </Empty>
+            ) : (
+                <DataTable
+                    table={table}
+                    rowHref={"/app/recipes/$recipeId"}
+                    rowParams={(recipe) => ({ recipeId: recipe.uuid })}
                 />
-            </div>
+            )}
 
             {openDelete && (
                 <Suspense>

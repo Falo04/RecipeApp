@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import i18n from "@/i18n.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { toast } from "sonner";
-import { Api } from "@/api/api.tsx";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLogout } from "@/api/generated";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field.tsx";
 import { Form } from "@/components/ui/form.tsx";
@@ -24,6 +25,8 @@ export function Settings() {
     const [tg] = useTranslation();
 
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const logoutMutation = useLogout();
 
     const form = useForm({
         defaultValues: {
@@ -51,12 +54,18 @@ export function Settings() {
     });
 
     const logout = async () => {
-        await Api.oidc.logout();
+        await logoutMutation.mutateAsync();
+        // Nothing cached belongs to the next account
+        queryClient.clear();
         await navigate({ to: "/" });
     };
 
     return (
-        <HeadingLayout heading={t("heading.title")} description={t("heading.description")}>
+        <HeadingLayout
+            heading={t("heading.title")}
+            description={t("heading.description")}
+            breadcrumbs={[{ label: tg("menu.settings") }]}
+        >
             <Form onSubmit={form.handleSubmit}>
                 <FieldSet>
                     <FieldGroup>

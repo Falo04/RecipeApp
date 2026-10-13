@@ -1,47 +1,33 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import HeadingLayout from "@/components/layouts/heading-layout";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { Api } from "@/api/api.tsx";
+import { useGetAllRecipes } from "@/api/generated";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 import RecipeTable from "@/components/recipe-table.tsx";
-import { useEffect } from "react";
-import WS from "@/api/websockets.ts";
 
 /**
  * The properties for {@link FoodOverview}
  */
 export type FoodOverviewProps = object;
 
-const LIMIT = 50;
-
 /**
  * Renders a food overview table.
  */
 export function FoodOverview() {
     const [t] = useTranslation("recipe");
+    const [tg] = useTranslation();
 
     const isMobile = useIsMobile();
-    const router = useRouter();
 
     const { search, page } = Route.useSearch();
-    const data = Route.useLoaderData();
-    if (!data) {
-        return;
-    }
-
-    useEffect(() => {
-        const listener = WS.addEventListener("message.RecipesChanged", () => {
-            router.invalidate({ sync: true });
-        });
-
-        return () => WS.removeEventListener(listener);
-    }, []);
+    const { data: recipes = [] } = useGetAllRecipes({ query: { select: (res) => res.list } });
 
     return (
         <HeadingLayout
+            breadcrumbs={[{ label: tg("menu.recipes") }]}
             heading={t("heading.overview-title")}
             description={t("heading.overview-description")}
             headingChildren={
@@ -55,7 +41,7 @@ export function FoodOverview() {
                 </Link>
             }
         >
-            <RecipeTable search={search} href={"/app/recipes"} data={data} page={page} />
+            <RecipeTable search={search} href={"/app/recipes"} recipes={recipes} page={page} />
         </HeadingLayout>
     );
 }
@@ -77,11 +63,4 @@ export const Route = createFileRoute("/_app/app/recipes/")({
             search: (search.search as string) || "",
         };
     },
-    loaderDeps: ({ search: { page, search } }) => ({ page, search }),
-    loader: async ({ deps }) =>
-        await Api.recipe.getAll({
-            limit: LIMIT,
-            offset: (deps.page - 1) * LIMIT,
-            filter_name: deps.search,
-        }),
 });
