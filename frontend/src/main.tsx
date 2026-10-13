@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 // Import the generated route tree
@@ -9,9 +10,10 @@ import "./i18n";
 import "./styles.css";
 import "./styles.css";
 import { Toaster } from "sonner";
-import { createQueryClient } from "./api/query-client.ts";
+import { createQueryClient, invalidateOnWebsocketMessages } from "./api/query-client.ts";
 
 const queryClient = createQueryClient();
+invalidateOnWebsocketMessages(queryClient);
 
 // Create a new router instance
 const router = createRouter({
@@ -36,8 +38,10 @@ if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <StrictMode>
-            <Toaster richColors expand={true} />
-            <RouterProvider router={router} />
+            <QueryClientProvider client={queryClient}>
+                <Toaster richColors expand={true} />
+                <RouterProvider router={router} />
+            </QueryClientProvider>
         </StrictMode>,
     );
 }
