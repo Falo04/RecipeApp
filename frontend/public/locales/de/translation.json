@@ -1,7 +1,8 @@
 {
     "accessibility": {
         "actions": "Aktionen",
-        "open-menu": "Men\u00fc \u00f6ffnen"
+        "open-menu": "Men\u00fc \u00f6ffnen",
+        "remove": "Entfernen"
     },
     "button": {
         "close": "Schlie\u00dfen"

@@ -1,5 +1,7 @@
 {
     "button": {
+        "add-ingredient": "Zutat hinzuf\u00fcgen",
+        "add-step": "Schritt hinzuf\u00fcgen",
         "add-tags": "Tags hinzuf\u00fcgen",
         "back": "Zur\u00fcck",
         "copy": "Kopieren",
@@ -14,11 +16,16 @@
         "delete-description": "M\u00f6chtest du dieses Rezept wirklich l\u00f6schen? Diese Aktion kann nicht r\u00fcckg\u00e4ngig gemacht werden.",
         "delete-title": "Rezept l\u00f6schen"
     },
+    "empty": {
+        "no-recipes": "Noch keine Rezepte",
+        "no-recipes-description": "Du hast noch keine Rezepte gespeichert. Erstelle dein erstes Rezept, um loszulegen."
+    },
     "error": {
         "description-required": "Eine Beschreibung f\u00fcr das Rezept ist erforderlich",
         "ingre-amount": "Die Zutatenmenge darf nicht leer oder null sein",
         "ingre-name": "Bitte gib einen Namen an",
         "ingre-unit": "Bitte gib eine Einheit an",
+        "name-already-exists": "Ein Rezept mit diesem Namen existiert bereits",
         "name-required": "Ein Rezeptname ist erforderlich",
         "step-length-255": "Einzelschritt darf nicht l\u00e4nger als 255 Zeichen sein",
         "step-length-zero": "Einzelschritt darf nicht leer sein",
@@ -53,7 +60,8 @@
         "name-ingredients": "Zutatenname",
         "select-tags": "Tags ausw\u00e4hlen",
         "step": "Schritt",
-        "tags-empty": "Keine Tags gefunden"
+        "tags-empty": "Keine Tags gefunden",
+        "unit": "Einheit"
     },
     "stepper": {
         "ingredients-description": "Zutaten f\u00fcr das Rezept hinzuf\u00fcgen",

@@ -14,6 +14,10 @@
         "update-description": "Details des Tags aktualisieren",
         "update-title": "Tag aktualisieren"
     },
+    "empty": {
+        "no-tags": "Noch keine Tags",
+        "no-tags-description": "Du hast noch keine Tags gespeichert. Erstelle einen, um deine Rezepte zu organisieren."
+    },
     "error": {
         "name-required": "Name vom Tag ben\u00f6tigt.",
         "too-long": "Name zu lang, maximal 255 Zeichen erlaubt."

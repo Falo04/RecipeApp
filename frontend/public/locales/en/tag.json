@@ -14,6 +14,10 @@
         "update-description": "Update the details of the tag",
         "update-title": "Update Tag"
     },
+    "empty": {
+        "no-tags": "No tags yet",
+        "no-tags-description": "You haven't stored any tags. Create one to organize your recipes."
+    },
     "error": {
         "name-required": "Tag name is required.",
         "too-long": "Name is too long, must be 255 characters or fewer."

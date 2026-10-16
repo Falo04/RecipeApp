@@ -1,5 +1,7 @@
 {
     "button": {
+        "add-ingredient": "Add Ingredient",
+        "add-step": "Add Step",
         "add-tags": "Add Tags",
         "back": "Back",
         "copy": "Copy",
@@ -14,11 +16,16 @@
         "delete-description": "Are you sure you want to delete this recipe? This action cannot be undone.",
         "delete-title": "Delete Recipe"
     },
+    "empty": {
+        "no-recipes": "No recipes yet",
+        "no-recipes-description": "You haven't stored any recipes. Create your first one to get started."
+    },
     "error": {
         "description-required": "A description is required for the recipe",
         "ingre-amount": "Ingredient amount cannot be empty or zero",
         "ingre-name": "Please provide a name",
         "ingre-unit": "Please provide a unit",
+        "name-already-exists": "A recipe with this name already exists",
         "name-required": "A name is required for the recipe",
         "step-length-255": "Step cannot be longer than 255 characters",
         "step-length-zero": "Step cannot be empty",
@@ -53,7 +60,8 @@
         "name-ingredients": "Ingredient Name",
         "select-tags": "Select Tags",
         "step": "Step",
-        "tags-empty": "No tags found"
+        "tags-empty": "No tags found",
+        "unit": "Unit"
     },
     "stepper": {
         "ingredients-description": "Add ingredients for the recipe",
