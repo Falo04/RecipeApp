@@ -7,9 +7,9 @@ use galvyn::core::GalvynRouter;
 use galvyn::core::SchemalessJson;
 use galvyn::core::middleware::catch_unwind::CatchUnwindMiddleware;
 use galvyn::get;
-use galvyn::openapi::get_openapi_for_page;
 use galvyn::openapi::OpenAPI;
 use galvyn::openapi::OpenapiRouterExt;
+use galvyn::openapi::get_openapi_for_page;
 use tower_http::trace::DefaultMakeSpan;
 use tower_http::trace::DefaultOnResponse;
 use tower_http::trace::TraceLayer;
@@ -25,7 +25,7 @@ pub async fn get_openapi() -> SchemalessJson<&'static OpenAPI> {
     SchemalessJson(galvyn::openapi::get_openapi())
 }
 
-#[get("/frontend_v1.json")]
+#[get("/frontend.json")]
 #[instrument]
 pub async fn get_frontend_openapi() -> SchemalessJson<&'static OpenAPI> {
     static CACHE: OnceLock<OpenAPI> = OnceLock::new();

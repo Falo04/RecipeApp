@@ -3,7 +3,7 @@ import { Subheading } from "@/components/ui/heading.tsx";
 import { MinusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { cn } from "@/utils/utils.ts";
-import type { FullIngredient } from "@/api/generated";
+import type { FullIngredient } from "@/api/generated/model";
 
 /**
  * The properties for {@link IngredientsGrid}

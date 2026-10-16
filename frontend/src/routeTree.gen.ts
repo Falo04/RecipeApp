@@ -8,72 +8,70 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppAppTagsIndexRouteImport } from './routes/_app/app/tags/index'
-import { Route as AppAppSettingsIndexRouteImport } from './routes/_app/app/settings/index'
-import { Route as AppAppRecipesIndexRouteImport } from './routes/_app/app/recipes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppAppIngredientsIndexRouteImport } from './routes/_app/app/ingredients/index'
+import { Route as AppAppRecipesIndexRouteImport } from './routes/_app/app/recipes/index'
 import { Route as AppAppRecipesCreateRouteImport } from './routes/_app/app/recipes/create'
-import { Route as AppAppTagsTagIdTagRouteImport } from './routes/_app/app/tags/$tagId/_tag'
+import { Route as AppAppSettingsIndexRouteImport } from './routes/_app/app/settings/index'
+import { Route as AppAppTagsIndexRouteImport } from './routes/_app/app/tags/index'
 import { Route as AppAppRecipesRecipeIdRecipesRouteImport } from './routes/_app/app/recipes/$recipeId/_recipes'
-import { Route as AppAppTagsTagIdTagIndexRouteImport } from './routes/_app/app/tags/$tagId/_tag/index'
+import { Route as AppAppTagsTagIdTagRouteImport } from './routes/_app/app/tags/$tagId/_tag'
 import { Route as AppAppRecipesRecipeIdRecipesIndexRouteImport } from './routes/_app/app/recipes/$recipeId/_recipes/index'
 import { Route as AppAppRecipesRecipeIdRecipesUpdateRouteImport } from './routes/_app/app/recipes/$recipeId/_recipes/update'
+import { Route as AppAppTagsTagIdTagIndexRouteImport } from './routes/_app/app/tags/$tagId/_tag/index'
 
-const AppLazyRouteImport = createFileRoute('/_app')()
-
-const AppLazyRoute = AppLazyRouteImport.update({
-  id: '/_app',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/_app.lazy').then((d) => d.Route))
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppAppTagsIndexRoute = AppAppTagsIndexRouteImport.update({
-  id: '/app/tags/',
-  path: '/app/tags/',
-  getParentRoute: () => AppLazyRoute,
-} as any)
-const AppAppSettingsIndexRoute = AppAppSettingsIndexRouteImport.update({
-  id: '/app/settings/',
-  path: '/app/settings/',
-  getParentRoute: () => AppLazyRoute,
-} as any)
-const AppAppRecipesIndexRoute = AppAppRecipesIndexRouteImport.update({
-  id: '/app/recipes/',
-  path: '/app/recipes/',
-  getParentRoute: () => AppLazyRoute,
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/_app.lazy').then((d) => d.Route))
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppAppIngredientsIndexRoute = AppAppIngredientsIndexRouteImport.update({
   id: '/app/ingredients/',
   path: '/app/ingredients/',
-  getParentRoute: () => AppLazyRoute,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAppRecipesIndexRoute = AppAppRecipesIndexRouteImport.update({
+  id: '/app/recipes/',
+  path: '/app/recipes/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAppRecipesCreateRoute = AppAppRecipesCreateRouteImport.update({
   id: '/app/recipes/create',
   path: '/app/recipes/create',
-  getParentRoute: () => AppLazyRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const AppAppTagsTagIdTagRoute = AppAppTagsTagIdTagRouteImport.update({
-  id: '/app/tags/$tagId/_tag',
-  path: '/app/tags/$tagId',
-  getParentRoute: () => AppLazyRoute,
+const AppAppSettingsIndexRoute = AppAppSettingsIndexRouteImport.update({
+  id: '/app/settings/',
+  path: '/app/settings/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAppTagsIndexRoute = AppAppTagsIndexRouteImport.update({
+  id: '/app/tags/',
+  path: '/app/tags/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAppRecipesRecipeIdRecipesRoute =
   AppAppRecipesRecipeIdRecipesRouteImport.update({
     id: '/app/recipes/$recipeId/_recipes',
     path: '/app/recipes/$recipeId',
-    getParentRoute: () => AppLazyRoute,
+    getParentRoute: () => AppRoute,
   } as any)
-const AppAppTagsTagIdTagIndexRoute = AppAppTagsTagIdTagIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppAppTagsTagIdTagRoute,
+const AppAppTagsTagIdTagRoute = AppAppTagsTagIdTagRouteImport.update({
+  id: '/app/tags/$tagId/_tag',
+  path: '/app/tags/$tagId',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAppRecipesRecipeIdRecipesIndexRoute =
   AppAppRecipesRecipeIdRecipesIndexRouteImport.update({
@@ -87,9 +85,15 @@ const AppAppRecipesRecipeIdRecipesUpdateRoute =
     path: '/update',
     getParentRoute: () => AppAppRecipesRecipeIdRecipesRoute,
   } as any)
+const AppAppTagsTagIdTagIndexRoute = AppAppTagsTagIdTagIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAppTagsTagIdTagRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/app/recipes/create': typeof AppAppRecipesCreateRoute
   '/app/ingredients/': typeof AppAppIngredientsIndexRoute
   '/app/recipes/': typeof AppAppRecipesIndexRoute
@@ -103,6 +107,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/app/recipes/create': typeof AppAppRecipesCreateRoute
   '/app/ingredients': typeof AppAppIngredientsIndexRoute
   '/app/recipes': typeof AppAppRecipesIndexRoute
@@ -115,7 +120,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_app': typeof AppLazyRouteWithChildren
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/_app/app/recipes/create': typeof AppAppRecipesCreateRoute
   '/_app/app/ingredients/': typeof AppAppIngredientsIndexRoute
   '/_app/app/recipes/': typeof AppAppRecipesIndexRoute
@@ -131,6 +137,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
     | '/app/recipes/create'
     | '/app/ingredients/'
     | '/app/recipes/'
@@ -144,6 +151,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
     | '/app/recipes/create'
     | '/app/ingredients'
     | '/app/recipes'
@@ -156,6 +164,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/login'
     | '/_app/app/recipes/create'
     | '/_app/app/ingredients/'
     | '/_app/app/recipes/'
@@ -170,18 +179,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppLazyRoute: typeof AppLazyRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -189,61 +192,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/app/tags/': {
-      id: '/_app/app/tags/'
-      path: '/app/tags'
-      fullPath: '/app/tags/'
-      preLoaderRoute: typeof AppAppTagsIndexRouteImport
-      parentRoute: typeof AppLazyRoute
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/app/settings/': {
-      id: '/_app/app/settings/'
-      path: '/app/settings'
-      fullPath: '/app/settings/'
-      preLoaderRoute: typeof AppAppSettingsIndexRouteImport
-      parentRoute: typeof AppLazyRoute
-    }
-    '/_app/app/recipes/': {
-      id: '/_app/app/recipes/'
-      path: '/app/recipes'
-      fullPath: '/app/recipes/'
-      preLoaderRoute: typeof AppAppRecipesIndexRouteImport
-      parentRoute: typeof AppLazyRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_app/app/ingredients/': {
       id: '/_app/app/ingredients/'
       path: '/app/ingredients'
       fullPath: '/app/ingredients/'
       preLoaderRoute: typeof AppAppIngredientsIndexRouteImport
-      parentRoute: typeof AppLazyRoute
+      parentRoute: typeof AppRoute
+    }
+    '/_app/app/recipes/': {
+      id: '/_app/app/recipes/'
+      path: '/app/recipes'
+      fullPath: '/app/recipes/'
+      preLoaderRoute: typeof AppAppRecipesIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/app/recipes/create': {
       id: '/_app/app/recipes/create'
       path: '/app/recipes/create'
       fullPath: '/app/recipes/create'
       preLoaderRoute: typeof AppAppRecipesCreateRouteImport
-      parentRoute: typeof AppLazyRoute
+      parentRoute: typeof AppRoute
     }
-    '/_app/app/tags/$tagId/_tag': {
-      id: '/_app/app/tags/$tagId/_tag'
-      path: '/app/tags/$tagId'
-      fullPath: '/app/tags/$tagId'
-      preLoaderRoute: typeof AppAppTagsTagIdTagRouteImport
-      parentRoute: typeof AppLazyRoute
+    '/_app/app/settings/': {
+      id: '/_app/app/settings/'
+      path: '/app/settings'
+      fullPath: '/app/settings/'
+      preLoaderRoute: typeof AppAppSettingsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/app/tags/': {
+      id: '/_app/app/tags/'
+      path: '/app/tags'
+      fullPath: '/app/tags/'
+      preLoaderRoute: typeof AppAppTagsIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/app/recipes/$recipeId/_recipes': {
       id: '/_app/app/recipes/$recipeId/_recipes'
       path: '/app/recipes/$recipeId'
       fullPath: '/app/recipes/$recipeId'
       preLoaderRoute: typeof AppAppRecipesRecipeIdRecipesRouteImport
-      parentRoute: typeof AppLazyRoute
+      parentRoute: typeof AppRoute
     }
-    '/_app/app/tags/$tagId/_tag/': {
-      id: '/_app/app/tags/$tagId/_tag/'
-      path: '/'
-      fullPath: '/app/tags/$tagId/'
-      preLoaderRoute: typeof AppAppTagsTagIdTagIndexRouteImport
-      parentRoute: typeof AppAppTagsTagIdTagRoute
+    '/_app/app/tags/$tagId/_tag': {
+      id: '/_app/app/tags/$tagId/_tag'
+      path: '/app/tags/$tagId'
+      fullPath: '/app/tags/$tagId'
+      preLoaderRoute: typeof AppAppTagsTagIdTagRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/app/recipes/$recipeId/_recipes/': {
       id: '/_app/app/recipes/$recipeId/_recipes/'
@@ -258,6 +268,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/recipes/$recipeId/update'
       preLoaderRoute: typeof AppAppRecipesRecipeIdRecipesUpdateRouteImport
       parentRoute: typeof AppAppRecipesRecipeIdRecipesRoute
+    }
+    '/_app/app/tags/$tagId/_tag/': {
+      id: '/_app/app/tags/$tagId/_tag/'
+      path: '/'
+      fullPath: '/app/tags/$tagId/'
+      preLoaderRoute: typeof AppAppTagsTagIdTagIndexRouteImport
+      parentRoute: typeof AppAppTagsTagIdTagRoute
     }
   }
 }
@@ -291,7 +308,7 @@ const AppAppTagsTagIdTagRouteChildren: AppAppTagsTagIdTagRouteChildren = {
 const AppAppTagsTagIdTagRouteWithChildren =
   AppAppTagsTagIdTagRoute._addFileChildren(AppAppTagsTagIdTagRouteChildren)
 
-interface AppLazyRouteChildren {
+interface AppRouteChildren {
   AppAppRecipesCreateRoute: typeof AppAppRecipesCreateRoute
   AppAppIngredientsIndexRoute: typeof AppAppIngredientsIndexRoute
   AppAppRecipesIndexRoute: typeof AppAppRecipesIndexRoute
@@ -301,7 +318,7 @@ interface AppLazyRouteChildren {
   AppAppTagsTagIdTagRoute: typeof AppAppTagsTagIdTagRouteWithChildren
 }
 
-const AppLazyRouteChildren: AppLazyRouteChildren = {
+const AppRouteChildren: AppRouteChildren = {
   AppAppRecipesCreateRoute: AppAppRecipesCreateRoute,
   AppAppIngredientsIndexRoute: AppAppIngredientsIndexRoute,
   AppAppRecipesIndexRoute: AppAppRecipesIndexRoute,
@@ -312,12 +329,12 @@ const AppLazyRouteChildren: AppLazyRouteChildren = {
   AppAppTagsTagIdTagRoute: AppAppTagsTagIdTagRouteWithChildren,
 }
 
-const AppLazyRouteWithChildren =
-  AppLazyRoute._addFileChildren(AppLazyRouteChildren)
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppLazyRoute: AppLazyRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { ErrorMessage, Text } from "@/components/ui/text.tsx";
@@ -17,24 +17,18 @@ import {
     CommandList,
     CommandSeparator,
 } from "@/components/ui/command.tsx";
-import INGREDIENTS_CONTEXT from "@/context/ingredients.tsx";
-import { Api } from "@/api/api.tsx";
-import RecipeTable from "@/components/recipe-table.tsx";
-import type { PageForSimpleRecipeWithTags, SimpleIngredient } from "@/api/generated";
+import { useGetAllIngredients } from "@/api/generated";
+import type { SimpleIngredient } from "@/api/generated/model";
 import { Form } from "@/components/ui/form.tsx";
-import { Separator } from "@/components/ui/separator.tsx";
 
 export type IngredientsSearchOverviewProps = object;
 
-const LIMIT = 50;
-
 export default function IngredientsSearchOverview() {
     const [t] = useTranslation("ingredients");
+    const [tg] = useTranslation();
 
-    const { page, search } = Route.useSearch();
-    const { ingredients } = React.useContext(INGREDIENTS_CONTEXT);
+    const { data: ingredients = [] } = useGetAllIngredients({ query: { select: (res) => res.list } });
 
-    const [recipes, setRecipes] = useState<PageForSimpleRecipeWithTags | null>(null);
     const [open, setOpen] = React.useState(false);
 
     const form = useForm({
@@ -50,19 +44,16 @@ export default function IngredientsSearchOverview() {
                         },
                     };
                 }
-                const res = await Api.ingredients.getRecipes({
-                    filter_uuids: { list: value.search.flatMap((i) => (i.name !== "" ? i.uuid : [])) },
-                    filter_name: search,
-                    limit: LIMIT,
-                    offset: (page - 1) * LIMIT,
-                });
-                setRecipes(res);
             },
         },
     });
 
     return (
-        <HeadingLayout heading={t("heading.overview-title")} description={t("heading.overview-description")}>
+        <HeadingLayout
+            heading={t("heading.overview-title")}
+            description={t("heading.overview-description")}
+            breadcrumbs={[{ label: tg("menu.ingredients") }]}
+        >
             <Form onSubmit={form.handleSubmit} className="flex flex-col gap-0">
                 <form.Field name="search">
                     {(fieldApi) => {
@@ -131,7 +122,8 @@ export default function IngredientsSearchOverview() {
                                         </Popover>
                                     </div>
 
-                                    <Button type="submit">
+                                    {/* TODO: needs the recipes' ingredients in the recipe list to filter them here */}
+                                    <Button type="submit" disabled>
                                         <SearchIcon className="size-4" />
                                         {t("tooltip.filter")}
                                     </Button>
@@ -162,14 +154,10 @@ export default function IngredientsSearchOverview() {
                     }}
                 </form.Field>
 
-                {recipes ? (
-                    <RecipeTable search={search} href={"/app/ingredients"} data={recipes} page={page} />
-                ) : (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border py-12 text-center">
-                        <CarrotIcon className="text-muted-foreground size-10" />
-                        <Text>{t("heading.overview-description")}</Text>
-                    </div>
-                )}
+                <div className="flex flex-col items-center justify-center gap-2 rounded-lg border py-12 text-center">
+                    <CarrotIcon className="text-muted-foreground size-10" />
+                    <Text>{t("heading.overview-description")}</Text>
+                </div>
             </Form>
         </HeadingLayout>
     );

@@ -38,7 +38,7 @@ make-migrations:
 [group('codegen')]
 [doc('Regenerate the frontend API client from the running webserver (stack must be up)')]
 gen-api:
-    {{ dev }} exec frontend npm run gen-api
+    {{ dev }} exec frontend pnpm run gen-api
 
 # ---------------------------------------------------------------- rust
 
