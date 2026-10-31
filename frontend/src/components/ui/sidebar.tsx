@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { PanelLeftIcon } from "lucide-react";
 import { Link, type LinkProps, useRouterState } from "@tanstack/react-router";
 import { clsx } from "clsx";
+import { motion } from "motion/react";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -289,7 +290,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
         <main
             data-slot="sidebar-inset"
             className={clsx(
-                "bg-background relative flex w-full flex-1 flex-col md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+                "bg-background relative flex w-full min-w-0 flex-1 flex-col md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:shadow-xs md:peer-data-[variant=inset]:ring-1 md:peer-data-[variant=inset]:ring-zinc-950/5 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2 dark:md:peer-data-[variant=inset]:ring-white/10",
                 className,
             )}
             {...props}
@@ -376,7 +377,7 @@ function SidebarGroupLabel({
         props: mergeProps<"div">(
             {
                 className: clsx(
-                    "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+                    "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-muted-foreground ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
                     className,
                 ),
             },
@@ -430,7 +431,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
         <ul
             data-slot="sidebar-menu"
             data-sidebar="menu"
-            className={clsx("flex w-full min-w-0 flex-col gap-2", className)}
+            className={clsx("flex w-full min-w-0 flex-col gap-0.5", className)}
             {...props}
         />
     );
@@ -655,12 +656,22 @@ function SidebarMenuSubButton({
 function SidebarItem({ children, href }: { className?: string; children?: React.ReactNode; href: LinkProps["href"] }) {
     const { setOpenMobile } = useSidebar();
     const pathName = useRouterState().location.pathname;
+    const isActive = pathName.includes(href ?? "");
 
     return (
         <SidebarMenuItem>
+            {isActive && (
+                <motion.span
+                    layoutId={"sidebar-current-indicator"}
+                    className={"bg-sidebar-primary absolute inset-y-2 -left-2 w-0.5 rounded-full"}
+                />
+            )}
             <SidebarMenuButton
                 render={<Link to={href} onClick={() => setOpenMobile(false)} />}
-                isActive={pathName.includes(href ?? "")}
+                isActive={isActive}
+                className={
+                    "h-9 gap-3 rounded-lg px-2 font-medium [&_svg]:size-5! [&_svg]:text-zinc-500 hover:[&_svg]:text-current data-active:[&_svg]:text-current dark:[&_svg]:text-zinc-400"
+                }
             >
                 {children}
             </SidebarMenuButton>

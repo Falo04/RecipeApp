@@ -1,4 +1,10 @@
-import { type CreateOrUpdateRecipe, type FullRecipe, type SimpleTag, Units } from "@/api/generated/model";
+import {
+    type CreateOrUpdateRecipe,
+    type FullIngredient,
+    type FullRecipe,
+    type SimpleTag,
+    Units,
+} from "@/api/generated/model";
 import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
@@ -50,7 +56,7 @@ export function RecipeForm(props: RecipeFormProps) {
         defaultValues: {
             name: props.formData?.name ?? "",
             description: props.formData?.description ?? "",
-            ingredients: props.formData?.ingredients ?? [],
+            ingredients: props.formData?.ingredients ?? [{ name: "", amount: 0, unit: Units.Gram }],
             steps: props.formData?.steps ?? [{ index: 0, step: "" }],
             tags: props.formData?.tags ?? [],
         },
@@ -61,7 +67,7 @@ export function RecipeForm(props: RecipeFormProps) {
                     tags: value.tags.map((tag) => tag.uuid),
                     name: value.name,
                     description: value.description,
-                    ingredients: value.ingredients,
+                    ingredients: value.ingredients.filter((ingredient) => !isEmptyIngredient(ingredient)),
                     steps: value.steps.map((s, idx) => ({ uuid: s.uuid, index: idx, step: s.step })),
                 };
 
@@ -182,8 +188,11 @@ export function RecipeForm(props: RecipeFormProps) {
                                     <form.Field
                                         name={`ingredients[${index}].name`}
                                         validators={{
-                                            onSubmit: ({ value }) =>
-                                                value.length === 0 ? t("error.ingre-name") : undefined,
+                                            onSubmit: ({ value, fieldApi }) =>
+                                                value.length === 0 &&
+                                                !isEmptyIngredient(fieldApi.form.getFieldValue(`ingredients[${index}]`))
+                                                    ? t("error.ingre-name")
+                                                    : undefined,
                                             onChange: ({ value }) =>
                                                 value.length > 255 ? t("error.too-long") : undefined,
                                         }}
@@ -213,7 +222,11 @@ export function RecipeForm(props: RecipeFormProps) {
                                     <form.Field
                                         name={`ingredients[${index}].amount`}
                                         validators={{
-                                            onSubmit: ({ value }) => (!value ? t("error.ingre-amount") : undefined),
+                                            onSubmit: ({ value, fieldApi }) =>
+                                                !value &&
+                                                !isEmptyIngredient(fieldApi.form.getFieldValue(`ingredients[${index}]`))
+                                                    ? t("error.ingre-amount")
+                                                    : undefined,
                                         }}
                                     >
                                         {(f) => (
@@ -449,6 +462,11 @@ function TagPicker(props: TagPickerProps) {
             </Popover>
         </div>
     );
+}
+
+/** Whether an ingredient row was left blank, such rows are dropped on save */
+function isEmptyIngredient(ingredient: Pick<FullIngredient, "name" | "amount">) {
+    return ingredient.name.trim().length === 0 && !ingredient.amount;
 }
 
 /** The badge variant matching the color of a tag */

@@ -17,6 +17,7 @@ import {
     PaginationEllipsis,
     PaginationItem,
     PaginationLink,
+    PaginationNext,
     PaginationPrevious,
 } from "./pagination.tsx";
 import type { LinkProps } from "@tanstack/react-router";
@@ -161,9 +162,9 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
     const pageCount = table.getPageCount();
 
     return (
-        <div>
+        <div className={"flex flex-col gap-4"}>
             <Table>
-                <TableHeader className={"sticky top-0 z-50"}>
+                <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
@@ -203,7 +204,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                                             key={cell.id}
                                             className={cn(
                                                 cell.column.columnDef.meta?.className,
-                                                "overflow-hidden, text-ellipsis whitespace-nowrap",
+                                                "overflow-hidden text-ellipsis whitespace-nowrap",
                                             )}
                                         >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -216,7 +217,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                 </TableBody>
             </Table>
 
-            <Pagination>
+            <Pagination className={"py-2"}>
                 <PaginationContent>
                     <PaginationItem onClick={() => table.previousPage()}>
                         <PaginationPrevious disabled={!table.getCanPreviousPage()} />
@@ -237,7 +238,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                         ),
                     )}
                     <PaginationItem onClick={() => table.nextPage()}>
-                        <PaginationPrevious disabled={!table.getCanNextPage()} />
+                        <PaginationNext disabled={!table.getCanNextPage()} />
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>
