@@ -23,6 +23,7 @@ import { Form } from "@/components/ui/form.tsx";
 
 export type IngredientsSearchOverviewProps = object;
 
+/** The ingredients page, where ingredients are picked to search recipes by */
 export default function IngredientsSearchOverview() {
     const [t] = useTranslation("ingredients");
     const [tg] = useTranslation();

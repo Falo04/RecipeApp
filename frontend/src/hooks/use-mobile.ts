@@ -1,25 +1,18 @@
 import * as React from "react";
 
-/**
- * Represents the screen width breakpoint for mobile devices.
- * This value determines the point at which the layout should shift to a mobile-friendly design.
- * Values typically represent pixel widths.
- * @description This constant defines the screen width (in pixels) at which the layout adjusts for mobile devices.
- */
+/** The screen width in pixels below which the layout switches to its mobile design */
 const MOBILE_BREAKPOINT: number = 768;
 
 /**
  * Determines if the current screen is mobile.
- * @returns {boolean} True if the screen width is less than or equal to the MOBILE_BREAKPOINT, false otherwise.
+ *
+ * @returns Whether the screen is narrower than {@link MOBILE_BREAKPOINT}
  */
 export function useIsMobile(): boolean {
     const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
     React.useEffect(() => {
         const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-        /**
-         *
-         */
         const onChange = () => {
             setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
         };
@@ -31,24 +24,19 @@ export function useIsMobile(): boolean {
     return !!isMobile;
 }
 
-/**
- * Represents the screen width breakpoint for mobile devices.
- * This is special for sidebar. I want to have break the sidebar at a bigger width.
- * @description This constant defines the screen width (in pixels) at which the layout adjusts for mobile devices.
- */
+/** The screen width in pixels below which the sidebar collapses, wider than {@link MOBILE_BREAKPOINT} */
 const SIDEBAR_MOBILE_BREAKPOINT: number = 1024;
 
 /**
- * Determines if the current screen is mobile for sidebar
+ * Determines if the current screen is narrow enough to collapse the sidebar.
+ *
+ * @returns Whether the screen is narrower than {@link SIDEBAR_MOBILE_BREAKPOINT}
  */
 export function useIsMobileSidebar() {
     const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
     React.useEffect(() => {
         const mql = window.matchMedia(`(max-width: ${SIDEBAR_MOBILE_BREAKPOINT - 1}px)`);
-        /**
-         *
-         */
         const onChange = () => {
             setIsMobile(window.innerWidth < SIDEBAR_MOBILE_BREAKPOINT);
         };
