@@ -6,11 +6,13 @@ import { isApiError } from "@/api/error";
 
 /**
  * Builds the query client the whole app shares.
+ *
+ * A successful mutation's `mutateAsync` resolves only once the queries it
+ * outdated have been refetched.
  */
 export function createQueryClient(): QueryClient {
     return new QueryClient({
         mutationCache: new MutationCache({
-            // Returning the promise makes `mutateAsync` wait for the refetch
             onSuccess: (_data, _variables, _context, mutation, { client }) =>
                 refreshAfterMutation(client, mutation.options.mutationKey),
         }),
