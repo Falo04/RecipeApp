@@ -8,6 +8,7 @@
         "build": "tsc && vite build --sourcemap true",
         "preview": "vite preview",
         "format": "prettier --config .prettierrc.json --write src/",
+        "format-check": "prettier --config .prettierrc.json --check src/",
         "gen-api": "orval",
         "test": "vitest run",
         "ci": "bash scripts/run-ci.sh"
@@ -52,6 +53,7 @@
         "@types/react-dom": "^19.3.0",
         "@vitejs/plugin-react": "^6.1.2",
         "eslint": "^10.12.0",
+        "eslint-plugin-react": "^7.37.5",
         "jsdom": "^28.1.0",
         "orval": "^8.40.0",
         "prettier": "^3.9.9",
