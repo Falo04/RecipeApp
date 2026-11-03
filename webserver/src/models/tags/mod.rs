@@ -21,7 +21,7 @@ use crate::models::recipes::db::RecipeTagModel;
 use crate::models::tags::db::__TagModel_ValueSpaceImpl;
 use crate::models::tags::db::TagModel;
 use crate::modules::websocket::broadcast_on_commit::BroadcastOnCommit;
-use crate::modules::websocket::message::WsServerMsg;
+use crate::modules::websocket::data_change::WsServerMsg;
 use crate::utils::typed_uuid::TypedUuid;
 use crate::utils::update_builder::TrackedUpdateBuilder;
 
