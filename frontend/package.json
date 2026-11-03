@@ -9,6 +9,7 @@
         "preview": "vite preview",
         "format": "prettier --config .prettierrc.json --write src/",
         "gen-api": "orval",
+        "test": "vitest run",
         "ci": "bash scripts/run-ci.sh"
     },
     "dependencies": {
