@@ -15,13 +15,13 @@ use galvyn::rorm::fields::types::MaxStr;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::DatabaseResult;
 use crate::models::recipes::RecipeUuid;
 use crate::models::recipes::db::RecipeTagModel;
 use crate::models::tags::db::__TagModel_ValueSpaceImpl;
 use crate::models::tags::db::TagModel;
 use crate::modules::websocket::broadcast_on_commit::BroadcastOnCommit;
+use crate::modules::websocket::message::WsServerMsg;
 use crate::utils::typed_uuid::TypedUuid;
 use crate::utils::update_builder::TrackedUpdateBuilder;
 
@@ -203,7 +203,9 @@ impl Tag {
         builder
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
-        tx.broadcast_on_commit(WsServerMsg::TagsChanged);
+        // Recipes embed their tags
+        tx.broadcast_on_commit(WsServerMsg::TagsChanged)
+            .broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
     }
 
@@ -213,7 +215,9 @@ impl Tag {
         rorm::delete(&mut *tx, TagModel)
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
-        tx.broadcast_on_commit(WsServerMsg::TagsChanged);
+        // Recipes embed their tags
+        tx.broadcast_on_commit(WsServerMsg::TagsChanged)
+            .broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
     }
 }

@@ -25,8 +25,8 @@ use tracing::debug;
 use tracing::error;
 use tracing::trace;
 
-use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::modules::websocket::WebsocketManager;
+use crate::modules::websocket::message::WsServerMsg;
 
 /// Open a websocket to the frontend.
 #[get("/")]
