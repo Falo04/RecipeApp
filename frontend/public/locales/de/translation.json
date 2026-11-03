@@ -7,6 +7,9 @@
     "button": {
         "close": "Schlie\u00dfen"
     },
+    "empty": {
+        "none": "Keine"
+    },
     "error": {
         "stepper-message": "Fehler, bitte korrekte Informationen angeben"
     },
