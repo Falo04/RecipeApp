@@ -29,7 +29,7 @@ function ErrorComponent(props: ErrorComponentProps) {
                     "flex max-w-xl min-w-sm flex-col gap-6 rounded-lg border border-zinc-300 bg-white p-12 dark:border-zinc-800 dark:bg-zinc-900"
                 }
             >
-                <Heading>{props.error.toString()}</Heading>
+                <Heading>{String(props.error)}</Heading>
                 <Text>{t("error.description")}</Text>
 
                 <Button className={"w-full"} onClick={() => props.reset()}>
