@@ -81,13 +81,13 @@ pub async fn migrate(driver: &DatabaseDriver) -> Result<(), Box<dyn Error>> {
 macro_rules! custom_db_enum{
     (enum: $Enum:ident, variants: [$($Variant:ident),+$(,)?], decoder: $Decoder:ident$(,)?) => (
         impl $Enum {
-            pub fn as_str(&self) -> &'static str {
+            pub fn to_db(&self) -> &'static str {
                 match self {
                     $(Self::$Variant => stringify!($Variant),)+
                 }
             }
 
-            pub fn from_str(string: &str) -> Option<Self> {
+            pub fn from_db(string: &str) -> Option<Self> {
                 Some(match string {
                     $(stringify!($Variant) => Self::$Variant,)+
                     _ => return None,
@@ -105,7 +105,7 @@ macro_rules! custom_db_enum{
                 self,
             ) -> galvyn::rorm::fields::traits::FieldColumns<Self, galvyn::rorm::conditions::Value<'a>> {
                 [::galvyn::rorm::conditions::Value::String(
-                    ::std::borrow::Cow::Borrowed(self.as_str()),
+                    ::std::borrow::Cow::Borrowed(self.to_db()),
                 )]
             }
 
@@ -116,7 +116,7 @@ macro_rules! custom_db_enum{
                     ::galvyn::rorm::conditions::Value<'_>,
                 > {
                     [::galvyn::rorm::conditions::Value::String(
-                        ::std::borrow::Cow::Borrowed(self.as_str()),
+                        ::std::borrow::Cow::Borrowed(self.to_db()),
                     )]
                 }
 
@@ -132,7 +132,7 @@ macro_rules! custom_db_enum{
         ::galvyn::rorm::new_converting_decoder!(
             pub $Decoder,
             |value: String| -> $Enum {
-                $Enum::from_str(&value).ok_or(format!("Invalid value '{value}' for enum '{}'", stringify!($Enum)),)
+                $Enum::from_db(&value).ok_or(format!("Invalid value '{value}' for enum '{}'", stringify!($Enum)),)
             }
         );
 
