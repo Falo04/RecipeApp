@@ -20,11 +20,7 @@ mod otel;
 pub fn init(service_name: &str, otel_endpoint: Option<&Url>) -> Option<SdkTracerProvider> {
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
-    let Some(otel_endpoint) = otel_endpoint else {
-        return None;
-    };
-
-    let (otel_layer, provider) = opentelemetry_layer(service_name, otel_endpoint.as_str())
+    let (otel_layer, provider) = opentelemetry_layer(service_name, otel_endpoint?.as_str())
         .expect("Failed to initialize opentelemetry, this is a programmer or deployment error");
 
     tracing_subscriber::registry()
