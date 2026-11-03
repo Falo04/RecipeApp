@@ -60,7 +60,9 @@ class TranslationHandler:
         namespaces_by_language = {}
         for lang_dir in LOCAL_DIR.iterdir():
             if lang_dir.is_dir() and lang_dir.name in LANGUAGES:
-                namespaces_by_language[lang_dir.name] = {file.stem for file in lang_dir.glob("*.json")}
+                namespaces_by_language[lang_dir.name] = {
+                    file.stem for file in lang_dir.glob("*.json")
+                }
 
         for namespaces in namespaces_by_language.values():
             self.namespaces |= namespaces
@@ -164,7 +166,9 @@ class TranslationHandler:
                     if key not in content or not isinstance(content[key], dict):
                         content[key] = {}
                     if inner_key not in content[key]:
-                        print(f"{lang_dir.name}/{file_path.name} -- add: {key}.{inner_key}")
+                        print(
+                            f"{lang_dir.name}/{file_path.name} -- add: {key}.{inner_key}"
+                        )
                         content[key][inner_key] = f"{key}.{inner_key}"
                 else:
                     key = pattern[0]
@@ -207,10 +211,16 @@ class TranslationHandler:
                         print(f"{lang_dir.name}/{file.name} -- remove: {key}")
                         del content[key]
                     else:
-                        print(f"{lang_dir.name}/{file.name} -- remove: {key}.{inner_key}")
+                        print(
+                            f"{lang_dir.name}/{file.name} -- remove: {key}.{inner_key}"
+                        )
                         del content[key][inner_key]
 
-                for key in [key for key, value in content.items() if type(value) is dict and len(value) == 0]:
+                for key in [
+                    key
+                    for key, value in content.items()
+                    if type(value) is dict and len(value) == 0
+                ]:
                     del content[key]
 
                 with open(file, "w", encoding="utf-8") as f:
