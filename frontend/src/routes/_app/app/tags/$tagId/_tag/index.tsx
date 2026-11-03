@@ -53,11 +53,9 @@ export default function RecipeOverviewForTag() {
             description={t("heading.tags-recipes-description")}
             headingChildren={
                 <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant={"ghost"} size={"icon"} data-nolink>
-                            <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
-                            <MoreHorizontalIcon className={"w-5"} />
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant={"ghost"} size={"icon"} />} data-nolink>
+                        <span className={"sr-only"}>{tg("accessibility.open-menu")}</span>
+                        <MoreHorizontalIcon className={"w-5"} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={"end"}>
                         <DropdownMenuItem
