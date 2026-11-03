@@ -1,7 +1,7 @@
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-    const theme = localStorage.getItem("theme") ?? "dark"
+    const theme = localStorage.getItem("theme") ?? "dark";
 
     return (
         <Sonner
