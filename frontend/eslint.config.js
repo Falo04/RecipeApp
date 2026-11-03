@@ -6,9 +6,9 @@ import jsdoc from "eslint-plugin-jsdoc";
 export default defineConfig([
     tseslint.configs.recommended,
     pluginReact.configs.flat.recommended,
-    jsdoc.configs["flat/recommended"],
+    jsdoc.configs["flat/recommended-typescript"],
     {
-        ignores: ["src/api/generate/**", "src/components/ui/**", "eslint.config.js", "src/index.css"],
+        ignores: ["src/api/generated/**", "src/components/ui/**", "eslint.config.js", "src/index.css"],
     },
     {
         files: ["**/*.{ts,tsx}"],
@@ -17,8 +17,9 @@ export default defineConfig([
             parserOptions: { project: ["./tsconfig.json"] },
         },
         plugins: { jsdoc },
+        settings: { react: { version: "19" } },
         rules: {
-            "no-console": "warn",
+            "no-console": ["warn", { allow: ["info", "warn", "error"] }],
             "no-alert": "warn",
 
             // TypeScript
@@ -34,6 +35,7 @@ export default defineConfig([
             "jsdoc/check-indentation": "warn",
             "jsdoc/require-returns": "off",
             "jsdoc/require-param": "off",
+            "jsdoc/tag-lines": ["warn", "any", { startLines: 1 }],
         },
     },
 ]);
