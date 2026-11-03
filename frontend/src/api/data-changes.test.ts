@@ -106,15 +106,17 @@ describe("every mutation orval generated", () => {
         expect(GENERATED_MUTATION_KEYS.length).toBeGreaterThan(0);
     });
 
-    test.each(GENERATED_MUTATION_KEYS)("%s says which data it changes", async (_name, getMutationKey) => {
-        const client = createQueryClient();
-        cache(client, ME);
+    test.each(GENERATED_MUTATION_KEYS)(
+        "%s is listed, so it leaves the logged-in user fresh",
+        async (_name, getMutationKey) => {
+            const client = createQueryClient();
+            cache(client, ME);
 
-        await mutate(client, getMutationKey());
+            await mutate(client, getMutationKey());
 
-        // No mutation changes the logged-in user, only the fallback for unlisted ones outdates it
-        expect(isOutdated(client, ME)).toBe(false);
-    });
+            expect(isOutdated(client, ME)).toBe(false);
+        },
+    );
 });
 
 describe("when the server reports a data change", () => {

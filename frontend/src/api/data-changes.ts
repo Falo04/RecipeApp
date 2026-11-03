@@ -31,16 +31,16 @@ type MutationEffect = ReadonlyArray<DataChange> | "after-websocket";
  *
  * Mirrors the data changes the server broadcasts for each write. A recipe
  * write may create ingredients, which isn't worth finding out for one refetch.
+ * Tag writes outdate recipes too, since recipes embed their tags.
+ * `getRecipesByTag` is generated as a mutation but only reads.
  */
 const CHANGED_BY: Record<string, MutationEffect> = {
     createRecipe: ["RecipesChanged", "IngredientsChanged"],
     updateRecipe: ["RecipesChanged", "IngredientsChanged"],
     deleteRecipe: ["RecipesChanged"],
     createTag: ["TagsChanged"],
-    // Recipes embed their tags
     updateTag: ["TagsChanged", "RecipesChanged"],
     deleteTag: ["TagsChanged", "RecipesChanged"],
-    // Generated as a mutation, but only reads
     getRecipesByTag: [],
     logout: [],
 };
@@ -48,18 +48,23 @@ const CHANGED_BY: Record<string, MutationEffect> = {
 /**
  * Refetches the queries each data change the server reports makes outdated.
  *
+ * A reconnect refetches every query, since data changes reported while the
+ * socket was down are lost.
+ *
  * @param queryClient The client whose cache the data changes outdate
  * @param websocket The connection the server reports data changes over
  */
 export function refreshOnDataChanges(queryClient: QueryClient, websocket: WebSocketManager) {
     websocket.addEventListener("message", (change) => void refresh(queryClient, [change]));
 
-    // Data changes reported while the socket was down are lost, so refetch everything
     websocket.addEventListener("state.connected", () => void queryClient.invalidateQueries());
 }
 
 /**
  * Refetches the queries a successful mutation made outdated.
+ *
+ * A mutation missing from the table may have changed anything, so it refetches
+ * every query.
  *
  * @param queryClient The client whose cache the mutation outdated
  * @param mutationKey The key of the mutation that succeeded
@@ -69,7 +74,6 @@ export async function refreshAfterMutation(queryClient: QueryClient, mutationKey
     const [name] = mutationKey ?? [];
     const changes: MutationEffect | undefined = typeof name === "string" ? CHANGED_BY[name] : undefined;
 
-    // Not knowing what a mutation changed, anything may be outdated
     if (changes === undefined) return queryClient.invalidateQueries();
     if (changes === "after-websocket") return;
 

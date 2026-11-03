@@ -187,6 +187,8 @@ impl Tag {
     }
 
     /// Update an existing tag.
+    ///
+    /// Reports recipes as changed too, since they embed their tags.
     #[instrument(name = "Tag::update", skip(tx))]
     pub async fn update(
         &mut self,
@@ -203,19 +205,19 @@ impl Tag {
         builder
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
-        // Recipes embed their tags
         tx.broadcast_on_commit(WsServerMsg::TagsChanged)
             .broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
     }
 
     /// Delete a tag by its UUID.
+    ///
+    /// Reports recipes as changed too, since they embed their tags.
     #[instrument(name = "Tag::delete", skip(tx))]
     pub async fn delete(self, tx: &mut Transaction) -> DatabaseResult<()> {
         rorm::delete(&mut *tx, TagModel)
             .condition(TagModel.uuid.equals(self.uuid.into_inner()))
             .await?;
-        // Recipes embed their tags
         tx.broadcast_on_commit(WsServerMsg::TagsChanged)
             .broadcast_on_commit(WsServerMsg::RecipesChanged);
         Ok(())
