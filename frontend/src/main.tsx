@@ -10,10 +10,12 @@ import "./i18n";
 import "./styles.css";
 import "./styles.css";
 import { Toaster } from "sonner";
-import { createQueryClient, invalidateOnWebsocketMessages } from "./api/query-client.ts";
+import { createQueryClient } from "./api/query-client.ts";
+import { refreshOnDataChanges } from "./api/data-changes.ts";
+import WS from "./api/websockets.ts";
 
 const queryClient = createQueryClient();
-invalidateOnWebsocketMessages(queryClient);
+refreshOnDataChanges(queryClient, WS);
 
 // Create a new router instance
 const router = createRouter({
