@@ -9,11 +9,11 @@ use galvyn::rorm::fields::types::MaxStr;
 use tracing::instrument;
 use uuid::Uuid;
 
-use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::models::DatabaseResult;
 use crate::models::ingredients::db::__IngredientModel_ValueSpaceImpl;
 use crate::models::ingredients::db::IngredientModel;
 use crate::modules::websocket::broadcast_on_commit::BroadcastOnCommit;
+use crate::modules::websocket::message::WsServerMsg;
 use crate::utils::typed_uuid::TypedUuid;
 
 pub(in crate::models) mod db;

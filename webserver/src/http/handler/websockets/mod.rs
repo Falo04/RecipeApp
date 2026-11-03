@@ -2,7 +2,6 @@ use galvyn::core::GalvynRouter;
 use galvyn::openapi::OpenapiRouterExt;
 
 mod handler;
-pub mod schema;
 
 pub fn initialize() -> GalvynRouter {
     GalvynRouter::new()
