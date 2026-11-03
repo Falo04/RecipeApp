@@ -1,7 +1,6 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { cn } from "@/utils/utils.ts";
 import { clsx } from "clsx";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
