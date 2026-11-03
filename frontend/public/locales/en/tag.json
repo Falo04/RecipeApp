@@ -19,6 +19,7 @@
         "no-tags-description": "You haven't stored any tags. Create one to organize your recipes."
     },
     "error": {
+        "name-already-exists": "A tag with this name already exists",
         "name-required": "Tag name is required.",
         "too-long": "Name is too long, must be 255 characters or fewer."
     },
@@ -35,6 +36,7 @@
         "empty": "No tags found"
     },
     "toast": {
+        "created-success": "Tag created successfully",
         "deleted-success": "Tag deleted successfully",
         "updated-success": "Tag updated successfully"
     }

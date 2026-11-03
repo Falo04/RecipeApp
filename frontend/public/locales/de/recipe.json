@@ -44,7 +44,7 @@
         "ingredients-title": "Gib deine Zutaten ein",
         "overview-description": "Allgemeine Informationen zum Rezept",
         "overview-title": "Rezept\u00fcbersicht",
-        "recipe": "heading.recipe",
+        "recipe": "Rezept: {{object}}",
         "step-title": "Gib deine Schritte ein",
         "steps": "Anleitung:",
         "update": "Rezept aktualisieren",

@@ -19,6 +19,7 @@
         "no-tags-description": "Du hast noch keine Tags gespeichert. Erstelle einen, um deine Rezepte zu organisieren."
     },
     "error": {
+        "name-already-exists": "Ein Tag mit diesem Namen existiert bereits",
         "name-required": "Name vom Tag ben\u00f6tigt.",
         "too-long": "Name zu lang, maximal 255 Zeichen erlaubt."
     },
@@ -35,6 +36,7 @@
         "empty": "Keine Tags gefunden"
     },
     "toast": {
+        "created-success": "Tag erfolgreich erstellt",
         "deleted-success": "Tag erfolgreich gel\u00f6scht",
         "updated-success": "Tag erfolgreich aktualisiert"
     }
