@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator.tsx";
 
 export type RecipeDetailProps = object;
 
+/** The recipe page, showing its ingredients, steps and tags */
 export function RecipeDetail() {
     const [t] = useTranslation("recipe");
     const [tg] = useTranslation();
