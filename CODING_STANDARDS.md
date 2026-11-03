@@ -21,8 +21,7 @@ predates a rule stays as it is until a change touches it.
   intra-doc links _(checked)_.
 - **Transactions**: every rorm transaction is resolved explicitly on every path:
   `commit` on success and on read-only paths, `rollback` before an early `Ok(..)`
-  that discards the writes. No `ast-grep-ignore` _(checked: `uncommitted-transaction*`
-  in `.ast-grep/rules/`)_.
+  that discards the writes.
 - **Output**: long-running code logs through `tracing`. One-shot cli subcommands may
   print their result for the operator (an invite link, a sync report) with `println!`,
   and config errors before tracing init go to `eprintln!`.
