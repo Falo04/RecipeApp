@@ -5,8 +5,8 @@ use galvyn::rorm::db::transaction::Transaction;
 use galvyn::rorm::db::transaction::TransactionHook;
 use tracing::error;
 
-use crate::http::handler::websockets::schema::WsServerMsg;
 use crate::modules::websocket::WebsocketManager;
+use crate::modules::websocket::message::WsServerMsg;
 
 /// Broadcasts accumulated during a transaction, sent once it commits successfully
 #[derive(Default)]

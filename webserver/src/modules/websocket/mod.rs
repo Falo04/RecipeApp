@@ -14,9 +14,10 @@ use tokio::time::timeout;
 use tracing::error;
 use tracing::warn;
 
-use crate::http::handler::websockets::schema::WsServerMsg;
+use crate::modules::websocket::message::WsServerMsg;
 
 pub mod broadcast_on_commit;
+pub mod message;
 
 /// How long a client has to accept a broadcast before its connection is closed
 const SEND_TIMEOUT: Duration = Duration::from_secs(5);
