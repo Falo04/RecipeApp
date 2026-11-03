@@ -1,4 +1,4 @@
-//! The messages the websocket pushes to clients
+//! The data changes the websocket pushes to clients
 
 use galvyn::core::re_exports::schemars;
 use galvyn::core::re_exports::schemars::JsonSchema;
