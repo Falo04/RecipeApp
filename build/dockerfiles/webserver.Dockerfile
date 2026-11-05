@@ -1,11 +1,6 @@
-FROM rust:1.95.0-slim-trixie@sha256:e14e87345b4d5964ddcc3491d27ee046a0f23820f340c3c1e24da6880141f7c0 AS builder
+FROM rust:1.98.1-alpine@sha256:7cc1c22d77d9432f7fe012a70e6d3e555af54c2a6832700ed7d553f1769ae89f AS builder
 
-RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends musl-tools
-EOF
-
-ENV CC_aarch64_unknown_linux_musl=musl-gcc
+RUN apk add --no-cache musl-dev
 
 RUN rustup target add aarch64-unknown-linux-musl
 
@@ -21,7 +16,7 @@ cp -v /build/target/aarch64-unknown-linux-musl/release/webserver /build/service
 EOF
 
 
-FROM dhi.io/alpine-base:3.23@sha256:27d91b0ae2dbb1bbf89398f4ee4564a0c7a14a82c34c8cffd3b2687033a9d97a AS final
+FROM alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS final
 
 COPY --from=builder /build/service /usr/local/bin/service
 COPY ./webserver/migrations /migrations

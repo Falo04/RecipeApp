@@ -1,0 +1,146 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Self-hosted via .github/workflows/renovate.yaml as a GitHub App, so platformCommit can produce the signed commits main requires."
+  ],
+  "extends": ["config:recommended", ":semanticCommitsDisabled"],
+  "labels": ["renovate"],
+  "timezone": "Europe/Berlin",
+  "schedule": ["before 6am on monday"],
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "platformCommit": "enabled",
+  // supply chain cooldown: a compromised release is usually yanked within days;
+  // vulnerability fixes skip it (vulnerabilityAlerts defaults to minimumReleaseAge null)
+  "minimumReleaseAge": "7 days",
+  // flexible: a branch moves to the newest release past the cooldown; strict holds back the
+  // whole branch, even a requested rebase, while a newer release is still cooling down
+  "internalChecksFilter": "flexible",
+  // GitHub alerts need Dependabot alerts enabled and read access for the app;
+  // OSV works without either, but only covers direct dependencies
+  "osvVulnerabilityAlerts": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update versions annotated with inline renovate comments",
+      "managerFilePatterns": [
+        "/^\\.github/.+/[^/]+\\.ya?ml$/",
+        "/^build/dockerfiles/[^/]+\\.Dockerfile$/"
+      ],
+      "matchStrings": [
+        // Match lines like:
+        // # renovate: datasource=github-releases depName=EmbarkStudios/cargo-deny versioning=semver
+        // CARGO_DENY_VERSION=0.20.2
+        // or like:
+        // # renovate: datasource=npm depName=swagger-ui-dist
+        // ARG SWAGGER_UI_VERSION=5.18.2
+        // or like:
+        // # renovate: datasource=npm depName=corepack
+        // ARG COREPACK_VERSION=0.36.0
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\n[^\\S\\n]*(?:ARG[^\\S\\n]+)?\\S+\\s*[=:]\\s*[\"']?v?(?<currentValue>[^\"'\\s]+)"
+      ]
+    }
+  ],
+  // GitHub merges each PR once the required ci-gate check passes, independent of Renovate's
+  // runs, which stop after two automerges each
+  "platformAutomerge": true,
+  "automergeType": "pr",
+  // GitHub signs squash commits (main requires signatures); branches need not be up to date
+  "automergeStrategy": "squash",
+  "rebaseWhen": "conflicted",
+  "packageRules": [
+    {
+      "description": "Automerge Rust patch updates of all crates",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge Rust minor updates of stable crates",
+      "matchManagers": ["cargo"],
+      "matchPackageNames": [
+        "serde",
+        "tokio",
+        "anyhow",
+        "thiserror",
+        "tracing",
+        "tracing-subscriber",
+        "clap",
+        "uuid",
+        "url",
+        "futures-util",
+        "secrecy",
+        "time",
+        "tower-http",
+        "regex"
+      ],
+      "matchUpdateTypes": ["minor"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge all frontend devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge frontend utility dependencies (patch)",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "clsx",
+        "class-variance-authority",
+        "tailwind-merge",
+        "sonner",
+        "cmdk",
+        "lucide-react",
+        "react-i18next",
+        "i18next-browser-languagedetector",
+        "i18next-http-backend"
+      ],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge Dockerfile base images (patch, minor and digest)",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["patch", "minor", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge GitHub Actions (patch and digest)",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Group eslint packages",
+      "groupName": "eslint packages",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "matchPackageNames": ["/eslint/"],
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
+    },
+    {
+      "description": "Move the Rust toolchain of CI and every Dockerfile in one PR, never automerged since new clippy lints break -D warnings",
+      "groupName": "rust toolchain",
+      "matchDepNames": ["rust"],
+      "matchDatasources": ["docker", "rust-version"],
+      "automerge": false
+    },
+    {
+      "description": "Move Node of CI and every Dockerfile in one PR, majors are never automerged",
+      "groupName": "node",
+      "matchDepNames": ["node"],
+      "matchDatasources": ["docker", "github-releases", "node-version"]
+    },
+    {
+      "description": "Major updates are always reviewed by hand",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ]
+}

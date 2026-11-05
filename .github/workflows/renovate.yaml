@@ -1,0 +1,44 @@
+name: Renovate
+
+# Runs hourly so vulnerability fixes land within the hour; regular updates are held to the
+# schedule in renovate.json. Editing the Dependency Dashboard issue triggers a run as well.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  issues:
+    types: [ edited ]
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  renovate:
+    if: >-
+      github.event_name != 'issues' || (
+        github.event.issue.title == 'Dependency Dashboard' &&
+        github.event.issue.user.type == 'Bot' &&
+        github.event.sender.type != 'Bot'
+      )
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Get app token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+
+      - name: Renovate
+        uses: renovatebot/github-action@43b963bf5dd5e57f1f95c59765a018d782870211 # v46.3.11
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+        env:
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_ONBOARDING: "false"
+          RENOVATE_REQUIRE_CONFIG: required
+          RENOVATE_PLATFORM_COMMIT: enabled

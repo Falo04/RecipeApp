@@ -8,26 +8,32 @@ apt-get update
 apt-get install wget -y
 EOF
 
+# renovate: datasource=npm depName=swagger-ui-dist
+ARG SWAGGER_UI_VERSION=5.18.2
+
 RUN <<EOF
 set -e
-wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.18.2.tar.gz
-tar xf v5.18.2.tar.gz
-mv swagger-ui-5.18.2/dist swagger-ui
+wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${SWAGGER_UI_VERSION}.tar.gz
+tar xf v${SWAGGER_UI_VERSION}.tar.gz
+mv swagger-ui-${SWAGGER_UI_VERSION}/dist swagger-ui
 EOF
 
-FROM node:25-trixie-slim AS build-frontend
+FROM node:26.13.0-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072 AS build-frontend
+
+# renovate: datasource=npm depName=corepack
+ARG COREPACK_VERSION=0.36.0
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN npm install --global corepack@${COREPACK_VERSION} && corepack enable
 
 WORKDIR /app
 
-COPY ./frontend/package.json .
-COPY ./frontend/package-lock.json .
 COPY ./frontend/ .
 
-RUN --mount=type=cache,target=./node_modules/ \
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store/ \
   <<EOF
 set -e
-npm clean-install
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 mv ./dist /frontend
 EOF
 
