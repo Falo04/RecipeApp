@@ -25,5 +25,9 @@ allow = [
 [licenses.private]
 ignore = true
 
+[bans]
+# Duplicate versions come from upstream crates lagging behind, even with every dependency up to date
+multiple-versions = "allow"
+
 [sources]
 unknown-git = "deny"

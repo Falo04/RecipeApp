@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import React, { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontalIcon, PenBoxIcon, PlusIcon, TagIcon, Trash2Icon } from "lucide-react";
 import { Text } from "@/components/ui/text.tsx";
 import {
@@ -15,7 +14,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { TableHead } from "@/components/ui/table.tsx";
-import { DataTable, useDataTabel } from "@/components/ui/data-table.tsx";
+import { DataTable, useDataTabel, type DataTableColumnDef } from "@/components/ui/data-table.tsx";
 import { FilterBar } from "@/components/ui/filter-bar.tsx";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty.tsx";
 import { EditTagDialog } from "@/components/dialogs/edit-tag.tsx";
@@ -50,7 +49,7 @@ export function TagsOverview() {
     const [openEdit, setOpenEdit] = React.useState<SimpleTag>();
     const [openDelete, setOpenDelete] = React.useState<string | undefined>(undefined);
 
-    const columns = React.useMemo<Array<ColumnDef<SimpleTag, string>>>(
+    const columns = React.useMemo<Array<DataTableColumnDef<SimpleTag>>>(
         () => [
             {
                 id: "name",
