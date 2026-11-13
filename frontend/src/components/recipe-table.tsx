@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, type LinkProps } from "@tanstack/react-router";
 import {
@@ -25,7 +24,7 @@ import {
 } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import { TableHead } from "./ui/table";
-import { DataTable, useDataTabel } from "./ui/data-table";
+import { DataTable, useDataTabel, type DataTableColumnDef } from "./ui/data-table";
 import { BadgeButton, badgeVariants } from "./ui/badge";
 import type { VariantProps } from "class-variance-authority";
 import { DeleteRecipeDialog } from "@/components/dialogs/delete-recipe.tsx";
@@ -63,7 +62,7 @@ export default function RecipeTable(props: RecipeTableProps) {
 
     const [openDelete, setOpenDelete] = React.useState<string | undefined>();
 
-    const columns = React.useMemo<Array<ColumnDef<SimpleRecipeWithTags, string>>>(
+    const columns = React.useMemo<Array<DataTableColumnDef<SimpleRecipeWithTags>>>(
         () => [
             {
                 id: "name",

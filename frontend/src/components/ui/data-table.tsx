@@ -1,11 +1,20 @@
 import {
+    columnFilteringFeature,
+    createFilteredRowModel,
+    createPaginatedRowModel,
+    createSortedRowModel,
+    filterFn_includesString,
     flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable,
+    globalFilteringFeature,
+    metaHelper,
+    rowPaginationFeature,
+    rowSortingFeature,
+    sortFn_alphanumeric,
+    sortFn_text,
+    tableFeatures,
+    useTable,
     type ColumnDef,
+    type ReactTable,
     type RowData,
     type SortingState,
 } from "@tanstack/react-table";
@@ -23,18 +32,37 @@ import {
 import type { LinkProps } from "@tanstack/react-router";
 import { cn } from "cn";
 
-declare module "@tanstack/react-table" {
-    interface ColumnMeta<TData extends RowData, TValue> {
-        /** Extra classes applied to every {@link TableCell} of this column */
-        className?: string;
-    }
-}
+/** Meta every {@link DataTable} column may set */
+type DataTableColumnMeta = {
+    /** Extra classes applied to every {@link TableCell} of this column */
+    className?: string;
+};
 
-export type UseDataTableParams<T> = {
+/** The table features every {@link DataTable} uses: sorting, global filtering and pagination */
+const dataTableFeatures = tableFeatures({
+    columnFilteringFeature,
+    globalFilteringFeature,
+    rowSortingFeature,
+    rowPaginationFeature,
+    filteredRowModel: createFilteredRowModel(),
+    sortedRowModel: createSortedRowModel(),
+    paginatedRowModel: createPaginatedRowModel(),
+    filterFns: { includesString: filterFn_includesString },
+    sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
+    columnMeta: metaHelper<DataTableColumnMeta>(),
+});
+
+/** The features type of a {@link DataTable} */
+export type DataTableFeatures = typeof dataTableFeatures;
+
+/** A column definition of a {@link DataTable} */
+export type DataTableColumnDef<T extends RowData> = ColumnDef<DataTableFeatures, T, unknown>;
+
+export type UseDataTableParams<T extends RowData> = {
     /** The list of data objects to show in the table */
     data: T[];
     /** List of column defintions */
-    columns: ColumnDef<T, string>[];
+    columns: DataTableColumnDef<T>[];
     /**
      * Specifies how the sorting is initially done before user interaction
      *
@@ -64,7 +92,7 @@ export type UseDataTableParams<T> = {
 };
 
 /** Sets up a TanStack table instance with sorting, filterting and pagination */
-export function useDataTabel<T>(params: UseDataTableParams<T>) {
+export function useDataTabel<T extends RowData>(params: UseDataTableParams<T>) {
     const {
         data,
         columns,
@@ -93,7 +121,8 @@ export function useDataTabel<T>(params: UseDataTableParams<T>) {
             : base;
     }, [isGrouped, sorting]);
 
-    const table = useReactTable({
+    const table = useTable({
+        features: dataTableFeatures,
         data,
         columns,
         state: { sorting: effectiveSorting, pagination: { pageIndex, pageSize }, globalFilter },
@@ -104,10 +133,6 @@ export function useDataTabel<T>(params: UseDataTableParams<T>) {
         },
         globalFilterFn: "includesString",
         autoResetPageIndex: false,
-        getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
     });
 
     const pageCount = table.getPageCount();
@@ -133,9 +158,9 @@ export function useDataTabel<T>(params: UseDataTableParams<T>) {
 /**
  * The properties for {@link DataTable}
  */
-export type DataTableProps<Row> = {
+export type DataTableProps<Row extends RowData> = {
     /** Table to render */
-    table: ReturnType<typeof useReactTable<Row>>;
+    table: ReactTable<DataTableFeatures, Row>;
     /**
      * When set, a separator is drawn between connsecutive rows
      * whose value for this column differ.
@@ -152,13 +177,13 @@ export type DataTableProps<Row> = {
 /**
  * The DataTable
  */
-export function DataTable<Row>(props: DataTableProps<Row>) {
+export function DataTable<Row extends RowData>(props: DataTableProps<Row>) {
     const { table, groupBy } = props;
     const { rows } = table.getRowModel();
     const groupCol = groupBy?.[0];
     const colSpan = table.getAllLeafColumns().length;
 
-    const pageIndex = table.getState().pagination.pageIndex;
+    const pageIndex = table.state.pagination.pageIndex;
     const pageCount = table.getPageCount();
 
     return (
@@ -199,7 +224,7 @@ export function DataTable<Row>(props: DataTableProps<Row>) {
                                     params={props.rowParams?.(row.original)}
                                     search={props.rowSearch?.(row.original)}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
+                                    {row.getAllCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
                                             className={cn(
