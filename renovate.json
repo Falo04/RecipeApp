@@ -13,10 +13,10 @@
   // supply chain cooldown: a compromised release is usually yanked within days;
   // vulnerability fixes skip it (vulnerabilityAlerts defaults to minimumReleaseAge null)
   "minimumReleaseAge": "7 days",
-  // strict: no branch or PR exists until a release is past the cooldown, so CI never runs a
-  // release that is still cooling down (flexible would fall back to it when nothing has passed);
-  // the cost is that a branch is held back, even a requested rebase, while a newer release cools
-  "internalChecksFilter": "strict",
+  // flexible: a branch moves to the newest release past the cooldown; strict would hold back the
+  // whole branch while a newer release cools, so packages releasing more than weekly never get a
+  // PR in the weekly schedule window
+  "internalChecksFilter": "flexible",
   "prCreation": "not-pending",
   // GitHub alerts need Dependabot alerts enabled and read access for the app;
   // OSV works without either, but only covers direct dependencies
