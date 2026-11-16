@@ -211,7 +211,7 @@ importers:
         version: 1.33.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@tanstack/react-query':
         specifier: ^5.105.3
-        version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
+        version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
       '@tanstack/react-router':
         specifier: ^1.170.46
         version: 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -281,7 +281,7 @@ importers:
         version: 0.5.0(@typescript-eslint/utils@8.72.1(@typescript/typescript6@6.0.2)(eslint@10.14.0(jiti@2.7.0)))(@typescript/typescript6@6.0.2)(eslint@10.14.0(jiti@2.7.0))
       '@tanstack/react-query-devtools':
         specifier: ^5.105.3
-        version: 5.106.1(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)
+        version: 5.107.1(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -317,7 +317,7 @@ importers:
         version: 30.1.3
       orval:
         specifier: ^8.46.0
-        version: 8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))(prettier@3.9.10)(zod@4.6.7)
+        version: 8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(prettier@3.9.10)(zod@4.6.7)
       prettier:
         specifier: ^3.9.10
         version: 3.9.10
@@ -1822,11 +1822,11 @@ packages:
     resolution: {integrity: sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w==}
     engines: {node: '>=18'}
 
-  '@tanstack/query-core@5.106.1':
-    resolution: {integrity: sha512-erYv/UACddcdgjOL2ixmFdK6tO/AVBeUcTCOtX2N51yZpDQ2U7KJ+xgB/bCNfsF3uoCDTqGHEEbDiFsIO9YUmQ==}
+  '@tanstack/query-core@5.107.1':
+    resolution: {integrity: sha512-PSyAik11oQBEVOiVy5hjZWHmoUqOXqK1WYy4v55mcxozEfKaQgpUMsgnXhWjuESzSht8JfzqMS1m6M/9CpNgvg==}
 
-  '@tanstack/query-devtools@5.106.1':
-    resolution: {integrity: sha512-SEDgVRKVTGS4mjhylu3pjIIy9waf7r6se64yoe99hFZUAumbEsuzjVz896wJMvAWGZmxjfIDPrjBad4Gri20fg==}
+  '@tanstack/query-devtools@5.107.1':
+    resolution: {integrity: sha512-cZvgIPNvsh57mM3yTTwuL2GUMmMp5XR+3k5r2UJDyStmPYCqSwZf8z7OulgA4X8vISziAG5PoykbQ1q+2zemdA==}
 
   '@tanstack/react-form@1.33.5':
     resolution: {integrity: sha512-LlRB28qJwO/QCGaHvWnbdh4haBgTFiZVmzA2uzxSBS3YA7/IqrQ6HOBK70CkFQ+DbflZ7NawsmSln13h5iIdTA==}
@@ -1837,18 +1837,18 @@ packages:
       '@tanstack/react-start':
         optional: true
 
-  '@tanstack/react-query-devtools@5.106.1':
-    resolution: {integrity: sha512-onUerFS3Ig/g+hcT08Dlb+p+rDORlBHyZCGj1mqJC7dgA5wZyw/XAdhdPFqDFRcZfPNwIJRBkuAL6BZzHacO7A==}
+  '@tanstack/react-query-devtools@5.107.1':
+    resolution: {integrity: sha512-A3q9X3iOxtlz1jU/ou7t9CFvNHT84rTMofS1YEkFcBalvwotZ/RJKPDsX1NsQVl10J8XwN0OYMSfdjgIElt0sg==}
     peerDependencies:
-      '@tanstack/react-query': ^5.106.1
+      '@tanstack/react-query': ^5.107.1
       '@types/react': ^18 || ^19
       react: ^18 || ^19
     peerDependenciesMeta:
       '@types/react':
         optional: true
 
-  '@tanstack/react-query@5.106.1':
-    resolution: {integrity: sha512-ORDvJG/DSfmlFL9lQ8GDkE0VjtQbLeRDY7BL8xjKkQFGLfjFGfNWNuteWgPqA2gPJgLLuWfQ7IX0FlsHCJriyg==}
+  '@tanstack/react-query@5.107.1':
+    resolution: {integrity: sha512-udCOOLp3ZAheUrIHLCe+ZZge6nr2ZUrGMSWcCuXsjY1Bf2JeeE09oxst97PILiCY6N8xo/7bIo3Hvz13zh06FA==}
     peerDependencies:
       '@types/react': ^18 || ^19
       react: ^18 || ^19
@@ -5396,12 +5396,12 @@ snapshots:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/query@8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))':
+  '@orval/query@8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))':
     dependencies:
       '@orval/core': 8.47.0(@modelcontextprotocol/server@2.4.0)
       '@orval/fetch': 8.47.0(@modelcontextprotocol/server@2.4.0)
     optionalDependencies:
-      '@tanstack/react-query': 5.106.1(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/react-query': 5.107.1(@types/react@19.3.0)(react@19.3.1)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
@@ -5728,7 +5728,7 @@ snapshots:
       '@scalar/types': 0.28.0
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
-      ajv-formats: 3.0.1(ajv@8.20.0)
+      ajv-formats: 3.0.1
       yaml: 2.9.1
 
   '@scalar/openapi-parser@0.29.21':
@@ -5978,16 +5978,16 @@ snapshots:
 
   '@tanstack/pacer-lite@0.1.1': {}
 
-  '@tanstack/query-core@5.106.1': {}
+  '@tanstack/query-core@5.107.1': {}
 
-  '@tanstack/query-devtools@5.106.1(csstype@3.2.3)':
+  '@tanstack/query-devtools@5.107.1(csstype@3.2.3)':
     dependencies:
       '@kobalte/core': 0.13.14(solid-js@1.9.19)
       '@solid-primitives/keyed': 1.5.3(solid-js@1.9.19)
       '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.19)
       '@solid-primitives/storage': 1.3.11(solid-js@1.9.19)
       '@tanstack/match-sorter-utils': 9.2.6
-      '@tanstack/query-core': 5.106.1
+      '@tanstack/query-core': 5.107.1
       '@tanstack/solid-virtual': 3.13.53(solid-js@1.9.19)
       clsx: 2.1.1
       goober: 2.1.19(csstype@3.2.3)
@@ -6005,19 +6005,19 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
-  '@tanstack/react-query-devtools@5.106.1(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)':
+  '@tanstack/react-query-devtools@5.107.1(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-devtools': 5.106.1(csstype@3.2.3)
-      '@tanstack/react-query': 5.106.1(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/query-devtools': 5.107.1(csstype@3.2.3)
+      '@tanstack/react-query': 5.107.1(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1)':
+  '@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.106.1
+      '@tanstack/query-core': 5.107.1
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
@@ -6440,12 +6440,12 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@2.1.1(ajv@8.20.0):
-    optionalDependencies:
+  ajv-formats@2.1.1:
+    dependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1(ajv@8.20.0):
-    optionalDependencies:
+  ajv-formats@3.0.1:
+    dependencies:
       ajv: 8.20.0
 
   ajv@6.15.0:
@@ -6679,7 +6679,7 @@ snapshots:
   conf@10.2.0:
     dependencies:
       ajv: 8.20.0
-      ajv-formats: 2.1.1(ajv@8.20.0)
+      ajv-formats: 2.1.1
       atomically: 1.7.0
       debounce-fn: 4.0.0
       dot-prop: 6.0.1
@@ -7923,7 +7923,7 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  orval@8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))(prettier@3.9.10)(zod@4.6.7):
+  orval@8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(prettier@3.9.10)(zod@4.6.7):
     dependencies:
       '@commander-js/extra-typings': 15.1.0(commander@15.1.0)
       '@orval/angular': 8.47.0(@modelcontextprotocol/server@2.4.0)
@@ -7935,7 +7935,7 @@ snapshots:
       '@orval/mcp': 8.47.0(@modelcontextprotocol/server@2.4.0)(zod@4.6.7)
       '@orval/mock': 8.47.0(@modelcontextprotocol/server@2.4.0)
       '@orval/pinia-colada': 8.47.0(@modelcontextprotocol/server@2.4.0)
-      '@orval/query': 8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1))
+      '@orval/query': 8.47.0(@modelcontextprotocol/server@2.4.0)(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))
       '@orval/solid-start': 8.47.0(@modelcontextprotocol/server@2.4.0)
       '@orval/swr': 8.47.0(@modelcontextprotocol/server@2.4.0)
       '@orval/valibot': 8.47.0(@modelcontextprotocol/server@2.4.0)
