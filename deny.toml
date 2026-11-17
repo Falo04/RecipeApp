@@ -5,6 +5,7 @@ db-urls = ["https://github.com/rustsec/advisory-db"]
 yanked = "deny"
 ignore = [
   "RUSTSEC-2023-0071", # not patched yet
+  "RUSTSEC-2026-0543", # Chrono is unmainted, wait until all dependencies updated 
 ]
 
 [licenses]
