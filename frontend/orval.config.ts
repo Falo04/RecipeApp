@@ -16,8 +16,7 @@ export default defineConfig({
         },
         output: {
             target: "./src/api/generated/endpoints.ts",
-            schemas: "./src/api/generated/model",
-            mode: "tags-split",
+            mode: "single",
             client: "react-query",
             httpClient: "fetch",
             clean: true,
