@@ -9,7 +9,7 @@ apt-get install wget -y
 EOF
 
 # renovate: datasource=npm depName=swagger-ui-dist
-ARG SWAGGER_UI_VERSION=5.34.1
+ARG SWAGGER_UI_VERSION=5.35.0
 
 RUN <<EOF
 set -e
